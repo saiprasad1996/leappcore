@@ -1,0 +1,24 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #f4c652;
+  --color-background-light: #f8f7f6;
+  --color-background-dark: #221d10;
+  --color-leapp-yellow: #ffc700;
+  --color-leapp-black: #1e1e1e;
+  
+  --font-display: "Plus Jakarta Sans", "Noto Sans", sans-serif;
+  
+  --radius: 0.5rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+  --radius-full: 9999px;
+}
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@layer base {
+  .dark {
+    color-scheme: dark;
+  }
+}

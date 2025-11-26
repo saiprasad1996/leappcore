@@ -1,0 +1,75 @@
+{
+    "actions": [],
+    "allow_rename": 1,
+    "creation": "2024-11-26 17:50:00.000000",
+    "doctype": "DocType",
+    "engine": "InnoDB",
+    "field_order": [
+        "conversation",
+        "sender",
+        "body",
+        "attachments",
+        "sent_at",
+        "seen_at"
+    ],
+    "fields": [
+        {
+            "fieldname": "conversation",
+            "fieldtype": "Link",
+            "in_list_view": 1,
+            "label": "Conversation",
+            "options": "Conversation"
+        },
+        {
+            "fieldname": "sender",
+            "fieldtype": "Link",
+            "in_list_view": 1,
+            "label": "Sender",
+            "options": "User"
+        },
+        {
+            "fieldname": "body",
+            "fieldtype": "Small Text",
+            "label": "Message Body"
+        },
+        {
+            "fieldname": "attachments",
+            "fieldtype": "Attach",
+            "label": "Attachments"
+        },
+        {
+            "fieldname": "sent_at",
+            "fieldtype": "Datetime",
+            "label": "Sent At"
+        },
+        {
+            "fieldname": "seen_at",
+            "fieldtype": "Datetime",
+            "label": "Seen At"
+        }
+    ],
+    "index_web_pages_for_search": 1,
+    "links": [],
+    "modified": "2024-11-26 17:50:00.000000",
+    "modified_by": "Administrator",
+    "module": "Leapp",
+    "name": "Message",
+    "owner": "Administrator",
+    "permissions": [
+        {
+            "create": 1,
+            "delete": 1,
+            "email": 1,
+            "export": 1,
+            "print": 1,
+            "read": 1,
+            "report": 1,
+            "role": "System Manager",
+            "share": 1,
+            "write": 1
+        }
+    ],
+    "sort_field": "modified",
+    "sort_order": "DESC",
+    "states": []
+}

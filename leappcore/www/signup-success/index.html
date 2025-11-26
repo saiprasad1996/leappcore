@@ -1,0 +1,43 @@
+{% extends 'templates/htmlbase/base.html' %}
+
+{% block head %}
+<style>
+    .material-symbols-outlined {
+        font-variation-settings:
+            'FILL' 0,
+            'wght' 400,
+            'GRAD' 0,
+            'opsz' 24
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="flex flex-1 items-center justify-center py-12">
+    <div class="layout-content-container flex w-full max-w-2xl flex-col items-center">
+        <div class="flex w-full flex-col items-center gap-6 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-background-dark p-12 shadow-lg text-center">
+            <div class="w-20 h-20 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center">
+                <span class="material-symbols-outlined text-green-600 dark:text-green-400 !text-5xl">check_circle</span>
+            </div>
+            
+            <div class="flex flex-col gap-3">
+                <h1 class="text-leapp-black dark:text-white text-3xl font-black leading-tight tracking-[-0.033em]">
+                    Registration Successful!
+                </h1>
+                <p class="text-gray-600 dark:text-gray-300 text-base font-normal leading-normal max-w-lg">
+                    {{ message or "Please check your email for verification instructions. Once verified, you can log in to your account." }}
+                </p>
+            </div>
+            
+            <div class="flex gap-3 pt-4">
+                <a href="/login" class="flex min-w-[120px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-12 px-6 bg-leapp-yellow text-leapp-black text-base font-bold leading-normal tracking-[0.015em] hover:bg-leapp-yellow/90 transition-colors">
+                    <span class="truncate">Go to Login</span>
+                </a>
+                <a href="/" class="flex min-w-[120px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-12 px-6 border-2 border-gray-300 dark:border-gray-600 text-leapp-black dark:text-white text-base font-medium leading-normal hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                    <span class="truncate">Go to Home</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock %}

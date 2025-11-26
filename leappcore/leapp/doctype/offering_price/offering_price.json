@@ -1,0 +1,63 @@
+{
+    "actions": [],
+    "allow_rename": 1,
+    "creation": "2024-11-26 17:10:00.000000",
+    "doctype": "DocType",
+    "engine": "InnoDB",
+    "field_order": [
+        "offering",
+        "amount",
+        "currency",
+        "billing_type"
+    ],
+    "fields": [
+        {
+            "fieldname": "offering",
+            "fieldtype": "Link",
+            "in_list_view": 1,
+            "label": "Offering",
+            "options": "Offering"
+        },
+        {
+            "fieldname": "amount",
+            "fieldtype": "Currency",
+            "in_list_view": 1,
+            "label": "Amount"
+        },
+        {
+            "fieldname": "currency",
+            "fieldtype": "Data",
+            "label": "Currency"
+        },
+        {
+            "fieldname": "billing_type",
+            "fieldtype": "Select",
+            "label": "Billing Type",
+            "options": "per_session\nper_month\npackage"
+        }
+    ],
+    "index_web_pages_for_search": 1,
+    "links": [],
+    "modified": "2024-11-26 17:10:00.000000",
+    "modified_by": "Administrator",
+    "module": "Leapp",
+    "name": "Offering Price",
+    "owner": "Administrator",
+    "permissions": [
+        {
+            "create": 1,
+            "delete": 1,
+            "email": 1,
+            "export": 1,
+            "print": 1,
+            "read": 1,
+            "report": 1,
+            "role": "System Manager",
+            "share": 1,
+            "write": 1
+        }
+    ],
+    "sort_field": "modified",
+    "sort_order": "DESC",
+    "states": []
+}

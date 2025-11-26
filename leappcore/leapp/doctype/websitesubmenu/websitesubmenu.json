@@ -1,0 +1,66 @@
+{
+    "actions": [],
+    "allow_rename": 1,
+    "autoname": "field:submenu",
+    "creation": "2024-11-26 18:35:00.000000",
+    "doctype": "DocType",
+    "engine": "InnoDB",
+    "field_order": [
+        "submenu",
+        "menu",
+        "remark",
+        "show"
+    ],
+    "fields": [
+        {
+            "fieldname": "submenu",
+            "fieldtype": "Data",
+            "in_list_view": 1,
+            "label": "Submenu",
+            "reqd": 1,
+            "unique": 1
+        },
+        {
+            "fieldname": "menu",
+            "fieldtype": "Link",
+            "in_list_view": 1,
+            "label": "Menu",
+            "options": "WebsiteMenu"
+        },
+        {
+            "fieldname": "remark",
+            "fieldtype": "Small Text",
+            "label": "Remark"
+        },
+        {
+            "default": "0",
+            "fieldname": "show",
+            "fieldtype": "Check",
+            "label": "Show"
+        }
+    ],
+    "index_web_pages_for_search": 1,
+    "links": [],
+    "modified": "2024-11-26 18:35:00.000000",
+    "modified_by": "Administrator",
+    "module": "Leapp",
+    "name": "WebsiteSubmenu",
+    "owner": "Administrator",
+    "permissions": [
+        {
+            "create": 1,
+            "delete": 1,
+            "email": 1,
+            "export": 1,
+            "print": 1,
+            "read": 1,
+            "report": 1,
+            "role": "System Manager",
+            "share": 1,
+            "write": 1
+        }
+    ],
+    "sort_field": "modified",
+    "sort_order": "DESC",
+    "states": []
+}
