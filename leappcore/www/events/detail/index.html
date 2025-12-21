@@ -1,0 +1,326 @@
+{% extends 'templates/htmlbase/base.html' %}
+
+{% block head %}
+<style type="text/css">
+    body {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+
+    #toast-container {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 9999;
+    }
+
+    .toast {
+        min-width: 300px;
+        padding: 16px;
+        margin-bottom: 12px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        animation: slideIn 0.3s ease-out;
+    }
+
+    @keyframes slideIn {
+        from {
+            transform: translateX(400px);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+
+    .toast.success {
+        background-color: #10b981;
+        color: white;
+    }
+
+    .toast.error {
+        background-color: #ef4444;
+        color: white;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+{% if show_404 %}
+<main class="flex-1 w-full bg-background-light dark:bg-background-dark text-leapp-black dark:text-white flex items-center justify-center min-h-screen">
+    <div class="text-center">
+        <h1 class="text-6xl font-black mb-4">404</h1>
+        <p class="text-xl mb-6">Event not found</p>
+        <a href="/events" class="px-6 py-3 bg-leapp-yellow text-leapp-black rounded-xl font-bold hover:bg-leapp-yellow/90 transition-all inline-block">
+            Browse Events
+        </a>
+    </div>
+</main>
+{% else %}
+<main class="flex-1 w-full bg-background-light dark:bg-background-dark text-leapp-black dark:text-white">
+    <div class="w-full">
+        <!-- Toast Container -->
+        <div id="toast-container"></div>
+
+        <!-- Hero Section with Image -->
+        <div class="relative w-full h-96 bg-gradient-to-br from-leapp-yellow/20 to-leapp-yellow/5 dark:from-leapp-yellow/10 dark:to-leapp-yellow/5">
+            {% if event.featured_image %}
+            <div class="absolute inset-0 bg-center bg-cover" style="background-image: url('{{ event.featured_image }}');"></div>
+            <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+            {% else %}
+            <div class="absolute inset-0 flex items-center justify-center">
+                <span class="material-symbols-outlined text-leapp-yellow text-9xl">event</span>
+            </div>
+            {% endif %}
+            
+            <!-- Event Title Overlay -->
+            <div class="absolute bottom-0 left-0 right-0 p-8">
+                <div class="max-w-6xl mx-auto">
+                    <h1 class="text-4xl sm:text-5xl font-black text-white mb-2 drop-shadow-lg">{{ event.event_name }}</h1>
+                    {% if event.heading %}
+                    <p class="text-xl text-white/90 drop-shadow-md">{{ event.heading }}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Content Section -->
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Main Content -->
+                <div class="lg:col-span-2 space-y-6">
+                    <!-- Short Description -->
+                    {% if event.short_description %}
+                    <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-background-dark border-l-4 border-l-leapp-yellow p-6">
+                        <p class="text-lg text-gray-700 dark:text-gray-300 leading-relaxed">{{ event.short_description }}</p>
+                    </div>
+                    {% endif %}
+
+                    <!-- Long Description -->
+                    {% if event.long_description %}
+                    <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-background-dark p-6">
+                        <h2 class="text-2xl font-bold text-leapp-black dark:text-white mb-4">About This Event</h2>
+                        <div class="prose dark:prose-invert max-w-none">
+                            <p class="text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-line">{{ event.long_description }}</p>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Event Details Grid -->
+                    <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-background-dark p-6">
+                        <h2 class="text-2xl font-bold text-leapp-black dark:text-white mb-4">Event Details</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {% if event.start_datetime %}
+                            <div class="flex items-start gap-3">
+                                <span class="material-symbols-outlined text-leapp-yellow mt-1">calendar_today</span>
+                                <div>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">Date</p>
+                                    <p class="font-semibold text-leapp-black dark:text-white">{{ event.start_datetime.strftime('%B %d, %Y') }}</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-3">
+                                <span class="material-symbols-outlined text-leapp-yellow mt-1">schedule</span>
+                                <div>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">Time</p>
+                                    <p class="font-semibold text-leapp-black dark:text-white">{{ event.start_datetime.strftime('%I:%M %p') }}</p>
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            {% if event.venue_address %}
+                            <div class="flex items-start gap-3 md:col-span-2">
+                                <span class="material-symbols-outlined text-leapp-yellow mt-1">location_on</span>
+                                <div>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">Venue</p>
+                                    <p class="font-semibold text-leapp-black dark:text-white">{{ event.venue_address }}</p>
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            {% if event.area_name %}
+                            <div class="flex items-start gap-3">
+                                <span class="material-symbols-outlined text-leapp-yellow mt-1">place</span>
+                                <div>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">Area</p>
+                                    <p class="font-semibold text-leapp-black dark:text-white">{{ event.area_name }}</p>
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            {% if event.organizer_name %}
+                            <div class="flex items-start gap-3">
+                                <span class="material-symbols-outlined text-leapp-yellow mt-1">person</span>
+                                <div>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">Organizer</p>
+                                    <p class="font-semibold text-leapp-black dark:text-white">{{ event.organizer_name }}</p>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sidebar -->
+                <div class="lg:col-span-1">
+                    <div class="sticky top-8 space-y-6">
+                        <!-- Interest Registration Card -->
+                        <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-background-dark p-6 shadow-lg">
+                            <h3 class="text-xl font-bold text-leapp-black dark:text-white mb-4">Register Your Interest</h3>
+                            
+                            <button id="interest-btn" 
+                                    data-event-id="{{ event.name }}"
+                                    data-csrf-token="{{ csrf_token }}"
+                                    class="w-full flex cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-xl h-12 px-4 bg-leapp-yellow text-leapp-black text-lg font-bold leading-normal tracking-[0.015em] hover:bg-leapp-yellow/90 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+                                <span class="material-symbols-outlined" id="interest-icon">favorite_border</span>
+                                <span class="truncate" id="interest-text">I'm Interested</span>
+                            </button>
+
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-3 text-center">
+                                Show your interest and the organizer will contact you with more details
+                            </p>
+                        </div>
+
+                        <!-- Organizer Card -->
+                        {% if event.organizer_name %}
+                        <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-background-dark p-6">
+                            <h3 class="text-lg font-bold text-leapp-black dark:text-white mb-4">Organized By</h3>
+                            <div class="flex items-center gap-3">
+                                {% if event.organizer_image %}
+                                <img src="{{ event.organizer_image }}" alt="{{ event.organizer_name }}" class="w-12 h-12 rounded-full object-cover">
+                                {% else %}
+                                <div class="w-12 h-12 rounded-full bg-leapp-yellow flex items-center justify-center text-leapp-black font-bold text-xl">
+                                    {{ event.organizer_name[0].upper() }}
+                                </div>
+                                {% endif %}
+                                <div>
+                                    <p class="font-semibold text-leapp-black dark:text-white">{{ event.organizer_name }}</p>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">Event Organizer</p>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <!-- Back to Events -->
+                        <a href="/events" class="flex items-center justify-center gap-2 w-full px-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-semibold hover:bg-gray-50 dark:hover:bg-gray-800 transition-all">
+                            <span class="material-symbols-outlined">arrow_back</span>
+                            <span>Back to Events</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const interestBtn = document.getElementById('interest-btn');
+    if (!interestBtn) return;
+    
+    const eventId = interestBtn.dataset.eventId;
+    const csrfToken = interestBtn.dataset.csrfToken;
+    const interestText = document.getElementById('interest-text');
+    const interestIcon = document.getElementById('interest-icon');
+    
+    // Check if user is already interested on page load
+    checkInterestStatus();
+    
+    // Handle button click
+    interestBtn.addEventListener('click', handleInterestClick);
+    
+    async function checkInterestStatus() {
+        try {
+            const response = await fetch(`/api/method/leappcore.api.interest.check_interest?event_id=${eventId}`);
+            const result = await response.json();
+            
+            if (result.message && result.message.interested) {
+                setInterestedState();
+            }
+        } catch (error) {
+            console.error('Error checking interest:', error);
+        }
+    }
+    
+    async function handleInterestClick() {
+        // Disable button during processing
+        interestBtn.disabled = true;
+        interestIcon.textContent = 'hourglass_empty';
+        interestText.textContent = 'Processing...';
+        
+        try {
+            const response = await fetch('/api/method/leappcore.api.interest.record_interest', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Frappe-CSRF-Token': csrfToken
+                },
+                body: JSON.stringify({
+                    event_id: eventId
+                })
+            });
+            
+            const result = await response.json();
+            
+            if (result.message && result.message.success) {
+                setInterestedState();
+                showToast(result.message.message, 'success');
+            } else if (result.exc_type === 'AuthenticationError') {
+                // Redirect to login
+                showToast('Please log in to show interest', 'error');
+                setTimeout(() => {
+                    window.location.href = '/login?redirect-to=' + encodeURIComponent(window.location.pathname + window.location.search);
+                }, 2000);
+            } else {
+                throw new Error(result.exception || 'Failed to record interest');
+            }
+        } catch (error) {
+            console.error('Error recording interest:', error);
+            showToast('Failed to record interest. Please try again.', 'error');
+            resetButtonState();
+        } finally {
+            interestBtn.disabled = false;
+        }
+    }
+    
+    function setInterestedState() {
+        interestIcon.textContent = 'favorite';
+        interestIcon.style.fontVariationSettings = "'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24";
+        interestText.textContent = 'Interest Registered';
+        interestBtn.classList.remove('bg-leapp-yellow', 'hover:bg-leapp-yellow/90');
+        interestBtn.classList.add('bg-green-500', 'hover:bg-green-600');
+        interestBtn.disabled = true;
+    }
+    
+    function resetButtonState() {
+        interestIcon.textContent = 'favorite_border';
+        interestText.textContent = "I'm Interested";
+    }
+    
+    function showToast(message, type = 'success') {
+        const container = document.getElementById('toast-container');
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        toast.innerHTML = `
+            <span class="material-symbols-outlined">${type === 'success' ? 'check_circle' : 'error'}</span>
+            <span>${message}</span>
+        `;
+        container.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    }
+});
+</script>
+{% endblock %}

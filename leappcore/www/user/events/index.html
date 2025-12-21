@@ -1,0 +1,93 @@
+{% extends 'templates/htmlbase/base.html' %}
+
+{% block head %}
+<style type="text/css">
+    body {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="flex-1 w-full bg-background-light dark:bg-background-dark text-leapp-black dark:text-white">
+    <div class="w-full px-4 sm:px-6 lg:px-8 py-8">
+        <div class="max-w-6xl mx-auto">
+            <!-- Header -->
+            <div class="mb-8">
+                <h1 class="text-3xl sm:text-4xl font-black text-leapp-black dark:text-white mb-2">My Events</h1>
+                <p class="text-gray-600 dark:text-gray-400">Events you've shown interest in</p>
+            </div>
+
+            {% if interested_events and interested_events|length > 0 %}
+            <!-- Events Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {% for event in interested_events %}
+                <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-background-dark shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
+                    <div class="p-6">
+                        <div class="flex items-start justify-between mb-4">
+                            <h3 class="text-lg font-bold text-leapp-black dark:text-white">{{ event.event_name }}</h3>
+                            {% if event.status == 'NEW' %}
+                            <span class="px-2 py-1 bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 text-xs font-bold rounded-full">New</span>
+                            {% elif event.status == 'CONTACTED' %}
+                            <span class="px-2 py-1 bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200 text-xs font-bold rounded-full">Contacted</span>
+                            {% elif event.status == 'CONFIRMED' %}
+                            <span class="px-2 py-1 bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 text-xs font-bold rounded-full">Confirmed</span>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="space-y-3 text-sm text-gray-600 dark:text-gray-400">
+                            <div class="flex items-start gap-2">
+                                <span class="material-symbols-outlined text-base text-leapp-yellow">calendar_today</span>
+                                <div>
+                                    <p class="font-medium text-leapp-black dark:text-white">{{ event.start_datetime.strftime('%B %d, %Y') if event.start_datetime else 'TBD' }}</p>
+                                    <p class="text-xs">{{ event.start_datetime.strftime('%I:%M %p') if event.start_datetime else '' }}</p>
+                                </div>
+                            </div>
+                            
+                            {% if event.venue_address %}
+                            <div class="flex items-start gap-2">
+                                <span class="material-symbols-outlined text-base text-leapp-yellow">location_on</span>
+                                <p>{{ event.venue_address }}</p>
+                            </div>
+                            {% endif %}
+                            
+                            <div class="flex items-start gap-2">
+                                <span class="material-symbols-outlined text-base text-leapp-yellow">person</span>
+                                <p>Organized by {{ event.organizer }}</p>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                            <a href="/events/detail?event={{ event.event_id }}" class="text-leapp-yellow hover:text-leapp-yellow/80 text-sm font-medium flex items-center gap-1">
+                                <span>View Details</span>
+                                <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <!-- Empty State -->
+            <div class="text-center py-16">
+                <div class="flex justify-center mb-6">
+                    <div class="w-24 h-24 rounded-full bg-leapp-yellow/10 dark:bg-leapp-yellow/20 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-leapp-yellow text-6xl">event</span>
+                    </div>
+                </div>
+                <h2 class="text-2xl font-bold text-leapp-black dark:text-white mb-3">No Events Yet</h2>
+                <p class="text-gray-600 dark:text-gray-400 mb-6">Start exploring events and show your interest</p>
+                <a href="/events" class="inline-flex items-center gap-2 px-6 py-3 bg-leapp-yellow text-leapp-black rounded-xl font-bold hover:bg-leapp-yellow/90 transition-all">
+                    <span class="material-symbols-outlined">explore</span>
+                    <span>Browse Events</span>
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</main>
+{% endblock %}

@@ -1,0 +1,198 @@
+{% extends 'templates/htmlbase/base.html' %}
+
+{% block head %}
+<style type="text/css">
+    body {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="flex-1 w-full bg-background-light dark:bg-background-dark text-leapp-black dark:text-white">
+    <div class="w-full px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Header -->
+        <div class="mb-8">
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <h1 class="text-3xl sm:text-4xl font-black text-leapp-black dark:text-white">Customer Interests</h1>
+                    <p class="text-gray-600 dark:text-gray-400 mt-2">Manage and respond to customer interest in your offerings</p>
+                </div>
+            </div>
+            
+            <!-- Navigation Tabs -->
+            <div class="flex gap-4 border-b border-gray-200 dark:border-gray-700">
+                <a href="/partner/profile" class="px-4 py-3 text-sm font-bold text-gray-600 dark:text-gray-400 hover:text-leapp-yellow transition-colors">Profile</a>
+                <a href="/partner/offering/register" class="px-4 py-3 text-sm font-bold text-gray-600 dark:text-gray-400 hover:text-leapp-yellow transition-colors">Offerings</a>
+                <a href="/partner/event/register" class="px-4 py-3 text-sm font-bold text-gray-600 dark:text-gray-400 hover:text-leapp-yellow transition-colors">Events</a>
+                <a href="/partner/interests" class="px-4 py-3 text-sm font-bold border-b-2 border-leapp-yellow text-leapp-yellow">User Interests</a>
+            </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-background-dark p-6 shadow-lg">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">Total Interests</p>
+                        <p class="text-3xl font-black text-leapp-black dark:text-white">{{ interest_stats.total }}</p>
+                    </div>
+                    <div class="w-12 h-12 rounded-lg bg-leapp-yellow/10 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-leapp-yellow text-2xl">favorite</span>
+                    </div>
+                </div>
+            </div>
+
+            <a href="/partner/interests?status=NEW" class="rounded-xl border {% if current_status == 'NEW' %}border-blue-500{% else %}border-gray-200 dark:border-gray-700{% endif %} bg-white dark:bg-background-dark p-6 shadow-lg hover:shadow-xl transition-shadow">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">New</p>
+                        <p class="text-3xl font-black text-blue-500">{{ interest_stats.new }}</p>
+                    </div>
+                    <div class="w-12 h-12 rounded-lg bg-blue-500/10 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-blue-500 text-2xl">fiber_new</span>
+                    </div>
+                </div>
+            </a>
+
+            <a href="/partner/interests?status=CONTACTED" class="rounded-xl border {% if current_status == 'CONTACTED' %}border-orange-500{% else %}border-gray-200 dark:border-gray-700{% endif %} bg-white dark:bg-background-dark p-6 shadow-lg hover:shadow-xl transition-shadow">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">Contacted</p>
+                        <p class="text-3xl font-black text-orange-500">{{ interest_stats.contacted }}</p>
+                    </div>
+                    <div class="w-12 h-12 rounded-lg bg-orange-500/10 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-orange-500 text-2xl">mail</span>
+                    </div>
+                </div>
+            </a>
+
+            <a href="/partner/interests?status=CONFIRMED" class="rounded-xl border {% if current_status == 'CONFIRMED' %}border-green-500{% else %}border-gray-200 dark:border-gray-700{% endif %} bg-white dark:bg-background-dark p-6 shadow-lg hover:shadow-xl transition-shadow">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">Confirmed</p>
+                        <p class="text-3xl font-black text-green-500">{{ interest_stats.confirmed }}</p>
+                    </div>
+                    <div class="w-12 h-12 rounded-lg bg-green-500/10 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-green-500 text-2xl">check_circle</span>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- Filter Bar -->
+        <div class="flex items-center justify-between mb-6">
+            <div class="flex items-center gap-2">
+                <a href="/partner/interests" class="px-4 py-2 rounded-lg {% if not current_status %}bg-leapp-yellow text-leapp-black{% else %}bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300{% endif %} text-sm font-medium hover:opacity-90 transition-opacity">
+                    All
+                </a>
+                <a href="/partner/interests?status=NEW" class="px-4 py-2 rounded-lg {% if current_status == 'NEW' %}bg-blue-500 text-white{% else %}bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300{% endif %} text-sm font-medium hover:opacity-90 transition-opacity">
+                    New
+                </a>
+                <a href="/partner/interests?status=CONTACTED" class="px-4 py-2 rounded-lg {% if current_status == 'CONTACTED' %}bg-orange-500 text-white{% else %}bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300{% endif %} text-sm font-medium hover:opacity-90 transition-opacity">
+                    Contacted
+                </a>
+                <a href="/partner/interests?status=CONFIRMED" class="px-4 py-2 rounded-lg {% if current_status == 'CONFIRMED' %}bg-green-500 text-white{% else %}bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300{% endif %} text-sm font-medium hover:opacity-90 transition-opacity">
+                    Confirmed
+                </a>
+            </div>
+            <p class="text-sm text-gray-600 dark:text-gray-400">
+                Showing {{ interests|length }} {% if current_status %}{{ current_status.lower() }}{% endif %} interest{{ 's' if interests|length != 1 }}
+            </p>
+        </div>
+
+        <!-- Interests List -->
+        {% if interests and interests|length > 0 %}
+        <div class="space-y-4">
+            {% for interest in interests %}
+            <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-background-dark p-6 shadow-lg hover:shadow-xl transition-shadow">
+                <div class="flex flex-col md:flex-row gap-6">
+                    <!-- Customer Info -->
+                    <div class="flex items-start gap-4 flex-1">
+                        <div class="w-16 h-16 rounded-full bg-leapp-yellow flex items-center justify-center text-leapp-black font-bold text-xl flex-shrink-0">
+                            {% if interest.customer_image %}
+                            <img src="{{ interest.customer_image }}" alt="{{ interest.customer_name }}" class="w-16 h-16 rounded-full object-cover">
+                            {% else %}
+                            {{ interest.customer_name[0].upper() }}
+                            {% endif %}
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h3 class="text-lg font-bold text-leapp-black dark:text-white mb-1">{{ interest.customer_name }}</h3>
+                            <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">{{ interest.customer_email }}</p>
+                            {% if interest.customer_phone %}
+                            <p class="text-sm text-gray-600 dark:text-gray-400 flex items-center gap-1">
+                                <span class="material-symbols-outlined text-xs">call</span>
+                                {{ interest.customer_phone }}
+                            </p>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Offering Info -->
+                    <div class="flex-1 min-w-0">
+                        <p class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">Interested In</p>
+                        <h4 class="font-bold text-leapp-black dark:text-white mb-2">{{ interest.offering_title }}</h4>
+                        <p class="text-sm text-leapp-yellow font-bold">₹{{ "%.0f"|format(interest.offering_price) }} per session</p>
+                    </div>
+
+                    <!-- Status & Actions -->
+                    <div class="flex flex-col items-end justify-between gap-3">
+                        <div class="flex items-center gap-2">
+                            {% if interest.status == 'NEW' %}
+                            <span class="px-3 py-1 bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 text-xs font-bold rounded-full">New</span>
+                            {% elif interest.status == 'CONTACTED' %}
+                            <span class="px-3 py-1 bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200 text-xs font-bold rounded-full">Contacted</span>
+                            {% elif interest.status == 'CONFIRMED' %}
+                            <span class="px-3 py-1 bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 text-xs font-bold rounded-full">Confirmed</span>
+                            {% elif interest.status == 'CLOSED' %}
+                            <span class="px-3 py-1 bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200 text-xs font-bold rounded-full">Closed</span>
+                            {% endif %}
+                        </div>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">{{ interest.created_ago }}</p>
+                        <div class="flex gap-2">
+                            <a href="mailto:{{ interest.customer_email }}" class="px-4 py-2 bg-leapp-yellow text-leapp-black rounded-lg text-sm font-medium hover:bg-leapp-yellow/90 transition-all flex items-center gap-1">
+                                <span class="material-symbols-outlined text-sm">mail</span>
+                                <span>Email</span>
+                            </a>
+                            {% if interest.customer_phone %}
+                            <a href="tel:{{ interest.customer_phone }}" class="px-4 py-2 border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-800 transition-all flex items-center gap-1">
+                                <span class="material-symbols-outlined text-sm">call</span>
+                                <span>Call</span>
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <!-- Empty State -->
+        <div class="text-center py-16 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-background-dark">
+            <div class="flex justify-center mb-6">
+                <div class="w-24 h-24 rounded-full bg-leapp-yellow/10 dark:bg-leapp-yellow/20 flex items-center justify-center">
+                    <span class="material-symbols-outlined text-leapp-yellow text-6xl">favorite_border</span>
+                </div>
+            </div>
+            <h2 class="text-2xl font-bold text-leapp-black dark:text-white mb-3">No Interests Yet</h2>
+            <p class="text-gray-600 dark:text-gray-400 mb-6">
+                {% if current_status %}
+                No {{ current_status.lower() }} interests found.
+                {% else %}
+                When customers show interest in your offerings, they'll appear here.
+                {% endif %}
+            </p>
+            {% if current_status %}
+            <a href="/partner/interests" class="inline-flex items-center gap-2 px-6 py-3 bg-leapp-yellow text-leapp-black rounded-xl font-bold hover:bg-leapp-yellow/90 transition-all">
+                <span>View All Interests</span>
+            </a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</main>
+{% endblock %}

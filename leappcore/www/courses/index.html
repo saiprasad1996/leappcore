@@ -1,12 +1,191 @@
 {% extends 'templates/htmlbase/base.html' %}
 
 {% block head %}
-<style type="text/css">
-
-
+<style>
+    .material-symbols-outlined {
+        font-variation-settings:
+            'FILL' 0,
+            'wght' 400,
+            'GRAD' 0,
+            'opsz' 24
+    }
 </style>
 {% endblock %}
 
 {% block content %}
-
+<main class="flex-1 w-full py-8">
+    <div class="w-full px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-col lg:flex-row gap-8">
+            <!-- Filter Sidebar -->
+            <aside class="w-full lg:w-1/4">
+                <h3 class="text-leapp-black dark:text-white text-lg font-bold mb-4">Filter Courses</h3>
+                <form method="get" action="/courses" class="flex flex-col gap-3">
+                    <!-- Keep current view mode -->
+                    <input type="hidden" name="view" value="{{ view_mode }}">
+                    
+                    <!-- Category Filter -->
+                    <details class="flex flex-col rounded-xl border border-slate-200 dark:border-slate-800 bg-background-light dark:bg-background-dark px-[15px] py-[7px] group" open>
+                        <summary class="flex cursor-pointer items-center justify-between gap-6 py-2">
+                            <p class="text-leapp-black dark:text-white text-sm font-medium leading-normal">Category</p>
+                            <span class="material-symbols-outlined text-leapp-black dark:text-white group-open:rotate-180">expand_more</span>
+                        </summary>
+                        <div class="space-y-2 pb-2">
+                            {% for category in categories[:10] %}
+                            <label class="flex items-center gap-2 text-slate-600 dark:text-slate-400 text-sm">
+                                <input class="form-checkbox rounded bg-slate-100 dark:bg-slate-800 border-slate-300 dark:border-slate-700 text-leapp-yellow focus:ring-leapp-yellow" type="checkbox" name="category" value="{{ category.category_name }}" {% if category.category_name in category_filter %}checked{% endif %}/>
+                                {{ category.category_name }}
+                            </label>
+                            {% endfor %}
+                        </div>
+                    </details>
+                    
+                    <!-- Location Filter -->
+                    <details class="flex flex-col rounded-xl border border-slate-200 dark:border-slate-800 bg-background-light dark:bg-background-dark px-[15px] py-[7px] group">
+                        <summary class="flex cursor-pointer items-center justify-between gap-6 py-2">
+                            <p class="text-leapp-black dark:text-white text-sm font-medium leading-normal">Location</p>
+                            <span class="material-symbols-outlined text-leapp-black dark:text-white group-open:rotate-180">expand_more</span>
+                        </summary>
+                        <div class="space-y-2 pb-2">
+                            {% for location in locations[:10] %}
+                            <label class="flex items-center gap-2 text-slate-600 dark:text-slate-400 text-sm">
+                                <input class="form-checkbox rounded bg-slate-100 dark:bg-slate-800 border-slate-300 dark:border-slate-700 text-leapp-yellow focus:ring-leapp-yellow" type="checkbox" name="location" value="{{ location.city }}" {% if location.city in location_filter %}checked{% endif %}/>
+                                {{ location.city }}
+                            </label>
+                            {% endfor %}
+                        </div>
+                    </details>
+                    
+                    <div class="mt-4 flex flex-col gap-2">
+                        <button type="submit" class="flex min-w-[84px] w-full cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 px-4 bg-leapp-yellow text-leapp-black text-sm font-bold leading-normal tracking-[0.015em]">
+                            <span class="truncate">Apply Filters</span>
+                        </button>
+                        <a href="/courses" class="text-slate-600 dark:text-slate-400 text-sm font-medium text-center">Clear Filters</a>
+                    </div>
+                </form>
+            </aside>
+            
+            <!-- Main Content -->
+            <div class="w-full lg:w-3/4">
+                <!-- Header -->
+                <div class="flex flex-wrap justify-between items-center gap-3 mb-6">
+                    <div class="flex min-w-72 flex-col gap-1">
+                        <p class="text-leapp-black dark:text-white text-4xl font-black leading-tight tracking-[-0.033em]">Explore Our Courses</p>
+                        <p class="text-slate-600 dark:text-slate-400 text-base font-normal leading-normal">Find the perfect activity to help your child learn and grow.</p>
+                    </div>
+                </div>
+                
+                <!-- View Toggle -->
+                <div class="pb-3 mb-6">
+                    <div class="flex border-b border-slate-200 dark:border-slate-800 gap-8">
+                        <a class="flex items-center justify-center border-b-[3px] {{ 'border-b-leapp-yellow text-leapp-black dark:text-white' if view_mode == 'list' else 'border-b-transparent text-slate-500' }} pb-[13px] pt-4 gap-2" href="?view=list{{ filter_query }}">
+                            <span class="material-symbols-outlined">list</span>
+                            <p class="text-sm font-bold leading-normal tracking-[0.015em]">List View</p>
+                        </a>
+                        <a class="flex items-center justify-center border-b-[3px] {{ 'border-b-leapp-yellow text-leapp-black dark:text-white' if view_mode == 'gallery' else 'border-b-transparent text-slate-500' }} pb-[13px] pt-4 gap-2" href="?view=gallery{{ filter_query }}">
+                            <span class="material-symbols-outlined">grid_view</span>
+                            <p class="text-sm font-bold leading-normal tracking-[0.015em]">Gallery View</p>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Gallery View -->
+                {% if view_mode == 'gallery' %}
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {% for offering in offerings %}
+                    <div class="flex flex-col gap-3 pb-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-background-light dark:bg-background-dark p-4 transition-all hover:shadow-lg hover:shadow-leapp-yellow/20">
+                        <div class="w-full bg-center bg-no-repeat aspect-video bg-cover rounded-lg" 
+                            style="background-image: url('{{ offering.image or "https://placehold.co/600x400?text=No+Image" }}');">
+                        </div>
+                        <div>
+                            <p class="text-leapp-black dark:text-white text-lg font-bold leading-normal">{{ offering.title }}</p>
+                            <p class="text-slate-600 dark:text-slate-400 text-sm font-normal leading-normal mt-1 line-clamp-2">{{ offering.description }}</p>
+                            <div class="flex gap-2 mt-3 flex-wrap">
+                                {% for category in offering.categories[:3] %}
+                                <span class="text-xs text-leapp-yellow bg-leapp-yellow/20 px-2 py-1 rounded-full">{{ category }}</span>
+                                {% endfor %}
+                            </div>
+                            <a href="{{ offering.detail_url }}" class="w-full mt-4 flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-9 px-4 bg-leapp-yellow text-leapp-black text-sm font-bold leading-normal tracking-[0.015em]">
+                                View Details
+                            </a>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="col-span-full text-center text-slate-500 py-12">
+                        <p class="text-lg">No courses found matching your filters.</p>
+                        <a href="/courses" class="text-leapp-yellow hover:underline mt-2 inline-block">Clear filters</a>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                
+                <!-- List View -->
+                {% if view_mode == 'list' %}
+                <div class="flex flex-col gap-4">
+                    {% for offering in offerings %}
+                    <div class="flex flex-col sm:flex-row gap-4 p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-background-light dark:bg-background-dark transition-all hover:shadow-lg hover:shadow-leapp-yellow/20">
+                        <div class="w-full sm:w-48 h-32 bg-center bg-no-repeat bg-cover rounded-lg flex-shrink-0" 
+                            style="background-image: url('{{ offering.image or "https://placehold.co/600x400?text=No+Image" }}');">
+                        </div>
+                        <div class="flex-1 flex flex-col justify-between">
+                            <div>
+                                <h3 class="text-leapp-black dark:text-white text-xl font-bold leading-tight">{{ offering.title }}</h3>
+                                <p class="text-slate-600 dark:text-slate-400 text-sm font-normal leading-normal mt-2 line-clamp-2">{{ offering.description }}</p>
+                                <div class="flex gap-2 mt-3 flex-wrap">
+                                    {% for category in offering.categories[:5] %}
+                                    <span class="text-xs text-leapp-yellow bg-leapp-yellow/20 px-2 py-1 rounded-full">{{ category }}</span>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="mt-4 sm:mt-0 flex items-center gap-4">
+                                {% if offering.duration_hours %}
+                                <span class="text-slate-600 dark:text-slate-400 text-sm">
+                                    <span class="material-symbols-outlined text-base align-middle">schedule</span>
+                                    {{ offering.duration_hours }} hrs
+                                </span>
+                                {% endif %}
+                                <a href="{{ offering.detail_url }}" class="ml-auto flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-9 px-4 bg-leapp-yellow text-leapp-black text-sm font-bold leading-normal tracking-[0.015em]">
+                                    View Details
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="text-center text-slate-500 py-12">
+                        <p class="text-lg">No courses found matching your filters.</p>
+                        <a href="/courses" class="text-leapp-yellow hover:underline mt-2 inline-block">Clear filters</a>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                
+                <!-- Pagination -->
+                {% if total_pages > 1 %}
+                <div class="flex justify-center items-center mt-8 space-x-2">
+                    {% if page > 1 %}
+                    <a href="?page={{ page - 1 }}&view={{ view_mode }}{{ filter_query }}" class="flex items-center justify-center size-10 rounded-lg bg-slate-200 dark:bg-slate-800 text-leapp-black dark:text-white">
+                        <span class="material-symbols-outlined">chevron_left</span>
+                    </a>
+                    {% endif %}
+                    
+                    {% for p in range(1, total_pages + 1) %}
+                    {% if p == page %}
+                    <span class="flex items-center justify-center size-10 rounded-lg bg-leapp-yellow text-leapp-black font-bold">{{ p }}</span>
+                    {% elif p <= 3 or p > total_pages - 3 or (p >= page - 1 and p <= page + 1) %}
+                    <a href="?page={{ p }}&view={{ view_mode }}{{ filter_query }}" class="flex items-center justify-center size-10 rounded-lg bg-slate-200 dark:bg-slate-800 text-leapp-black dark:text-white">{{ p }}</a>
+                    {% elif p == 4 or p == total_pages - 3 %}
+                    <span class="flex items-center justify-center size-10 text-slate-500">...</span>
+                    {% endif %}
+                    {% endfor %}
+                    
+                    {% if page < total_pages %}
+                    <a href="?page={{ page + 1 }}&view={{ view_mode }}{{ filter_query }}" class="flex items-center justify-center size-10 rounded-lg bg-slate-200 dark:bg-slate-800 text-leapp-black dark:text-white">
+                        <span class="material-symbols-outlined">chevron_right</span>
+                    </a>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</main>
 {% endblock %}

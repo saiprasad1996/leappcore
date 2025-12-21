@@ -1,0 +1,123 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "format:{user}",
+ "creation": "2024-11-26 16:35:00",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "org_name",
+  "occupation",
+  "availability",
+  "area",
+  "rating",
+  "column_break_ajla",
+  "highest_qualification",
+  "languages",
+  "sample_video",
+  "platform_user_section",
+  "user"
+ ],
+ "fields": [
+  {
+   "fieldname": "user",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "User",
+   "options": "User",
+   "reqd": 1
+  },
+  {
+   "fieldname": "area",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Area",
+   "options": "Area",
+   "reqd": 1
+  },
+  {
+   "fieldname": "occupation",
+   "fieldtype": "Data",
+   "label": "Occupation"
+  },
+  {
+   "fieldname": "highest_qualification",
+   "fieldtype": "Data",
+   "label": "Highest Qualification"
+  },
+  {
+   "fieldname": "languages",
+   "fieldtype": "Data",
+   "label": "Languages"
+  },
+  {
+   "fieldname": "availability",
+   "fieldtype": "Data",
+   "label": "Availability"
+  },
+  {
+   "fieldname": "sample_video",
+   "fieldtype": "Attach",
+   "label": "Sample Video"
+  },
+  {
+   "fieldname": "rating",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Rating",
+   "non_negative": 1
+  },
+  {
+   "fieldname": "column_break_ajla",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "platform_user_section",
+   "fieldtype": "Section Break",
+   "label": "Platform User"
+  },
+  {
+   "fieldname": "org_name",
+   "fieldtype": "Data",
+   "label": "Organisation Name"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-12-21 10:46:53.292509",
+ "modified_by": "Administrator",
+ "module": "Leapp",
+ "name": "Partner Profile",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Leapp Partner",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

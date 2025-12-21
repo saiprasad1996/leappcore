@@ -2,11 +2,257 @@
 
 {% block head %}
 <style type="text/css">
+    body {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+    }
 
-
+    .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
 </style>
 {% endblock %}
 
 {% block content %}
+<main class="flex-1 w-full bg-background-light dark:bg-background-dark text-leapp-black dark:text-white">
+    <div class="w-full px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Header -->
+        <div class="mb-8">
+            <h1 class="text-4xl sm:text-5xl font-black text-leapp-black dark:text-white mb-4">Explore Events</h1>
+            <p class="text-lg text-gray-600 dark:text-gray-400">Discover exciting events happening in your area</p>
+        </div>
 
+        <!-- Filters and Search Bar -->
+        <div class="mb-8 space-y-4">
+            <form method="get" action="/events" class="flex flex-col md:flex-row gap-4">
+                <!-- Search Input -->
+                <div class="flex-1">
+                    <div class="relative">
+                        <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">search</span>
+                        <input
+                            type="text"
+                            name="search"
+                            value="{{ search_query }}"
+                            placeholder="Search events..."
+                            class="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark text-leapp-black dark:text-white placeholder:text-gray-400 focus:border-leapp-yellow focus:outline-0 focus:ring-2 focus:ring-leapp-yellow/50" />
+                    </div>
+                </div>
+
+                <!-- Area Filter -->
+                <div class="w-full md:w-64">
+                    <select
+                        name="area"
+                        onchange="this.form.submit()"
+                        class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark text-leapp-black dark:text-white focus:border-leapp-yellow focus:outline-0 focus:ring-2 focus:ring-leapp-yellow/50">
+                        <option value="">All Areas</option>
+                        {% for area in areas %}
+                        <option value="{{ area.name }}" {% if area.name in area_filter %}selected{% endif %}>{{ area.area_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- View Toggle -->
+                <div class="flex gap-2 bg-gray-100 dark:bg-gray-800 p-1 rounded-lg">
+                    <a href="/events?view=gallery{% if filter_query %}&{{ filter_query }}{% endif %}"
+                       class="px-4 py-2 rounded-md flex items-center gap-2 transition-all {% if view_mode == 'gallery' %}bg-white dark:bg-gray-700 text-leapp-yellow shadow-sm{% else %}text-gray-600 dark:text-gray-400 hover:text-leapp-black dark:hover:text-white{% endif %}">
+                        <span class="material-symbols-outlined text-xl">grid_view</span>
+                        <span class="hidden sm:inline text-sm font-medium">Gallery</span>
+                    </a>
+                    <a href="/events?view=list{% if filter_query %}&{{ filter_query }}{% endif %}"
+                       class="px-4 py-2 rounded-md flex items-center gap-2 transition-all {% if view_mode == 'list' %}bg-white dark:bg-gray-700 text-leapp-yellow shadow-sm{% else %}text-gray-600 dark:text-gray-400 hover:text-leapp-black dark:hover:text-white{% endif %}">
+                        <span class="material-symbols-outlined text-xl">view_list</span>
+                        <span class="hidden sm:inline text-sm font-medium">List</span>
+                    </a>
+                </div>
+
+                <!-- Search Button -->
+                <button type="submit" class="px-6 py-3 bg-leapp-yellow text-leapp-black rounded-xl font-bold hover:bg-leapp-yellow/90 transition-all">
+                    Search
+                </button>
+            </form>
+        </div>
+
+        <!-- Results Count -->
+        <div class="mb-6 flex items-center justify-between">
+            <p class="text-gray-600 dark:text-gray-400">
+                Showing <span class="font-bold text-leapp-black dark:text-white">{{ events|length }}</span> 
+                of <span class="font-bold text-leapp-black dark:text-white">{{ total_count }}</span> events
+            </p>
+        </div>
+
+        {% if events and events|length > 0 %}
+
+        {% if view_mode == 'gallery' %}
+        <!-- Gallery View -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            {% for event in events %}
+            <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-background-dark shadow-lg overflow-hidden hover:shadow-xl transition-shadow group">
+                <!-- Event Image -->
+                {% if event.featured_image %}
+                <div class="w-full h-48 bg-center bg-cover" style="background-image: url('{{ event.featured_image }}');"></div>
+                {% else %}
+                <div class="w-full h-48 bg-gradient-to-br from-leapp-yellow/20 to-leapp-yellow/5 flex items-center justify-center">
+                    <span class="material-symbols-outlined text-leapp-yellow text-6xl">event</span>
+                </div>
+                {% endif %}
+
+                <div class="p-6">
+                    <!-- Event Name -->
+                    <h3 class="text-lg font-bold text-leapp-black dark:text-white mb-2 line-clamp-2 group-hover:text-leapp-yellow transition-colors">
+                        {{ event.event_name }}
+                    </h3>
+
+                    <!-- Heading/Subtitle -->
+                    {% if event.heading %}
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mb-3">{{ event.heading }}</p>
+                    {% endif %}
+
+                    <!-- Short Description -->
+                    {% if event.short_description %}
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mb-4 line-clamp-2">{{ event.short_description }}</p>
+                    {% endif %}
+
+                    <!-- Event Details -->
+                    <div class="space-y-2 mb-4 text-sm">
+                        {% if event.start_datetime %}
+                        <div class="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+                            <span class="material-symbols-outlined text-base text-leapp-yellow">calendar_today</span>
+                            <span>{{ event.start_datetime.strftime('%B %d, %Y at %I:%M %p') }}</span>
+                        </div>
+                        {% endif %}
+
+                        {% if event.venue_address %}
+                        <div class="flex items-start gap-2 text-gray-600 dark:text-gray-400">
+                            <span class="material-symbols-outlined text-base text-leapp-yellow">location_on</span>
+                            <span class="line-clamp-2">{{ event.venue_address }}</span>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- View Details Button -->
+                    <a href="{{ event.detail_url }}" class="flex items-center justify-center gap-2 w-full px-4 py-3 bg-leapp-yellow text-leapp-black rounded-xl font-bold hover:bg-leapp-yellow/90 transition-all">
+                        <span>View Details</span>
+                        <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        {% else %}
+        <!-- List View -->
+        <div class="space-y-4 mb-8">
+            {% for event in events %}
+            <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-background-dark shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
+                <div class="flex flex-col md:flex-row">
+                    <!-- Event Image -->
+                    {% if event.featured_image %}
+                    <div class="w-full md:w-64 h-48 md:h-auto bg-center bg-cover flex-shrink-0" style="background-image: url('{{ event.featured_image }}');"></div>
+                    {% else %}
+                    <div class="w-full md:w-64 h-48 md:h-auto bg-gradient-to-br from-leapp-yellow/20 to-leapp-yellow/5 flex items-center justify-center flex-shrink-0">
+                        <span class="material-symbols-outlined text-leapp-yellow text-6xl">event</span>
+                    </div>
+                    {% endif %}
+
+                    <!-- Event Content -->
+                    <div class="flex-1 p-6">
+                        <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+                            <div class="flex-1">
+                                <h3 class="text-xl font-bold text-leapp-black dark:text-white mb-2 hover:text-leapp-yellow transition-colors">
+                                    {{ event.event_name }}
+                                </h3>
+
+                                {% if event.heading %}
+                                <p class="text-sm text-gray-600 dark:text-gray-400 mb-3">{{ event.heading }}</p>
+                                {% endif %}
+
+                                {% if event.short_description %}
+                                <p class="text-sm text-gray-600 dark:text-gray-400 mb-4 line-clamp-2">{{ event.short_description }}</p>
+                                {% endif %}
+
+                                <!-- Event Details -->
+                                <div class="flex flex-wrap gap-4 text-sm mb-4">
+                                    {% if event.start_datetime %}
+                                    <div class="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+                                        <span class="material-symbols-outlined text-base text-leapp-yellow">calendar_today</span>
+                                        <span>{{ event.start_datetime.strftime('%B %d, %Y') }}</span>
+                                    </div>
+                                    <div class="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+                                        <span class="material-symbols-outlined text-base text-leapp-yellow">schedule</span>
+                                        <span>{{ event.start_datetime.strftime('%I:%M %p') }}</span>
+                                    </div>
+                                    {% endif %}
+
+                                    {% if event.venue_address %}
+                                    <div class="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+                                        <span class="material-symbols-outlined text-base text-leapp-yellow">location_on</span>
+                                        <span class="line-clamp-1">{{ event.venue_address }}</span>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- Action Button -->
+                            <div class="flex flex-col items-end gap-3">
+                                <a href="{{ event.detail_url }}" class="flex items-center gap-2 px-6 py-3 bg-leapp-yellow text-leapp-black rounded-xl font-bold hover:bg-leapp-yellow/90 transition-all whitespace-nowrap">
+                                    <span>View Details</span>
+                                    <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Pagination -->
+        {% if total_pages > 1 %}
+        <div class="flex justify-center items-center gap-2">
+            {% if page > 1 %}
+            <a href="/events?page={{ page - 1 }}{% if filter_query %}&{{ filter_query }}{% endif %}&view={{ view_mode }}"
+               class="px-4 py-2 rounded-lg bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-700 transition-colors">
+                <span class="material-symbols-outlined">chevron_left</span>
+            </a>
+            {% endif %}
+
+            <span class="px-4 py-2 text-gray-600 dark:text-gray-400">
+                Page {{ page }} of {{ total_pages }}
+            </span>
+
+            {% if page < total_pages %}
+            <a href="/events?page={{ page + 1 }}{% if filter_query %}&{{ filter_query }}{% endif %}&view={{ view_mode }}"
+               class="px-4 py-2 rounded-lg bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-700 transition-colors">
+                <span class="material-symbols-outlined">chevron_right</span>
+            </a>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        {% else %}
+        <!-- Empty State -->
+        <div class="text-center py-16">
+            <div class="flex justify-center mb-6">
+                <div class="w-24 h-24 rounded-full bg-leapp-yellow/10 dark:bg-leapp-yellow/20 flex items-center justify-center">
+                    <span class="material-symbols-outlined text-leapp-yellow text-6xl">event</span>
+                </div>
+            </div>
+            <h2 class="text-2xl font-bold text-leapp-black dark:text-white mb-3">No Events Found</h2>
+            <p class="text-gray-600 dark:text-gray-400 mb-6">
+                {% if search_query or area_filter %}
+                Try adjusting your filters or search query.
+                {% else %}
+                Check back soon for upcoming events.
+                {% endif %}
+            </p>
+            {% if search_query or area_filter %}
+            <a href="/events" class="inline-flex items-center gap-2 px-6 py-3 bg-leapp-yellow text-leapp-black rounded-xl font-bold hover:bg-leapp-yellow/90 transition-all">
+                <span class="material-symbols-outlined">refresh</span>
+                <span>Clear Filters</span>
+            </a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</main>
 {% endblock %}

@@ -245,3 +245,9 @@ app_license = "gpl-3.0"
 # 	"Logging DocType Name": 30  # days to retain logs
 # }
 
+
+
+fixtures = [
+    {"dt": "Role", "filters": [["name", "in", ["Leapp Customer", "Leapp Partner"]]]},
+    {"dt": "Custom DocPerm", "filters": [["role", "in", ["Leapp Customer", "Leapp Partner"]]]},
+]

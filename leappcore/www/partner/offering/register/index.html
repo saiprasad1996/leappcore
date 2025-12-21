@@ -1,0 +1,252 @@
+{% extends 'templates/htmlbase/base.html' %}
+
+{% block head %}
+<style type="text/css">
+    body {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="flex-1 w-full bg-background-light dark:bg-background-dark text-leapp-black dark:text-white">
+    <div class="w-full px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Header -->
+        <div class="mb-8">
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <h1 class="text-3xl sm:text-4xl font-black text-leapp-black dark:text-white">
+                        {% if is_edit %}Edit Offering{% else %}Create New Offering{% endif %}
+                    </h1>
+                    <p class="text-gray-600 dark:text-gray-400 mt-2">{% if is_edit %}Update your offering details{% else %}Add a new offering to the platform{% endif %}</p>
+                </div>
+            </div>
+            
+            <!-- Navigation Tabs -->
+            <div class="flex gap-4 border-b border-gray-200 dark:border-gray-700">
+                <a href="/partner/profile" class="px-4 py-3 text-sm font-bold text-gray-600 dark:text-gray-400 hover:text-leapp-yellow transition-colors">Profile</a>
+                <a href="/partner/offering/register" class="px-4 py-3 text-sm font-bold border-b-2 border-leapp-yellow text-leapp-yellow">Offerings</a>
+                <a href="/partner/event/register" class="px-4 py-3 text-sm font-bold text-gray-600 dark:text-gray-400 hover:text-leapp-yellow transition-colors">Events</a>
+                <a href="/partner/interests" class="px-4 py-3 text-sm font-bold text-gray-600 dark:text-gray-400 hover:text-leapp-yellow transition-colors">User Interests</a>
+            </div>
+        </div>
+
+        {% if success_message %}
+        <div class="mb-6 p-4 text-sm text-green-800 bg-green-100 rounded-lg dark:bg-green-900 dark:text-green-200 flex items-center gap-2" role="alert">
+            <span class="material-symbols-outlined">check_circle</span>
+            <span>{{ success_message }}</span>
+        </div>
+        {% endif %}
+        
+        {% if error_message %}
+        <div class="mb-6 p-4 text-sm text-red-800 bg-red-100 rounded-lg dark:bg-red-900 dark:text-red-200 flex items-center gap-2" role="alert">
+            <span class="material-symbols-outlined">error</span>
+            <span>{{ error_message }}</span>
+        </div>
+        {% endif %}
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- My Offerings Sidebar -->
+            <div class="lg:col-span-1 order-2 lg:order-1">
+                <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-background-dark p-6 shadow-lg">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-bold text-leapp-black dark:text-white">My Offerings</h3>
+                        <span class="px-2 py-1 bg-leapp-yellow/10 text-leapp-yellow text-xs font-bold rounded-full">{{ my_offerings|length }}</span>
+                    </div>
+                    
+                    {% if my_offerings %}
+                    <div class="space-y-3">
+                        {% for item in my_offerings %}
+                        <a href="/partner/offering/register?id={{ item.name }}" 
+                           class="block p-3 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-leapp-yellow hover:bg-leapp-yellow/5 transition-all {% if offering.name == item.name %}border-leapp-yellow bg-leapp-yellow/5{% endif %}">
+                            <div class="flex items-start justify-between gap-2">
+                                <div class="flex-1 min-w-0">
+                                    <p class="font-semibold text-leapp-black dark:text-white truncate">{{ item.title }}</p>
+                                    <p class="text-xs text-gray-600 dark:text-gray-400 truncate">{{ item.subtitle or 'No subtitle' }}</p>
+                                    <div class="flex items-center gap-2 mt-2">
+                                        <span class="text-xs font-bold text-leapp-yellow">₹{{ "%.0f"|format(item.price) }}</span>
+                                        {% if item.active %}
+                                        <span class="px-2 py-0.5 bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 text-xs rounded-full">Active</span>
+                                        {% else %}
+                                        <span class="px-2 py-0.5 bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200 text-xs rounded-full">Inactive</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="text-center py-8">
+                        <span class="material-symbols-outlined text-gray-400 text-5xl mb-2">school</span>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">No offerings yet</p>
+                    </div>
+                    {% endif %}
+                    
+                    <button onclick="window.location.href='/partner/offering/register'" class="w-full mt-4 px-4 py-3 border-2 border-dashed border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400 rounded-lg hover:border-leapp-yellow hover:text-leapp-yellow transition-all flex items-center justify-center gap-2">
+                        <span class="material-symbols-outlined">add</span>
+                        <span class="text-sm font-medium">New Offering</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Offering Form -->
+            <div class="lg:col-span-2 order-1 lg:order-2">
+                <form method="post" action="/partner/offering/register{% if offering.name %}?id={{ offering.name }}{% endif %}" id="offering-form" class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-background-dark p-6 shadow-lg space-y-6">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                    
+                    <!-- Basic Information -->
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-gray-700">
+                            <span class="material-symbols-outlined text-leapp-yellow">school</span>
+                            <h3 class="text-lg font-bold text-leapp-black dark:text-white">Basic Information</h3>
+                        </div>
+                        
+                        <label class="flex flex-col">
+                            <p class="text-leapp-black dark:text-white text-base font-medium leading-normal pb-2">Title <span class="text-red-500">*</span></p>
+                            <input
+                                name="title"
+                                value="{{ offering.title or '' }}"
+                                required
+                                class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark h-14 p-[15px] text-base font-normal leading-normal text-leapp-black dark:text-white placeholder:text-gray-400 focus:border-leapp-yellow focus:outline-0 focus:ring-2 focus:ring-leapp-yellow/50"
+                                placeholder="e.g., Creative Arts Workshop for Kids" type="text" />
+                        </label>
+                        
+                        <label class="flex flex-col">
+                            <p class="text-leapp-black dark:text-white text-base font-medium leading-normal pb-2">Subtitle / Tagline</p>
+                            <input
+                                name="subtitle"
+                                value="{{ offering.subtitle or '' }}"
+                                class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark h-14 p-[15px] text-base font-normal leading-normal text-leapp-black dark:text-white placeholder:text-gray-400 focus:border-leapp-yellow focus:outline-0 focus:ring-2 focus:ring-leapp-yellow/50"
+                                placeholder="A short catchy description" type="text" />
+                        </label>
+                        
+                        <label class="flex flex-col">
+                            <p class="text-leapp-black dark:text-white text-base font-medium leading-normal pb-2">Description</p>
+                            <textarea
+                                name="description"
+                                rows="5"
+                                class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark p-[15px] text-base font-normal leading-normal text-leapp-black dark:text-white placeholder:text-gray-400 focus:border-leapp-yellow focus:outline-0 focus:ring-2 focus:ring-leapp-yellow/50"
+                                placeholder="Detailed description of your offering">{{ offering.description or '' }}</textarea>
+                        </label>
+                    </div>
+
+                    <!-- Pricing & Details -->
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-gray-700">
+                            <span class="material-symbols-outlined text-leapp-yellow">payments</span>
+                            <h3 class="text-lg font-bold text-leapp-black dark:text-white">Pricing & Details</h3>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <label class="flex flex-col">
+                                <p class="text-leapp-black dark:text-white text-base font-medium leading-normal pb-2">Price (₹)</p>
+                                <input
+                                    name="price"
+                                    value="{{ offering.price or 0 }}"
+                                    type="number"
+                                    min="0"
+                                    step="0.01"
+                                    class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark h-14 p-[15px] text-base font-normal leading-normal text-leapp-black dark:text-white placeholder:text-gray-400 focus:border-leapp-yellow focus:outline-0 focus:ring-2 focus:ring-leapp-yellow/50"
+                                    placeholder="0.00" />
+                            </label>
+                            
+                            <label class="flex flex-col">
+                                <p class="text-leapp-black dark:text-white text-base font-medium leading-normal pb-2">Duration (hours)</p>
+                                <input
+                                    name="duration_hours"
+                                    value="{{ offering.duration_hours or 0 }}"
+                                    type="number"
+                                    min="0"
+                                    step="0.5"
+                                    class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark h-14 p-[15px] text-base font-normal leading-normal text-leapp-black dark:text-white placeholder:text-gray-400 focus:border-leapp-yellow focus:outline-0 focus:ring-2 focus:ring-leapp-yellow/50"
+                                    placeholder="0" />
+                            </label>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <label class="flex flex-col">
+                                <p class="text-leapp-black dark:text-white text-base font-medium leading-normal pb-2">Skill Level</p>
+                                <select
+                                    name="level"
+                                    class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark h-14 p-[15px] text-base font-normal leading-normal text-leapp-black dark:text-white focus:border-leapp-yellow focus:outline-0 focus:ring-2 focus:ring-leapp-yellow/50">
+                                    <option value="Beginner" {% if offering.level == 'Beginner' %}selected{% endif %}>Beginner</option>
+                                    <option value="Intermediate" {% if offering.level == 'Intermediate' %}selected{% endif %}>Intermediate</option>
+                                    <option value="Advanced" {% if offering.level == 'Advanced' %}selected{% endif %}>Advanced</option>
+                                </select>
+                            </label>
+                            
+                            <label class="flex flex-col">
+                                <p class="text-leapp-black dark:text-white text-base font-medium leading-normal pb-2">Total Sessions</p>
+                                <input
+                                    name="total_sessions"
+                                    value="{{ offering.total_sessions or 0 }}"
+                                    type="number"
+                                    min="0"
+                                    class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark h-14 p-[15px] text-base font-normal leading-normal text-leapp-black dark:text-white placeholder:text-gray-400 focus:border-leapp-yellow focus:outline-0 focus:ring-2 focus:ring-leapp-yellow/50"
+                                    placeholder="0" />
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Status -->
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-gray-700">
+                            <span class="material-symbols-outlined text-leapp-yellow">toggle_on</span>
+                            <h3 class="text-lg font-bold text-leapp-black dark:text-white">Status</h3>
+                        </div>
+                        
+                        <div class="flex items-center gap-3">
+                            <input
+                                type="checkbox"
+                                id="active"
+                                name="active"
+                                {% if offering.active %}checked{% endif %}
+                                class="h-5 w-5 rounded border-gray-300 dark:border-gray-600 text-leapp-yellow focus:ring-leapp-yellow focus:ring-2" />
+                            <label for="active" class="text-base text-gray-700 dark:text-gray-300">
+                                <span class="font-medium">Make this offering active</span>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">Active offerings will be visible to all users on the platform</p>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Submit Buttons -->
+                    <div class="flex flex-col sm:flex-row justify-end gap-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                        <button
+                            type="button"
+                            onclick="window.location.href='/partner/profile'"
+                            class="px-6 py-3 border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-xl font-bold hover:bg-gray-50 dark:hover:bg-gray-800 transition-all">
+                            Cancel
+                        </button>
+                        <button
+                            type="submit"
+                            class="flex items-center justify-center gap-2 px-6 py-3 bg-leapp-yellow text-leapp-black rounded-xl font-bold hover:bg-leapp-yellow/90 transition-all">
+                            <span class="material-symbols-outlined">save</span>
+                            <span>{% if is_edit %}Update Offering{% else %}Create Offering{% endif %}</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Auto-hide success messages after 5 seconds
+        const successAlert = document.querySelector('[role="alert"]');
+        if (successAlert && successAlert.classList.contains('text-green-800')) {
+            setTimeout(() => {
+                successAlert.style.opacity = '0';
+                setTimeout(() => successAlert.remove(), 300);
+            }, 5000);
+        }
+    });
+</script>
+{% endblock %}

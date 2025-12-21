@@ -17,7 +17,7 @@
             "fieldtype": "Link",
             "in_list_view": 1,
             "label": "Event",
-            "options": "Event"
+            "options": "Leapp Event"
         },
         {
             "fieldname": "user",

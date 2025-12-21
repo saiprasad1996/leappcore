@@ -14,30 +14,27 @@
 
 {% block content %}
 <main class="flex-1 w-full py-12">
-    <div class="w-full px-4 sm:px-6 lg:px-8"></div>
-        <div class="@container">
-            <div class="@[480px]:p-4">
-                <div
-                    class="flex min-h-[480px] flex-col gap-6 bg-gradient-to-br from-yellow-300 to-yellow-500 @[480px]:gap-8 @[480px]:rounded-xl items-center justify-center p-4 text-center">
-                    <div class="flex flex-col gap-2">
-                        <h1
-                            class="text-black text-4xl font-black leading-tight tracking-[-0.033em] @[480px]:text-5xl @[480px]:font-black @[480px]:leading-tight @[480px]:tracking-[-0.033em]">
-                            About LEAPP: Fostering Every Child's Potential
-                        </h1>
-                        <h2
-                            class="text-slate-800 text-sm font-normal leading-normal @[480px]:text-base @[480px]:font-normal @[480px]:leading-normal max-w-2xl mx-auto">
-                            LEAPP is a dedicated platform designed to support and enhance the developmental
-                            journey of every child. We provide engaging activities and resources to help
-                            children thrive.
-                        </h2>
-                    </div>
-                    <button
-                        class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 @[480px]:h-12 @[480px]:px-5 bg-black text-white text-sm font-bold leading-normal tracking-[0.015em] @[480px]:text-base @[480px]:font-bold @[480px]:leading-normal @[480px]:tracking-[0.015em]">
-                        <span class="truncate">Learn More</span>
-                    </button>
+    <div class="w-full px-4 sm:px-6 lg:px-8">
+        <div class="p-4">
+            <div
+                class="flex min-h-[480px] flex-col gap-6 bg-gradient-to-br from-yellow-300 to-yellow-500 gap-8 rounded-xl items-center justify-center p-4 text-center">
+                <div class="flex flex-col gap-2">
+                    <h1
+                        class="text-black text-4xl font-black leading-tight tracking-[-0.033em] sm:text-5xl sm:font-black sm:leading-tight sm:tracking-[-0.033em]">
+                        About LEAPP: Fostering Every Child's Potential
+                    </h1>
+                    <h2
+                        class="text-slate-800 text-sm font-normal leading-normal sm:text-base sm:font-normal sm:leading-normal max-w-2xl mx-auto">
+                        {{ main_page.aboutus_content_short or "LEAPP is a dedicated platform designed to support and enhance the developmental journey of every child." }}
+                    </h2>
                 </div>
+                <button
+                    class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 sm:h-12 sm:px-5 bg-black text-white text-sm font-bold leading-normal tracking-[0.015em] sm:text-base sm:font-bold sm:leading-normal sm:tracking-[0.015em]">
+                    <span class="truncate">Learn More</span>
+                </button>
             </div>
         </div>
+    </div>
 
         <!-- Mission, Vision, and Values Section -->
         <section class="py-16">
@@ -95,7 +92,7 @@
             <h2
                 class="text-text-light dark:text-text-dark text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-12 text-center">
                 Our Journey: Nurturing Growth, One Step at a Time</h2>
-            <div class="relative w-full max-w-6xl mx-auto px-4"></div>
+            <div class="relative w-full max-w-6xl mx-auto px-4">
                 <div class="absolute left-1/2 -translate-x-1/2 w-1 bg-yellow-400 h-full"></div>
                 <div class="mb-12 flex justify-between items-center w-full right-timeline flex-row-reverse">
                     <div class="order-1 w-5/12"></div>
@@ -168,35 +165,17 @@
                 class="text-text-light dark:text-text-dark text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-6 text-center">
                 Meet the Minds Behind LEAPP</h2>
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                {% for member in team_members %}
                 <div class="flex flex-col items-center text-center">
                     <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-32 mb-4 bg-gray-200 dark:bg-gray-700"
-                        style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBCBsJt3gKqXETi0U0rqWYsX4qJsdOjaLxK06Kpbuz5bXOLZK8r34Ux3z91Isd_lUUk3_wi0fyPBLx6JZP5pDEMhx5tWpUXvCmyhlS_AF8a-XKkJC2JVnic_FofpP0PKCLntysnxN3IRmsZHnUi4E5Pw91pqDnpagmyOeHaqDutrobxo5dwRKEx5pwJDNJQ-JDRzVQZkpg7NcibB5Gcoq0_6cu0Yj40o3YRQ_EhhM1Fd1SGL-wRooVVrS3PeNn0Jx_-VLc5latFt-gn');">
+                        style="background-image: url('{{ member.image or "https://placehold.co/400x400?text=No+Image" }}');">
                     </div>
-                    <h3 class="text-text-light dark:text-text-dark font-bold">Jane Doe</h3>
-                    <p class="text-slate-600 dark:text-slate-400 text-sm">Founder &amp; CEO</p>
+                    <h3 class="text-text-light dark:text-text-dark font-bold">{{ member.member_name }}</h3>
+                    <p class="text-slate-600 dark:text-slate-400 text-sm">{{ member.position }}</p>
                 </div>
-                <div class="flex flex-col items-center text-center">
-                    <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-32 mb-4 bg-gray-200 dark:bg-gray-700"
-                        style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBCBsJt3gKqXETi0U0rqWYsX4qJsdOjaLxK06Kpbuz5bXOLZK8r34Ux3z91Isd_lUUk3_wi0fyPBLx6JZP5pDEMhx5tWpUXvCmyhlS_AF8a-XKkJC2JVnic_FofpP0PKCLntysnxN3IRmsZHnUi4E5Pw91pqDnpagmyOeHaqDutrobxo5dwRKEx5pwJDNJQ-JDRzVQZkpg7NcibB5Gcoq0_6cu0Yj40o3YRQ_EhhM1Fd1SGL-wRooVVrS3PeNn0Jx_-VLc5latFt-gn');">
-                    </div>
-                    <h3 class="text-text-light dark:text-text-dark font-bold">John Smith</h3>
-                    <p class="text-slate-600 dark:text-slate-400 text-sm">Lead Child Development Specialist
-                    </p>
-                </div>
-                <div class="flex flex-col items-center text-center">
-                    <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-32 mb-4 bg-gray-200 dark:bg-gray-700"
-                        style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBCBsJt3gKqXETi0U0rqWYsX4qJsdOjaLxK06Kpbuz5bXOLZK8r34Ux3z91Isd_lUUk3_wi0fyPBLx6JZP5pDEMhx5tWpUXvCmyhlS_AF8a-XKkJC2JVnic_FofpP0PKCLntysnxN3IRmsZHnUi4E5Pw91pqDnpagmyOeHaqDutrobxo5dwRKEx5pwJDNJQ-JDRzVQZkpg7NcibB5Gcoq0_6cu0Yj40o3YRQ_EhhM1Fd1SGL-wRooVVrS3PeNn0Jx_-VLc5latFt-gn');">
-                    </div>
-                    <h3 class="text-text-light dark:text-text-dark font-bold">Alex Johnson</h3>
-                    <p class="text-slate-600 dark:text-slate-400 text-sm">Technology Lead</p>
-                </div>
-                <div class="flex flex-col items-center text-center">
-                    <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-32 mb-4 bg-gray-200 dark:bg-gray-700"
-                        style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBCBsJt3gKqXETi0U0rqWYsX4qJsdOjaLxK06Kpbuz5bXOLZK8r34Ux3z91Isd_lUUk3_wi0fyPBLx6JZP5pDEMhx5tWpUXvCmyhlS_AF8a-XKkJC2JVnic_FofpP0PKCLntysnxN3IRmsZHnUi4E5Pw91pqDnpagmyOeHaqDutrobxo5dwRKEx5pwJDNJQ-JDRzVQZkpg7NcibB5Gcoq0_6cu0Yj40o3YRQ_EhhM1Fd1SGL-wRooVVrS3PeNn0Jx_-VLc5latFt-gn');">
-                    </div>
-                    <h3 class="text-text-light dark:text-text-dark font-bold">Sarah Williams</h3>
-                    <p class="text-slate-600 dark:text-slate-400 text-sm">UX/UI Designer</p>
-                </div>
+                {% else %}
+                <div class="col-span-full text-center text-slate-500">Our team is growing! Check back soon.</div>
+                {% endfor %}
             </div>
         </section>
 
@@ -257,59 +236,29 @@
                 class="text-text-light dark:text-text-dark text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-6 text-center">
                 Voices of Our Impact</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {% for testimonial in testimonials %}
                 <div
                     class="flex flex-col gap-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-background-light dark:bg-background-dark p-6">
                     <div class="flex items-center gap-4">
                         <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-12"
-                            style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBCBsJt3gKqXETi0U0rqWYsX4qJsdOjaLxK06Kpbuz5bXOLZK8r34Ux3z91Isd_lUUk3_wi0fyPBLx6JZP5pDEMhx5tWpUXvCmyhlS_AF8a-XKkJC2JVnic_FofpP0PKCLntysnxN3IRmsZHnUi4E5Pw91pqDnpagmyOeHaqDutrobxo5dwRKEx5pwJDNJQ-JDRzVQZkpg7NcibB5Gcoq0_6cu0Yj40o3YRQ_EhhM1Fd1SGL-wRooVVrS3PeNn0Jx_-VLc5latFt-gn');">
+                            style="background-image: url('{{ testimonial.image or "https://placehold.co/100x100?text=No+Image" }}');">
                         </div>
                         <div>
-                            <h3 class="text-text-light dark:text-text-dark font-bold">Parent A</h3>
-                            <p class="text-slate-600 dark:text-slate-400 text-sm">Parent of a 4-year-old</p>
+                            <h3 class="text-text-light dark:text-text-dark font-bold">{{ testimonial.customer_name }}</h3>
+                            <p class="text-slate-600 dark:text-slate-400 text-sm">{{ testimonial.customer_designation }}</p>
                         </div>
                     </div>
                     <p class="text-slate-600 dark:text-slate-400 text-base font-normal leading-normal italic">
-                        "LEAPP has been a game-changer for our family. The activities are not only fun but
-                        genuinely help with my child's development. We've seen remarkable progress."
+                        "{{ testimonial.description }}"
                     </p>
                 </div>
-                <div
-                    class="flex flex-col gap-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-background-light dark:bg-background-dark p-6">
-                    <div class="flex items-center gap-4">
-                        <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-12"
-                            style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBCBsJt3gKqXETi0U0rqWYsX4qJsdOjaLxK06Kpbuz5bXOLZK8r34Ux3z91Isd_lUUk3_wi0fyPBLx6JZP5pDEMhx5tWpUXvCmyhlS_AF8a-XKkJC2JVnic_FofpP0PKCLntysnxN3IRmsZHnUi4E5Pw91pqDnpagmyOeHaqDutrobxo5dwRKEx5pwJDNJQ-JDRzVQZkpg7NcibB5Gcoq0_6cu0Yj40o3YRQ_EhhM1Fd1SGL-wRooVVrS3PeNn0Jx_-VLc5latFt-gn');">
-                        </div>
-                        <div>
-                            <h3 class="text-text-light dark:text-text-dark font-bold">Educator B</h3>
-                            <p class="text-slate-600 dark:text-slate-400 text-sm">Elementary School Teacher
-                            </p>
-                        </div>
-                    </div>
-                    <p class="text-slate-600 dark:text-slate-400 text-base font-normal leading-normal italic">
-                        "Integrating LEAPP's resources into my curriculum has enhanced engagement and
-                        learning outcomes. It's an invaluable tool for educators focusing on holistic
-                        development."
-                    </p>
-                </div>
+                {% else %}
+                <div class="col-span-full text-center text-slate-500">No testimonials yet.</div>
+                {% endfor %}
             </div>
         </section>
 
-        <!-- Impact Report Section -->
-        <section class="py-16 text-center px-4">
-            <h2
-                class="text-text-light dark:text-text-dark text-[22px] font-bold leading-tight tracking-[-0.015em] pb-6">
-                Download Our Latest Impact Report</h2>
-            <p class="text-slate-600 dark:text-slate-400 text-base font-normal leading-normal mb-8 max-w-4xl mx-auto">
-                Gain deeper insights into LEAPP's achievements, methodologies, and future goals. Our
-                comprehensive Impact Report highlights our commitment to transparency and measurable
-                success.
-            </p>
-            <button
-                class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-5 bg-primary text-black text-base font-bold leading-normal tracking-[0.015em] mx-auto">
-                <span class="material-symbols-outlined mr-2">download</span>
-                <span class="truncate">Download Report (PDF)</span>
-            </button>
-        </section>
+        
     </div>
 </main>
 {% endblock %}

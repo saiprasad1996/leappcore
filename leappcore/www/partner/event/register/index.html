@@ -1,0 +1,257 @@
+{% extends 'templates/htmlbase/base.html' %}
+
+{% block head %}
+<style type="text/css">
+    body {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="flex-1 w-full bg-background-light dark:bg-background-dark text-leapp-black dark:text-white">
+    <div class="w-full px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Header -->
+        <div class="mb-8">
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <h1 class="text-3xl sm:text-4xl font-black text-leapp-black dark:text-white">
+                       {% if is_edit %}Edit Event{% else %}Create New Event{% endif %}
+                    </h1>
+                    <p class="text-gray-600 dark:text-gray-400 mt-2">{% if is_edit %}Update your event details{% else %}Add a new event to the platform{% endif %}</p>
+                </div>
+            </div>
+            
+            <!-- Navigation Tabs -->
+            <div class="flex gap-4 border-b border-gray-200 dark:border gray-700">
+                <a href="/partner/profile" class="px-4 py-3 text-sm font-bold text-gray-600 dark:text-gray-400 hover:text-leapp-yellow transition-colors">Profile</a>
+                <a href="/partner/offering/register" class="px-4 py-3 text-sm font-bold text-gray-600 dark:text-gray-400 hover:text-leapp-yellow transition-colors">Offerings</a>
+                <a href="/partner/event/register" class="px-4 py-3 text-sm font-bold border-b-2 border-leapp-yellow text-leapp-yellow">Events</a>
+                <a href="/partner/interests" class="px-4 py-3 text-sm font-bold text-gray-600 dark:text-gray-400 hover:text-leapp-yellow transition-colors">User Interests</a>
+            </div>
+        </div>
+
+        {% if success_message %}
+        <div class="mb-6 p-4 text-sm text-green-800 bg-green-100 rounded-lg dark:bg-green-900 dark:text-green-200 flex items-center gap-2" role="alert">
+            <span class="material-symbols-outlined">check_circle</span>
+            <span>{{ success_message }}</span>
+        </div>
+        {% endif %}
+        
+        {% if error_message %}
+        <div class="mb-6 p-4 text-sm text-red-800 bg-red-100 rounded-lg dark:bg-red-900 dark:text-red-200 flex items-center gap-2" role="alert">
+            <span class="material-symbols-outlined">error</span>
+            <span>{{ error_message }}</span>
+        </div>
+        {% endif %}
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- My Events Sidebar -->
+            <div class="lg:col-span-1 order-2 lg:order-1">
+                <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-background-dark p-6 shadow-lg">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-bold text-leapp-black dark:text-white">My Events</h3>
+                        <span class="px-2 py-1 bg-leapp-yellow/10 text-leapp-yellow text-xs font-bold rounded-full">{{ my_events|length }}</span>
+                    </div>
+                    
+                    {% if my_events %}
+                    <div class="space-y-3">
+                        {% for item in my_events %}
+                        <a href="/partner/event/register?id={{ item.name }}" 
+                           class="block p-3 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-leapp-yellow hover:bg-leapp-yellow/5 transition-all {% if event.name == item.name %}border-leapp-yellow bg-leapp-yellow/5{% endif %}">
+                            <div class="flex items-start justify-between gap-2">
+                                <div class="flex-1 min-w-0">
+                                    <p class="font-semibold text-leapp-black dark:text-white truncate">{{ item.event_name }}</p>
+                                    <p class="text-xs text-gray-600 dark:text-gray-400 truncate">{{ item.heading or 'No heading' }}</p>
+                                    <div class="flex items-center gap-2 mt-2">
+                                        {% if item.start_datetime %}
+                                        <span class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                                            <span class="material-symbols-outlined text-xs">schedule</span>
+                                            {{ frappe.utils.formatdate(item.start_datetime, "dd MMM") }}
+                                        </span>
+                                        {% endif %}
+                                        {% if item.active %}
+                                        <span class="px-2 py-0.5 bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 text-xs rounded-full">Active</span>
+                                        {% else %}
+                                        <span class="px-2 py-0.5 bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200 text-xs rounded-full">Inactive</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="text-center py-8">
+                        <span class="material-symbols-outlined text-gray-400 text-5xl mb-2">event</span>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">No events yet</p>
+                    </div>
+                    {% endif %}
+                    
+                    <button onclick="window.location.href='/partner/event/register'" class="w-full mt-4 px-4 py-3 border-2 border-dashed border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400 rounded-lg hover:border-leapp-yellow hover:text-leapp-yellow transition-all flex items-center justify-center gap-2">
+                        <span class="material-symbols-outlined">add</span>
+                        <span class="text-sm font-medium">New Event</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Event Form -->
+            <div class="lg:col-span-2 order-1 lg:order-2">
+                <form method="post" action="/partner/event/register{% if event.name %}?id={{ event.name }}{% endif %}" id="event-form" class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-background-dark p-6 shadow-lg space-y-6">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                    
+                    <!-- Basic Information -->
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-gray-700">
+                            <span class="material-symbols-outlined text-leapp-yellow">event</span>
+                            <h3 class="text-lg font-bold text-leapp-black dark:text-white">Event Information</h3>
+                        </div>
+                        
+                        <label class="flex flex-col">
+                            <p class="text-leapp-black dark:text-white text-base font-medium leading-normal pb-2">Event Name <span class="text-red-500">*</span></p>
+                            <input
+                                name="event_name"
+                                value="{{ event.event_name or '' }}"
+                                required
+                                class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark h-14 p-[15px] text-base font-normal leading-normal text-leapp-black dark:text-white placeholder:text-gray-400 focus:border-leapp-yellow focus:outline-0 focus:ring-2 focus:ring-leapp-yellow/50"
+                                placeholder="e.g., Summer Art Camp 2024" type="text" />
+                        </label>
+                        
+                        <label class="flex flex-col">
+                            <p class="text-leapp-black dark:text-white text-base font-medium leading-normal pb-2">Heading</p>
+                            <input
+                                name="heading"
+                                value="{{ event.heading or '' }}"
+                                class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark h-14 p-[15px] text-base font-normal leading-normal text-leapp-black dark:text-white placeholder:text-gray-400 focus:border-leapp-yellow focus:outline-0 focus:ring-2 focus:ring-leapp-yellow/50"
+                                placeholder="Event heading or title" type="text" />
+                        </label>
+                        
+                        <label class="flex flex-col">
+                            <p class="text-leapp-black dark:text-white text-base font-medium leading-normal pb-2">Short Description</p>
+                            <textarea
+                                name="short_description"
+                                rows="3"
+                                class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark p-[15px] text-base font-normal leading-normal text-leapp-black dark:text-white placeholder:text-gray-400 focus:border-leapp-yellow focus:outline-0 focus:ring-2 focus:ring-leapp-yellow/50"
+                                placeholder="Brief description for preview">{{ event.short_description or '' }}</textarea>
+                        </label>
+                        
+                        <label class="flex flex-col">
+                            <p class="text-leapp-black dark:text-white text-base font-medium leading-normal pb-2">Long Description</p>
+                            <textarea
+                                name="long_description"
+                                rows="5"
+                                class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark p-[15px] text-base font-normal leading-normal text-leapp-black dark:text-white placeholder:text-gray-400 focus:border-leapp-yellow focus:outline-0 focus:ring-2 focus:ring-leapp-yellow/50"
+                                placeholder="Detailed description of the event">{{ event.long_description or '' }}</textarea>
+                        </label>
+                    </div>
+
+                    <!-- Schedule & Location -->
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-gray-700">
+                            <span class="material-symbols-outlined text-leapp-yellow">schedule</span>
+                            <h3 class="text-lg font-bold text-leapp-black dark:text-white">Schedule & Location</h3>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <label class="flex flex-col">
+                                <p class="text-leapp-black dark:text-white text-base font-medium leading-normal pb-2">Start Date & Time</p>
+                                <input
+                                    name="start_datetime"
+                                    value="{{ event.start_datetime or '' }}"
+                                    type="datetime-local"
+                                    class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark h-14 p-[15px] text-base font-normal leading-normal text-leapp-black dark:text-white placeholder:text-gray-400 focus:border-leapp-yellow focus:outline-0 focus:ring-2 focus:ring-leapp-yellow/50" />
+                            </label>
+                            
+                            <label class="flex flex-col">
+                                <p class="text-leapp-black dark:text-white text-base font-medium leading-normal pb-2">End Date & Time</p>
+                                <input
+                                    name="end_datetime"
+                                    value="{{ event.end_datetime or '' }}"
+                                    type="datetime-local"
+                                    class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark h-14 p-[15px] text-base font-normal leading-normal text-leapp-black dark:text-white placeholder:text-gray-400 focus:border-leapp-yellow focus:outline-0 focus:ring-2 focus:ring-leapp-yellow/50" />
+                            </label>
+                        </div>
+                        
+                        <label class="flex flex-col">
+                            <p class="text-leapp-black dark:text-white text-base font-medium leading-normal pb-2">Area</p>
+                            <select
+                                name="area"
+                                class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark h-14 p-[15px] text-base font-normal leading-normal text-leapp-black dark:text-white placeholder:text-gray-400 focus:border-leapp-yellow focus:outline-0 focus:ring-2 focus:ring-leapp-yellow/50">
+                                <option value="">Select an area</option>
+                                {% for area in areas %}
+                                <option value="{{ area.name }}" {% if event.area == area.name %}selected{% endif %}>{{ area.area_name }}</option>
+                                {% endfor %}
+                            </select>
+                        </label>
+                        
+                        <label class="flex flex-col">
+                            <p class="text-leapp-black dark:text-white text-base font-medium leading-normal pb-2">Venue Address</p>
+                            <textarea
+                                name="venue_address"
+                                rows="3"
+                                class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark p-[15px] text-base font-normal leading-normal text-leapp-black dark:text-white placeholder:text-gray-400 focus:border-leapp-yellow focus:outline-0 focus:ring-2 focus:ring-leapp-yellow/50"
+                                placeholder="Full venue address with landmarks">{{ event.venue_address or '' }}</textarea>
+                        </label>
+                    </div>
+
+                    <!-- Status -->
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-gray-700">
+                            <span class="material-symbols-outlined text-leapp-yellow">toggle_on</span>
+                            <h3 class="text-lg font-bold text-leapp-black dark:text-white">Status</h3>
+                        </div>
+                        
+                        <div class="flex items-center gap-3">
+                            <input
+                                type="checkbox"
+                                id="active"
+                                name="active"
+                                {% if event.active %}checked{% endif %}
+                                class="h-5 w-5 rounded border-gray-300 dark:border-gray-600 text-leapp-yellow focus:ring-leapp-yellow focus:ring-2" />
+                            <label for="active" class="text-base text-gray-700 dark:text-gray-300">
+                                <span class="font-medium">Make this event active</span>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">Active events will be visible to all users on the platform</p>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Submit Buttons -->
+                    <div class="flex flex-col sm:flex-row justify-end gap-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                        <button
+                            type="button"
+                            onclick="window.location.href='/partner/profile'"
+                            class="px-6 py-3 border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-xl font-bold hover:bg-gray-50 dark:hover:bg-gray-800 transition-all">
+                            Cancel
+                        </button>
+                        <button
+                            type="submit"
+                            class="flex items-center justify-center gap-2 px-6 py-3 bg-leapp-yellow text-leapp-black rounded-xl font-bold hover:bg-leapp-yellow/90 transition-all">
+                            <span class="material-symbols-outlined">save</span>
+                            <span>{% if is_edit %}Update Event{% else %}Create Event{% endif %}</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Auto-hide success messages after 5 seconds
+        const successAlert = document.querySelector('[role="alert"]');
+        if (successAlert && successAlert.classList.contains('text-green-800')) {
+            setTimeout(() => {
+                successAlert.style.opacity = '0';
+                setTimeout(() => successAlert.remove(), 300);
+            }, 5000);
+        }
+    });
+</script>
+{% endblock %}

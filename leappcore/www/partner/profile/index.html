@@ -1,0 +1,206 @@
+{% extends 'templates/htmlbase/base.html' %}
+
+{% block head %}
+<style type="text/css">
+    body {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="flex-1 w-full bg-background-light dark:bg-background-dark text-leapp-black dark:text-white">
+    <div class="w-full px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Header -->
+        <div class="mb-8">
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <h1 class="text-3xl sm:text-4xl font-black text-leapp-black dark:text-white">Partner Profile</h1>
+                    <p class="text-gray-600 dark:text-gray-400 mt-2">Manage your partner information and preferences</p>
+                </div>
+                <a href="/partner/offering/register" class="flex items-center gap-2 px-6 py-3 bg-leapp-yellow text-leapp-black rounded-xl font-bold hover:bg-leapp-yellow/90 transition-all">
+                    <span class="material-symbols-outlined">add_circle</span>
+                    <span class="hidden sm:inline">New Offering</span>
+                </a>
+            </div>
+            
+            <!-- Navigation Tabs -->
+            <div class="flex gap-4 border-b border-gray-200 dark:border-gray-700">
+                <a href="/partner/profile" class="px-4 py-3 text-sm font-bold border-b-2 border-leapp-yellow text-leapp-yellow">Profile</a>
+                <a href="/partner/offering/register" class="px-4 py-3 text-sm font-bold text-gray-600 dark:text-gray-400 hover:text-leapp-yellow transition-colors">Offerings</a>
+                <a href="/partner/event/register" class="px-4 py-3 text-sm font-bold text-gray-600 dark:text-gray-400 hover:text-leapp-yellow transition-colors">Events</a>
+                <a href="/partner/interests" class="px-4 py-3 text-sm font-bold text-gray-600 dark:text-gray-400 hover:text-leapp-yellow transition-colors">User Interests</a>
+            </div>
+        </div>
+
+        {% if success_message %}
+        <div class="mb-6 p-4 text-sm text-green-800 bg-green-100 rounded-lg dark:bg-green-900 dark:text-green-200 flex items-center gap-2" role="alert">
+            <span class="material-symbols-outlined">check_circle</span>
+            <span>{{ success_message }}</span>
+        </div>
+        {% endif %}
+        
+        {% if error_message %}
+        <div class="mb-6 p-4 text-sm text-red-800 bg-red-100 rounded-lg dark:bg-red-900 dark:text-red-200 flex items-center gap-2" role="alert">
+            <span class="material-symbols-outlined">error</span>
+            <span>{{ error_message }}</span>
+        </div>
+        {% endif %}
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- User Info Card -->
+            <div class="lg:col-span-1">
+                <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-background-dark p-6 shadow-lg">
+                    <div class="flex flex-col items-center text-center space-y-4">
+                        <div class="w-24 h-24 rounded-full bg-leapp-yellow flex items-center justify-center text-leapp-black font-bold text-3xl">
+                            {% if user_info.user_image %}
+                            <img src="{{ user_info.user_image }}" alt="{{ user_info.full_name }}" class="w-24 h-24 rounded-full object-cover">
+                            {% else %}
+                            {{ user_info.full_name[0].upper() }}
+                            {% endif %}
+                        </div>
+                        <div class="w-full">
+                            <h3 class="text-xl font-bold text-leapp-black dark:text-white">{{ user_info.full_name }}</h3>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">{{ user_info.email }}</p>
+                            {% if user_info.phone %}
+                            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">{{ user_info.phone }}</p>
+                            {% endif %}
+                        </div>
+                        
+                        {% if profile.rating %}
+                        <div class="flex items-center gap-2 px-4 py-2 bg-leapp-yellow/10 rounded-lg">
+                            <span class="material-symbols-outlined text-leapp-yellow" style="font-variation-settings: 'FILL' 1;">star</span>
+                            <span class="font-bold text-leapp-black dark:text-white">{{ profile.rating }}/5</span>
+                        </div>
+                        {% endif %}
+                        
+                        <div class="w-full pt-4 border-t border-gray-200 dark:border-gray-700">
+                            <a href="/app/user/{{ frappe.session.user }}" class="text-leapp-yellow hover:text-leapp-yellow/80 text-sm font-medium flex items-center justify-center gap-2">
+                                <span class="material-symbols-outlined text-base">settings</span>
+                                <span>Account Settings</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile Form -->
+            <div class="lg:col-span-2">
+                <form method="post" action="/partner/profile" id="profile-form" class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-background-dark p-6 shadow-lg space-y-6">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                    
+                    <!-- Organization Section -->
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-gray-700">
+                            <span class="material-symbols-outlined text-leapp-yellow">business</span>
+                            <h3 class="text-lg font-bold text-leapp-black dark:text-white">Organization Details</h3>
+                        </div>
+                        
+                        <label class="flex flex-col">
+                            <p class="text-leapp-black dark:text-white text-base font-medium leading-normal pb-2">Organization Name</p>
+                            <input
+                                name="org_name"
+                                value="{{ profile.org_name or '' }}"
+                                class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark h-14 p-[15px] text-base font-normal leading-normal text-leapp-black dark:text-white placeholder:text-gray-400 focus:border-leapp-yellow focus:outline-0 focus:ring-2 focus:ring-leapp-yellow/50"
+                                placeholder="Enter organization name" type="text" />
+                        </label>
+                        
+                        <label class="flex flex-col">
+                            <p class="text-leapp-black dark:text-white text-base font-medium leading-normal pb-2">Area/Location</p>
+                            <select
+                                name="area"
+                                class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark h-14 p-[15px] text-base font-normal leading-normal text-leapp-black dark:text-white placeholder:text-gray-400 focus:border-leapp-yellow focus:outline-0 focus:ring-2 focus:ring-leapp-yellow/50">
+                                <option value="">Select an area</option>
+                                {% for area in areas %}
+                                <option value="{{ area.name }}" {% if profile.area == area.name %}selected{% endif %}>{{ area.area_name }}</option>
+                                {% endfor %}
+                            </select>
+                        </label>
+                    </div>
+
+                    <!-- Professional Information -->
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-gray-700">
+                            <span class="material-symbols-outlined text-leapp-yellow">work</span>
+                            <h3 class="text-lg font-bold text-leapp-black dark:text-white">Professional Information</h3>
+                        </div>
+                        
+                        <label class="flex flex-col">
+                            <p class="text-leapp-black dark:text-white text-base font-medium leading-normal pb-2">Occupation</p>
+                            <input
+                                name="occupation"
+                                value="{{ profile.occupation or '' }}"
+                                class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark h-14 p-[15px] text-base font-normal leading-normal text-leapp-black dark:text-white placeholder:text-gray-400 focus:border-leapp-yellow focus:outline-0 focus:ring-2 focus:ring-leapp-yellow/50"
+                                placeholder="e.g., Teacher, Coach, Instructor" type="text" />
+                        </label>
+                        
+                        <label class="flex flex-col">
+                            <p class="text-leapp-black dark:text-white text-base font-medium leading-normal pb-2">Highest Qualification</p>
+                            <input
+                                name="highest_qualification"
+                                value="{{ profile.highest_qualification or '' }}"
+                                class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark h-14 p-[15px] text-base font-normal leading-normal text-leapp-black dark:text-white placeholder:text-gray-400 focus:border-leapp-yellow focus:outline-0 focus:ring-2 focus:ring-leapp-yellow/50"
+                                placeholder="e.g., Master's in Education" type="text" />
+                        </label>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <label class="flex flex-col">
+                                <p class="text-leapp-black dark:text-white text-base font-medium leading-normal pb-2">Languages</p>
+                                <input
+                                    name="languages"
+                                    value="{{ profile.languages or '' }}"
+                                    class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark h-14 p-[15px] text-base font-normal leading-normal text-leapp-black dark:text-white placeholder:text-gray-400 focus:border-leapp-yellow focus:outline-0 focus:ring-2 focus:ring-leapp-yellow/50"
+                                    placeholder="e.g., English, Hindi" type="text" />
+                            </label>
+                            
+                            <label class="flex flex-col">
+                                <p class="text-leapp-black dark:text-white text-base font-medium leading-normal pb-2">Availability</p>
+                                <input
+                                    name="availability"
+                                    value="{{ profile.availability or '' }}"
+                                    class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark h-14 p-[15px] text-base font-normal leading-normal text-leapp-black dark:text-white placeholder:text-gray-400 focus:border-leapp-yellow focus:outline-0 focus:ring-2 focus:ring-leapp-yellow/50"
+                                    placeholder="e.g., Weekdays, Weekends" type="text" />
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="flex justify-end gap-4 pt-4">
+                        <button
+                            type="button"
+                            onclick="window.location.href='/'"
+                            class="px-6 py-3 border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-xl font-bold hover:bg-gray-50 dark:hover:bg-gray-800 transition-all">
+                            Cancel
+                        </button>
+                        <button
+                            type="submit"
+                            class="flex items-center gap-2 px-6 py-3 bg-leapp-yellow text-leapp-black rounded-xl font-bold hover:bg-leapp-yellow/90 transition-all">
+                            <span class="material-symbols-outlined">save</span>
+                            <span>Save Profile</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Auto-hide success messages after 5 seconds
+        const successAlert = document.querySelector('[role="alert"]');
+        if (successAlert && successAlert.classList.contains('text-green-800')) {
+            setTimeout(() => {
+                successAlert.style.opacity = '0';
+                setTimeout(() => successAlert.remove(), 300);
+            }, 5000);
+        }
+    });
+</script>
+{% endblock %}

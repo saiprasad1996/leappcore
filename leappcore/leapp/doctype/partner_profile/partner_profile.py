@@ -5,5 +5,5 @@
 from frappe.model.document import Document
 
 
-class Interest(Document):
+class PartnerProfile(Document):
 	pass

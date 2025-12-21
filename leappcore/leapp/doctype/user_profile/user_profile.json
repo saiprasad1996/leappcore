@@ -1,108 +1,110 @@
 {
-    "actions": [],
-    "allow_rename": 1,
-    "autoname": "format:{user}",
-    "creation": "2024-11-26 16:30:00.000000",
-    "doctype": "DocType",
-    "engine": "InnoDB",
-    "field_order": [
-        "user",
-        "area",
-        "address",
-        "instruction_medium",
-        "about",
-        "children",
-        "looking_for",
-        "interested_in",
-        "founding_year",
-        "head",
-        "theme"
-    ],
-    "fields": [
-        {
-            "fieldname": "user",
-            "fieldtype": "Link",
-            "in_list_view": 1,
-            "label": "User",
-            "options": "User",
-            "reqd": 1
-        },
-        {
-            "fieldname": "area",
-            "fieldtype": "Link",
-            "in_list_view": 1,
-            "label": "Area",
-            "options": "Area",
-            "reqd": 1
-        },
-        {
-            "fieldname": "address",
-            "fieldtype": "Small Text",
-            "label": "Address"
-        },
-        {
-            "fieldname": "instruction_medium",
-            "fieldtype": "Data",
-            "label": "Instruction Medium"
-        },
-        {
-            "fieldname": "about",
-            "fieldtype": "Text",
-            "label": "About"
-        },
-        {
-            "fieldname": "children",
-            "fieldtype": "Int",
-            "label": "Children"
-        },
-        {
-            "fieldname": "looking_for",
-            "fieldtype": "Small Text",
-            "label": "Looking For"
-        },
-        {
-            "fieldname": "interested_in",
-            "fieldtype": "Small Text",
-            "label": "Interested In"
-        },
-        {
-            "fieldname": "founding_year",
-            "fieldtype": "Int",
-            "label": "Founding Year"
-        },
-        {
-            "fieldname": "head",
-            "fieldtype": "Data",
-            "label": "Head of Organization"
-        },
-        {
-            "fieldname": "theme",
-            "fieldtype": "Data",
-            "label": "Theme"
-        }
-    ],
-    "index_web_pages_for_search": 1,
-    "links": [],
-    "modified": "2024-11-26 16:30:00.000000",
-    "modified_by": "Administrator",
-    "module": "Leapp",
-    "name": "User Profile",
-    "owner": "Administrator",
-    "permissions": [
-        {
-            "create": 1,
-            "delete": 1,
-            "email": 1,
-            "export": 1,
-            "print": 1,
-            "read": 1,
-            "report": 1,
-            "role": "System Manager",
-            "share": 1,
-            "write": 1
-        }
-    ],
-    "sort_field": "modified",
-    "sort_order": "DESC",
-    "states": []
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "format:{user}",
+ "creation": "2024-11-26 16:30:00",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "user",
+  "about",
+  "instruction_medium",
+  "children",
+  "looking_for",
+  "interested_in",
+  "column_break_fuko",
+  "area",
+  "address",
+  "theme",
+  "institution_name"
+ ],
+ "fields": [
+  {
+   "fieldname": "user",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "User",
+   "options": "User",
+   "reqd": 1
+  },
+  {
+   "fieldname": "area",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Area",
+   "options": "Area",
+   "reqd": 1
+  },
+  {
+   "fieldname": "address",
+   "fieldtype": "Small Text",
+   "label": "Address"
+  },
+  {
+   "fieldname": "instruction_medium",
+   "fieldtype": "Data",
+   "label": "Instruction Medium"
+  },
+  {
+   "fieldname": "about",
+   "fieldtype": "Text",
+   "label": "About"
+  },
+  {
+   "fieldname": "children",
+   "fieldtype": "Int",
+   "label": "Children"
+  },
+  {
+   "fieldname": "looking_for",
+   "fieldtype": "Small Text",
+   "label": "Looking For"
+  },
+  {
+   "fieldname": "interested_in",
+   "fieldtype": "Small Text",
+   "label": "Interested In"
+  },
+  {
+   "fieldname": "theme",
+   "fieldtype": "Select",
+   "label": "Theme",
+   "options": "Light\nDark"
+  },
+  {
+   "fieldname": "column_break_fuko",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "institution_name",
+   "fieldtype": "Data",
+   "label": "Institution"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-12-21 14:06:55.221787",
+ "modified_by": "Administrator",
+ "module": "Leapp",
+ "name": "User Profile",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
 }

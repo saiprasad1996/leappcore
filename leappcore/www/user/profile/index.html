@@ -1,216 +1,281 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends 'templates/htmlbase/base.html' %}
 
-<head>
-    <meta charset="utf-8" />
-    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <title>Student Profile</title>
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&amp;display=swap"
-        rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        "primary": "#f4c652",
-                        "background-light": "#ffffff",
-                        "panel-light": "#f0f0f0",
-                        "text-dark": "#1a1a1a",
-                        "text-light": "#555555",
-                    },
-                    fontFamily: {
-                        "display": ["Plus Jakarta Sans", "Noto Sans", "sans-serif"]
-                    },
-                    borderRadius: {
-                        "DEFAULT": "0.5rem",
-                        "lg": "1rem",
-                        "xl": "1.5rem",
-                        "full": "9999px"
-                    },
-                },
-            },
-        }
-    </script>
-    <style>
-        .material-symbols-outlined {
-            font-variation-settings:
-                'FILL' 0,
-                'wght' 400,
-                'GRAD' 0,
-                'opsz' 24
-        }
-    </style>
-</head>
+{% block head %}
+<style type="text/css">
+    body {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+    }
 
-<body class="bg-background-light font-display">
-    <div class="flex min-h-screen">
-        <aside class="w-64 bg-panel-light text-text-dark p-4 flex flex-col justify-between">
-            <div>
-                <div class="flex items-center gap-3 mb-8">
-                    <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10"
-                        data-alt="John Doe's profile picture"
-                        style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuD-WoFan_GvAzyZBXSuoDtrDRhrWfIMzuubsYHfkv7abML8ZY4iq-z2WKLJ2X-tOgWSCpN2-V9IIfzA_hNH-zJp0nlDhRK0mIG-f5k9hfb1tHTOXsC6ZV5E6q6COnndfbmE3fueTdUZB3G14Ast39Pw9jMpV-lMCFYchpt0C8E-9-j9nI7ERXMRGgmK4z30eSn7lw096T9JSqCe-7je-_qNLFh48fEJ_g4Os5k9f-xvgMUImgYcuRcpmZE7j10Q6Ze9oau4DwuZp8ug");'>
-                    </div>
-                    <div>
-                        <h1 class="text-base font-medium leading-normal text-text-dark">John Doe</h1>
-                        <p class="text-sm font-normal leading-normal text-text-light">Grade 5</p>
-                    </div>
-                </div>
-                <nav class="flex flex-col gap-2">
-                    <a class="flex items-center gap-3 px-3 py-2 rounded-xl" href="#">
-                        <span class="material-symbols-outlined text-text-dark">dashboard</span>
-                        <span class="text-sm font-medium text-text-dark">Dashboard</span>
-                    </a>
-                    <a class="flex items-center gap-3 px-3 py-2 rounded-xl" href="#">
-                        <span class="material-symbols-outlined text-text-dark">local_activity</span>
-                        <span class="text-sm font-medium text-text-dark">Activities</span>
-                    </a>
-                    <a class="flex items-center gap-3 px-3 py-2 rounded-xl" href="#">
-                        <span class="material-symbols-outlined text-text-dark">trending_up</span>
-                        <span class="text-sm font-medium text-text-dark">Progress</span>
-                    </a>
-                    <a class="flex items-center gap-3 px-3 py-2 rounded-xl bg-gray-200" href="#">
-                        <span class="material-symbols-outlined text-text-dark"
-                            style="font-variation-settings: 'FILL' 1;">person</span>
-                        <span class="text-sm font-medium text-text-dark">Profile</span>
-                    </a>
-                </nav>
+    .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="flex-1 w-full bg-background-light dark:bg-background-dark text-leapp-black dark:text-white">
+    <div class="w-full px-4 sm:px-6 lg:px-8 py-8">
+        <div class="max-w-6xl mx-auto">
+            {% if success_message %}
+            <div class="mb-6 p-4 text-sm text-green-800 bg-green-100 rounded-lg dark:bg-green-900 dark:text-green-200 flex items-center gap-2" role="alert" id="success-alert">
+                <span class="material-symbols-outlined">check_circle</span>
+                <span>{{ success_message }}</span>
             </div>
-            <div class="flex flex-col gap-4">
-                <button
-                    class="flex items-center justify-center w-full h-10 px-4 text-sm font-bold tracking-wider rounded-xl bg-primary text-text-dark">
-                    Logout
-                </button>
-                <div class="flex flex-col gap-1">
-                    <a class="flex items-center gap-3 px-3 py-2 rounded-xl" href="#">
-                        <span class="material-symbols-outlined text-text-dark">settings</span>
-                        <span class="text-sm font-medium text-text-dark">Settings</span>
-                    </a>
-                    <a class="flex items-center gap-3 px-3 py-2 rounded-xl" href="#">
-                        <span class="material-symbols-outlined text-text-dark">help</span>
-                        <span class="text-sm font-medium text-text-dark">Help</span>
-                    </a>
-                </div>
+            {% endif %}
+            
+            {% if error_message %}
+            <div class="mb-6 p-4 text-sm text-red-800 bg-red-100 rounded-lg dark:bg-red-900 dark:text-red-200 flex items-center gap-2" role="alert">
+                <span class="material-symbols-outlined">error</span>
+                <span>{{ error_message }}</span>
             </div>
-        </aside>
-        <main class="flex-1 p-8 bg-background-light">
-            <div class="max-w-4xl mx-auto">
-                <div class="flex p-4 @container bg-gradient-to-r from-gray-200 to-gray-300 rounded-xl mb-8">
-                    <div
-                        class="flex w-full flex-col gap-4 @[520px]:flex-row @[520px]:justify-between @[520px]:items-center">
-                        <div class="flex items-center gap-4">
-                            <div class="relative">
-                                <div class="w-32 h-32 bg-center bg-no-repeat bg-cover rounded-full"
-                                    data-alt="John Doe's profile picture"
-                                    style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDUPkNfAsyd0L5KGuhMlehsbeu_himk7ottBGdND09Fmw2-L4ZPq24d3fcDiMzikCyg8tf5Uxw_gcIkz7IZ6TecL4DmApMMVbb-idyWnikp-lZejDCvOFDFJB8j3JDMjB5fu7F5r4-iyXJcPyowRH4B9Ly9TlM5UJaSxPJlOfFp2ayP3cbQ9ELKkoYBr-CQbhCOqy8aIQJ8VzhqKXaUBvlONuSzd-vTT9wHxy-f1gf5e1Du5DVOqTDj_3ASPiNcr03u-rl_2yUI5ZWF");'>
-                                </div>
-                                <button class="absolute bottom-1 right-1 bg-primary text-text-dark rounded-full p-2">
-                                    <span class="material-symbols-outlined">edit</span>
-                                </button>
-                            </div>
-                            <div class="flex flex-col justify-center">
-                                <p class="text-text-dark text-[22px] font-bold leading-tight tracking-[-0.015em]">John
-                                    Doe</p>
-                                <p class="text-text-light text-base font-normal leading-normal">john.doe@example.com</p>
-                                <p class="text-text-light text-base font-normal leading-normal">Profile last updated 2
-                                    days ago</p>
-                            </div>
-                        </div>
-                        <div class="flex w-full max-w-[480px] gap-3 @[480px]:w-auto">
-                            <button
-                                class="flex-1 min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 px-4 bg-gray-200 text-text-dark text-sm font-bold leading-normal tracking-[0.015em] @[480px]:flex-auto">
-                                <span class="truncate">Edit Profile</span>
-                            </button>
-                            <button
-                                class="flex-1 min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 px-4 bg-primary text-text-dark text-sm font-bold leading-normal tracking-[0.015em] @[480px]:flex-auto">
-                                <span class="truncate">View Public Profile</span>
-                            </button>
+            {% endif %}
+
+            <!-- Profile Header -->
+            <div class="bg-gradient-to-r from-leapp-yellow/20 to-leapp-yellow/10 dark:from-leapp-yellow/10 dark:to-leapp-yellow/5 rounded-xl p-8 mb-8">
+                <div class="flex flex-col md:flex-row items-start md:items-center gap-6">
+                    <!-- Profile Picture -->
+                    <div class="relative flex-shrink-0">
+                        <div class="w-32 h-32 rounded-full bg-leapp-yellow flex items-center justify-center text-leapp-black font-bold text-5xl">
+                            {{ user_initial }}
                         </div>
                     </div>
-                </div>
-                <div class="p-4 mb-8 bg-panel-light rounded-xl">
-                    <div class="flex flex-col gap-3">
-                        <div class="flex justify-between gap-6">
-                            <p class="text-base font-medium leading-normal text-text-dark">Profile Completeness</p>
-                            <p class="text-sm font-normal leading-normal text-text-dark">75%</p>
-                        </div>
-                        <div class="rounded bg-gray-300">
-                            <div class="h-2 rounded bg-primary" style="width: 75%;"></div>
-                        </div>
+                    
+                    <!-- User Info -->
+                    <div class="flex-1">
+                        <h1 class="text-3xl font-black text-leapp-black dark:text-white mb-2">{{ user_fullname }}</h1>
+                        <p class="text-gray-600 dark:text-gray-400 mb-1">{{ user_email }}</p>
+                        <p class="text-sm text-gray-500 dark:text-gray-500">Profile last updated {{ last_updated }}</p>
                     </div>
-                </div>
-                <div class="bg-panel-light rounded-xl">
-                    <div class="pb-3">
-                        <div class="flex px-4 border-b border-gray-300 gap-8">
-                            <a class="flex flex-col items-center justify-center border-b-[3px] border-b-primary text-text-dark pb-[13px] pt-4"
-                                href="#">
-                                <p class="text-sm font-bold leading-normal tracking-[0.015em]">Personal Information</p>
-                            </a>
-                            <a class="flex flex-col items-center justify-center border-b-[3px] border-b-transparent text-text-light pb-[13px] pt-4"
-                                href="#">
-                                <p class="text-sm font-bold leading-normal tracking-[0.015em]">Contact Details</p>
-                            </a>
-                            <a class="flex flex-col items-center justify-center border-b-[3px] border-b-transparent text-text-light pb-[13px] pt-4"
-                                href="#">
-                                <p class="text-sm font-bold leading-normal tracking-[0.015em]">Preferences</p>
-                            </a>
-                        </div>
-                    </div>
-                    <div class="p-6">
-                        <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
-                            <div class="flex flex-col">
-                                <label class="pb-2 text-base font-medium leading-normal text-text-dark">Full
-                                    Name</label>
-                                <input
-                                    class="form-input w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-text-dark focus:outline-0 focus:ring-0 border border-gray-300 bg-white focus:border-primary h-14 placeholder:text-text-light p-[15px] text-base font-normal leading-normal"
-                                    value="John Doe" />
-                            </div>
-                            <div class="flex flex-col">
-                                <label class="pb-2 text-base font-medium leading-normal text-text-dark">Age</label>
-                                <input
-                                    class="form-input w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-text-dark focus:outline-0 focus:ring-0 border border-gray-300 bg-white focus:border-primary h-14 placeholder:text-text-light p-[15px] text-base font-normal leading-normal"
-                                    value="10" />
-                            </div>
-                            <div class="flex flex-col">
-                                <label class="pb-2 text-base font-medium leading-normal text-text-dark">Grade</label>
-                                <input
-                                    class="form-input w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-text-dark focus:outline-0 focus:ring-0 border border-gray-300 bg-white focus:border-primary h-14 placeholder:text-text-light p-[15px] text-base font-normal leading-normal"
-                                    value="5" />
-                            </div>
-                            <div class="flex flex-col">
-                                <label class="pb-2 text-base font-medium leading-normal text-text-dark">School</label>
-                                <input
-                                    class="form-input w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-text-dark focus:outline-0 focus:ring-0 border border-gray-300 bg-white focus:border-primary h-14 placeholder:text-text-light p-[15px] text-base font-normal leading-normal"
-                                    value="Leapp Elementary" />
-                            </div>
-                        </div>
-                        <div class="mt-8">
-                            <div class="p-4 rounded-lg bg-primary/20">
-                                <div class="flex items-center gap-3">
-                                    <span class="material-symbols-outlined text-primary">emoji_events</span>
-                                    <p class="text-text-dark">You've earned the "Profile Pro" badge for completing your
-                                        personal information!</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="flex justify-end gap-4 mt-8">
-                            <button
-                                class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 px-4 bg-gray-200 text-text-dark text-sm font-bold leading-normal tracking-[0.015em]">
-                                <span class="truncate">Cancel</span>
-                            </button>
-                            <button
-                                class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 px-4 bg-primary text-text-dark text-sm font-bold leading-normal tracking-[0.015em]">
-                                <span class="truncate">Save Changes</span>
-                            </button>
-                        </div>
+                    
+                    <!-- Quick Actions -->
+                    <div class="flex gap-3">
+                        <a href="/user/courses" class="px-4 py-2 rounded-xl border-2 border-gray-600 dark:border-gray-400 text-gray-800 dark:text-gray-200 font-medium hover:bg-gray-100 dark:hover:bg-gray-800 transition-all">
+                            My Courses
+                        </a>
+                        <a href="/user/events" class="px-4 py-2 rounded-xl bg-leapp-yellow text-leapp-black font-bold hover:bg-leapp-yellow/90 transition-all">
+                            My Events
+                        </a>
                     </div>
                 </div>
             </div>
-        </main>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Sidebar - Profile Stats -->
+                <div class="lg:col-span-1 space-y-6">
+                    <!-- Profile Completeness -->
+                    <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-background-dark p-6 shadow-lg">
+                        <h3 class="text-lg font-bold text-leapp-black dark:text-white mb-4">Profile Completeness</h3>
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm text-gray-600 dark:text-gray-400">{{ profile_completeness }}% Complete</span>
+                                {% if show_badge %}
+                                <span class="material-symbols-outlined text-leapp-yellow" style="font-variation-settings: 'FILL' 1;">verified</span>
+                                {% endif %}
+                            </div>
+                            <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
+                                <div class="bg-leapp-yellow h-3 rounded-full transition-all duration-300" style="width: {{ profile_completeness }}%"></div>
+                            </div>
+                            {% if profile_completeness < 100 %}
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">Complete your profile to unlock more features!</p>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Achievement Badge -->
+                    {% if show_badge %}
+                    <div class="rounded-xl border border-leapp-yellow bg-leapp-yellow/5 p-6">
+                        <div class="flex items-start gap-3">
+                            <span class="material-symbols-outlined text-leapp-yellow text-4xl" style="font-variation-settings: 'FILL' 1;">emoji_events</span>
+                            <div>
+                                <h4 class="font-bold text-leapp-black dark:text-white mb-1">Profile Pro!</h4>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">You've earned the "Profile Pro" badge for completing your personal information!</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Main Content - Profile Form -->
+                <div class="lg:col-span-2">
+                    <form method="post" action="/user/profile" id="profile-form" class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-background-dark p-6 shadow-lg">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                        
+                        <h2 class="text-2xl font-bold text-leapp-black dark:text-white mb-6">Personal Information</h2>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- Full Name (from User) -->
+                            <div class="md:col-span-2">
+                                <label class="flex flex-col">
+                                    <p class="text-leapp-black dark:text-white text-base font-medium leading-normal pb-2">Full Name</p>
+                                    <input
+                                        name="full_name"
+                                        value="{{ user_fullname }}"
+                                        class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark h-14 p-[15px] text-base font-normal leading-normal text-leapp-black dark:text-white placeholder:text-gray-400 focus:border-leapp-yellow focus:outline-0 focus:ring-2 focus:ring-leapp-yellow/50"
+                                        placeholder="Enter your full name" type="text" />
+                                </label>
+                            </div>
+
+                            <!-- Phone (from User) -->
+                            <div>
+                                <label class="flex flex-col">
+                                    <p class="text-leapp-black dark:text-white text-base font-medium leading-normal pb-2">Phone Number</p>
+                                    <input
+                                        name="phone"
+                                        value="{{ user_phone or '' }}"
+                                        type="tel"
+                                        class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark h-14 p-[15px] text-base font-normal leading-normal text-leapp-black dark:text-white placeholder:text-gray-400 focus:border-leapp-yellow focus:outline-0 focus:ring-2 focus:ring-leapp-yellow/50"
+                                        placeholder="Enter phone number" />
+                                </label>
+                            </div>
+
+                            <!-- Area -->
+                            <div>
+                                <label class="flex flex-col">
+                                    <p class="text-leapp-black dark:text-white text-base font-medium leading-normal pb-2">Area <span class="text-red-500">*</span></p>
+                                    <select
+                                        name="area"
+                                        required
+                                        class="form-select flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark h-14 p-[15px] text-base font-normal leading-normal text-leapp-black dark:text-white focus:border-leapp-yellow focus:outline-0 focus:ring-2 focus:ring-leapp-yellow/50">
+                                        <option value="">Select an area</option>
+                                        {% for area in areas %}
+                                        <option value="{{ area.name }}" {% if profile_area == area.name %}selected{% endif %}>{{ area.area_name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </label>
+                            </div>
+
+                            <!-- Institution -->
+                            <div class="md:col-span-2">
+                                <label class="flex flex-col">
+                                    <p class="text-leapp-black dark:text-white text-base font-medium leading-normal pb-2">Institution / School</p>
+                                    <input
+                                        name="institution_name"
+                                        value="{{ profile_institution or '' }}"
+                                        class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark h-14 p-[15px] text-base font-normal leading-normal text-leapp-black dark:text-white placeholder:text-gray-400 focus:border-leapp-yellow focus:outline-0 focus:ring-2 focus:ring-leapp-yellow/50"
+                                        placeholder="Enter your school or institution name" type="text" />
+                                </label>
+                            </div>
+
+                            <!-- Address -->
+                            <div class="md:col-span-2">
+                                <label class="flex flex-col">
+                                    <p class="text-leapp-black dark:text-white text-base font-medium leading-normal pb-2">Address</p>
+                                    <textarea
+                                        name="address"
+                                        rows="3"
+                                        class="form-textarea flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark p-[15px] text-base font-normal leading-normal text-leapp-black dark:text-white placeholder:text-gray-400 focus:border-leapp-yellow focus:outline-0 focus:ring-2 focus:ring-leapp-yellow/50"
+                                        placeholder="Enter your address">{{ profile_address or '' }}</textarea>
+                                </label>
+                            </div>
+
+                            <!-- Number of Children -->
+                            <div>
+                                <label class="flex flex-col">
+                                    <p class="text-leapp-black dark:text-white text-base font-medium leading-normal pb-2">Number of Children</p>
+                                    <input
+                                        name="children"
+                                        value="{{ profile_children or '' }}"
+                                        type="number"
+                                        min="0"
+                                        class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark h-14 p-[15px] text-base font-normal leading-normal text-leapp-black dark:text-white placeholder:text-gray-400 focus:border-leapp-yellow focus:outline-0 focus:ring-2 focus:ring-leapp-yellow/50"
+                                        placeholder="Number of children" />
+                                </label>
+                            </div>
+
+                            <!-- Instruction Medium -->
+                            <div>
+                                <label class="flex flex-col">
+                                    <p class="text-leapp-black dark:text-white text-base font-medium leading-normal pb-2">Preferred Instruction Medium</p>
+                                    <input
+                                        name="instruction_medium"
+                                        value="{{ profile_instruction_medium or '' }}"
+                                        class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark h-14 p-[15px] text-base font-normal leading-normal text-leapp-black dark:text-white placeholder:text-gray-400 focus:border-leapp-yellow focus:outline-0 focus:ring-2 focus:ring-leapp-yellow/50"
+                                        placeholder="e.g., English, Hindi" type="text" />
+                                </label>
+                            </div>
+
+                            <!-- About -->
+                            <div class="md:col-span-2">
+                                <label class="flex flex-col">
+                                    <p class="text-leapp-black dark:text-white text-base font-medium leading-normal pb-2">About</p>
+                                    <textarea
+                                        name="about"
+                                        rows="3"
+                                        class="form-textarea flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark p-[15px] text-base font-normal leading-normal text-leapp-black dark:text-white placeholder:text-gray-400 focus:border-leapp-yellow focus:outline-0 focus:ring-2 focus:ring-leapp-yellow/50"
+                                        placeholder="Tell us about yourself">{{ profile_about or '' }}</textarea>
+                                </label>
+                            </div>
+
+                            <!-- Interested In -->
+                            <div class="md:col-span-2">
+                                <label class="flex flex-col">
+                                    <p class="text-leapp-black dark:text-white text-base font-medium leading-normal pb-2">Interested In</p>
+                                    <textarea
+                                        name="interested_in"
+                                        rows="2"
+                                        class="form-textarea flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark p-[15px] text-base font-normal leading-normal text-leapp-black dark:text-white placeholder:text-gray-400 focus:border-leapp-yellow focus:outline-0 focus:ring-2 focus:ring-leapp-yellow/50"
+                                        placeholder="What are you interested in learning?">{{ profile_interested_in or '' }}</textarea>
+                                </label>
+                            </div>
+
+                            <!-- Looking For -->
+                            <div class="md:col-span-2">
+                                <label class="flex flex-col">
+                                    <p class="text-leapp-black dark:text-white text-base font-medium leading-normal pb-2">Looking For</p>
+                                    <textarea
+                                        name="looking_for"
+                                        rows="2"
+                                        class="form-textarea flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark p-[15px] text-base font-normal leading-normal text-leapp-black dark:text-white placeholder:text-gray-400 focus:border-leapp-yellow focus:outline-0 focus:ring-2 focus:ring-leapp-yellow/50"
+                                        placeholder="What are you looking for in courses?">{{ profile_looking_for or '' }}</textarea>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Form Actions -->
+                        <div class="flex justify-end gap-4 mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
+                            <button
+                                type="button"
+                                onclick="window.location.href='/'"
+                                class="px-6 py-3 border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-xl font-bold hover:bg-gray-50 dark:hover:bg-gray-800 transition-all">
+                                Cancel
+                            </button>
+                            <button
+                                type="submit"
+                                class="flex items-center gap-2 px-6 py-3 bg-leapp-yellow text-leapp-black rounded-xl font-bold hover:bg-leapp-yellow/90 transition-all">
+                                <span class="material-symbols-outlined">save</span>
+                                <span>Save Changes</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
+</main>
+{% endblock %}
 
-</body>
-
-</html>
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Auto-hide success and error messages after 5 seconds
+        const successAlert = document.getElementById('success-alert');
+        const errorAlert = document.querySelector('[role="alert"]');
+        
+        if (successAlert) {
+            setTimeout(() => {
+                successAlert.style.opacity = '0';
+                successAlert.style.transition = 'opacity 0.5s';
+                setTimeout(() => successAlert.remove(), 500);
+            }, 5000);
+        }
+        
+        if (errorAlert && errorAlert.classList.contains('text-red-800')) {
+            setTimeout(() => {
+                errorAlert.style.opacity = '0';
+                errorAlert.style.transition = 'opacity 0.5s';
+                setTimeout(() => errorAlert.remove(), 500);
+            }, 5000);
+        }
+    });
+</script>
+{% endblock %}
