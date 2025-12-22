@@ -11,8 +11,8 @@ def get_context(context):
     
     # Check if user has Leapp Partner role
     if not has_partner_role():
-        # Redirect customers to courses page
-        frappe.local.flags.redirect_location = "/courses"
+        # Redirect customers to user profile page
+        frappe.local.flags.redirect_location = "/user/profile"
         raise frappe.Redirect
     
     context.csrf_token = frappe.sessions.get_csrf_token()

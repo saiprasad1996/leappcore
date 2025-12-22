@@ -9,6 +9,11 @@ def get_context(context):
         frappe.local.flags.redirect_location = "/login?redirect-to=/user/profile"
         raise frappe.Redirect
     
+    # Check if user is a partner - redirect to partner profile
+    if "Leapp Partner" in frappe.get_roles(frappe.session.user):
+        frappe.local.flags.redirect_location = "/partner/profile"
+        raise frappe.Redirect
+    
     context.no_cache = 1
     context.csrf_token = frappe.sessions.get_csrf_token()
     
