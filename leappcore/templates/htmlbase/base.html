@@ -4,6 +4,10 @@
 <head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <!-- Prevent aggressive caching on mobile browsers -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
     <title>LEAPP</title>
     <link href="/assets/leappcore/css/styles.prod.css" rel="stylesheet" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -400,12 +404,20 @@
                 }
             }).then(response => {
                 if (response.ok) {
-                    window.location.href = '/';
+                    // Force a hard reload to prevent caching issues on mobile
+                    window.location.replace('/?t=' + new Date().getTime());
+                    // Use reload(true) as fallback for browsers that support it
+                    setTimeout(() => {
+                        window.location.reload(true);
+                    }, 100);
                 }
             }).catch(error => {
                 console.error('Logout error:', error);
-                // Fallback: redirect anyway
-                window.location.href = '/';
+                // Fallback: redirect with cache-busting anyway
+                window.location.replace('/?t=' + new Date().getTime());
+                setTimeout(() => {
+                    window.location.reload(true);
+                }, 100);
             });
         }
     </script>
