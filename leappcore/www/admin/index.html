@@ -1,0 +1,319 @@
+{% extends 'templates/htmlbase/base.html' %}
+
+{% block head %}
+<style type="text/css">
+    body {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+
+    .material-symbols-outlined.filled {
+        font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+
+    /* Sidebar Styles */
+    .admin-sidebar {
+        position: sticky;
+        top: 80px;
+        height: calc(100vh - 100px);
+        overflow-y: auto;
+    }
+
+    /* Scrollbar Styling */
+    .admin-sidebar::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .admin-sidebar::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .admin-sidebar::-webkit-scrollbar-thumb {
+        background: rgba(0, 0, 0, 0.2);
+        border-radius: 3px;
+    }
+
+    .dark .admin-sidebar::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.2);
+    }
+
+    /* Card Hover Effects */
+    .hover-lift {
+        transition: all 0.3s ease;
+    }
+
+    .hover-lift:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+    }
+
+    .dark .hover-lift:hover {
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.4);
+    }
+
+    /* Active Sidebar Item */
+    .sidebar-item {
+        transition: all 0.2s ease;
+        cursor: pointer;
+    }
+
+    .sidebar-item.active {
+        background: linear-gradient(135deg, #FFC700 0%, #FFD700 100%);
+        color: #000;
+        font-weight: 700;
+    }
+
+    .sidebar-item:not(.active):hover {
+        background: rgba(255, 199, 0, 0.1);
+    }
+
+    /* Doctype Card Grid */
+    .doctype-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        gap: 1rem;
+    }
+
+    @media (min-width: 768px) {
+        .doctype-grid {
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        }
+    }
+
+    @media (min-width: 1024px) {
+        .doctype-grid {
+            grid-template-columns: repeat(6, 1fr);
+        }
+    }
+
+    /* Doctype Card */
+    .doctype-card {
+        aspect-ratio: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        padding: 1rem;
+        text-align: center;
+        transition: all 0.3s ease;
+    }
+
+    .doctype-card:hover {
+        background: linear-gradient(135deg, rgba(255, 199, 0, 0.1) 0%, rgba(255, 215, 0, 0.05) 100%);
+        border-color: #FFC700;
+    }
+
+    .dark .doctype-card:hover {
+        background: linear-gradient(135deg, rgba(255, 199, 0, 0.15) 0%, rgba(255, 215, 0, 0.08) 100%);
+    }
+
+    .doctype-card .material-symbols-outlined {
+        font-size: 2.5rem;
+        color: #FFC700;
+    }
+
+    .doctype-card span:last-child {
+        font-size: 0.875rem;
+        font-weight: 600;
+        line-height: 1.2;
+    }
+
+    /* Analytics Card */
+    .analytics-card {
+        position: relative;
+        overflow: hidden;
+    }
+
+    .analytics-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #FFC700 0%, #FFD700 100%);
+    }
+
+    /* Content Section Fade In */
+    .content-section {
+        opacity: 0;
+        animation: fadeIn 0.5s ease forwards;
+    }
+
+    @keyframes fadeIn {
+        to {
+            opacity: 1;
+        }
+    }
+
+    .content-section:nth-child(2) {
+        animation-delay: 0.1s;
+    }
+
+    .content-section:nth-child(3) {
+        animation-delay: 0.2s;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="flex-1 w-full bg-background-light dark:bg-background-dark text-leapp-black dark:text-white">
+    <div class="w-full px-4 sm:px-6 lg:px-8 py-8">
+        <div class="max-w-full mx-auto">
+            <!-- Page Header -->
+            <div class="mb-8">
+                <h1 class="text-4xl font-black text-leapp-black dark:text-white mb-2">Admin Dashboard</h1>
+                <p class="text-gray-600 dark:text-gray-400">Manage your Leapp platform</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                <!-- Sidebar -->
+                <div class="lg:col-span-1">
+                    <div class="admin-sidebar rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-background-dark p-4 shadow-lg">
+                        <nav class="space-y-2">
+                            <div class="sidebar-item active rounded-lg px-4 py-3 flex items-center gap-3" data-section="analytics">
+                                <span class="material-symbols-outlined">analytics</span>
+                                <span class="font-semibold">Analytics</span>
+                            </div>
+                            <div class="sidebar-item rounded-lg px-4 py-3 flex items-center gap-3" data-section="shortcuts">
+                                <span class="material-symbols-outlined">dashboard</span>
+                                <span class="font-semibold">Shortcuts</span>
+                            </div>
+                        </nav>
+                    </div>
+                </div>
+
+                <!-- Main Content -->
+                <div class="lg:col-span-3 space-y-8">
+                    <!-- Analytics Section -->
+                    <div id="analytics-section" class="content-section">
+                        <div class="mb-6">
+                            <h2 class="text-2xl font-bold text-leapp-black dark:text-white mb-1">Analytics Overview</h2>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">Key metrics at a glance</p>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 gap-4">
+                            <!-- Customers Card -->
+                            <a href="/app/customer-interest" class="analytics-card hover-lift block rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-background-dark p-6 shadow-lg">
+                                <div class="flex items-start justify-between mb-4">
+                                    <div class="p-3 rounded-lg bg-leapp-yellow/10">
+                                        <span class="material-symbols-outlined filled text-leapp-yellow text-3xl">favorite</span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">Customers</p>
+                                    <p class="text-3xl font-bold text-leapp-black dark:text-white">{{ analytics.customers }}</p>
+                                </div>
+                            </a>
+
+                            <!-- Partners Card -->
+                            <a href="/app/partner-profile" class="analytics-card hover-lift block rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-background-dark p-6 shadow-lg">
+                                <div class="flex items-start justify-between mb-4">
+                                    <div class="p-3 rounded-lg bg-leapp-yellow/10">
+                                        <span class="material-symbols-outlined filled text-leapp-yellow text-3xl">groups</span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">Partners</p>
+                                    <p class="text-3xl font-bold text-leapp-black dark:text-white">{{ analytics.partners }}</p>
+                                </div>
+                            </a>
+
+                            <!-- Offerings Card -->
+                            <a href="/app/offering" class="analytics-card hover-lift block rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-background-dark p-6 shadow-lg">
+                                <div class="flex items-start justify-between mb-4">
+                                    <div class="p-3 rounded-lg bg-leapp-yellow/10">
+                                        <span class="material-symbols-outlined filled text-leapp-yellow text-3xl">school</span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">Offerings</p>
+                                    <p class="text-3xl font-bold text-leapp-black dark:text-white">{{ analytics.offerings }}</p>
+                                </div>
+                            </a>
+
+                            <!-- Events Card -->
+                            <a href="/app/leapp-event" class="analytics-card hover-lift block rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-background-dark p-6 shadow-lg">
+                                <div class="flex items-start justify-between mb-4">
+                                    <div class="p-3 rounded-lg bg-leapp-yellow/10">
+                                        <span class="material-symbols-outlined filled text-leapp-yellow text-3xl">event</span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">Events</p>
+                                    <p class="text-3xl font-bold text-leapp-black dark:text-white">{{ analytics.events }}</p>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Shortcuts Section -->
+                    <div id="shortcuts-section" class="content-section hidden">
+                        <div class="mb-6">
+                            <h2 class="text-2xl font-bold text-leapp-black dark:text-white mb-1">Quick Access</h2>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">Navigate to any doctype</p>
+                        </div>
+
+                        <!-- Doctype Categories -->
+                        {% for category in doctype_categories %}
+                        <div class="mb-8">
+                            <h3 class="text-lg font-bold text-leapp-black dark:text-white mb-4 flex items-center gap-2">
+                                <span class="w-1 h-6 bg-leapp-yellow rounded-full"></span>
+                                {{ category.name }}
+                            </h3>
+                            
+                            <div class="doctype-grid">
+                                {% for doctype in category.doctypes %}
+                                <a href="/app/{{ doctype.name.lower().replace(' ', '') }}" 
+                                   class="doctype-card rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-background-dark shadow-md hover-lift">
+                                    <span class="material-symbols-outlined">{{ doctype.icon }}</span>
+                                    <span class="text-leapp-black dark:text-white">{{ doctype.label }}</span>
+                                </a>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Sidebar navigation
+        const sidebarItems = document.querySelectorAll('.sidebar-item');
+        const analyticsSection = document.getElementById('analytics-section');
+        const shortcutsSection = document.getElementById('shortcuts-section');
+
+        sidebarItems.forEach(item => {
+            item.addEventListener('click', () => {
+                // Remove active class from all items
+                sidebarItems.forEach(i => i.classList.remove('active'));
+                
+                // Add active class to clicked item
+                item.classList.add('active');
+
+                // Get section to show
+                const section = item.dataset.section;
+
+                // Show/hide sections
+                if (section === 'analytics') {
+                    analyticsSection.classList.remove('hidden');
+                    shortcutsSection.classList.add('hidden');
+                } else if (section === 'shortcuts') {
+                    analyticsSection.classList.add('hidden');
+                    shortcutsSection.classList.remove('hidden');
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

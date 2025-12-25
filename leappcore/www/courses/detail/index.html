@@ -144,18 +144,49 @@
                         </div>
                     </div>
 
-                    <!-- Description -->
+                    <!-- Description & Instructor Tabs -->
                     <div class="rounded-xl border border-slate-200 dark:border-slate-800 bg-background-light dark:bg-background-dark p-6">
                         <div class="pb-3 border-b border-slate-200 dark:border-slate-800">
                             <div class="flex gap-6">
-                                <span class="text-sm font-bold leading-normal tracking-[0.015em] border-b-2 border-leapp-yellow pb-2">Description</span>
-                                <span class="text-sm font-bold leading-normal tracking-[0.015em] text-slate-400">Instructor</span>
+                                <button data-tab="description" class="tab-button text-sm font-bold leading-normal tracking-[0.015em] border-b-2 border-leapp-yellow pb-2 transition-all">
+                                    Description
+                                </button>
+                                <button data-tab="instructor" class="tab-button text-sm font-bold leading-normal tracking-[0.015em] text-slate-400 pb-2 border-b-2 border-transparent transition-all hover:text-leapp-black dark:hover:text-white">
+                                    Instructor
+                                </button>
                             </div>
                         </div>
-                        <div class="pt-4 space-y-3 text-slate-600 dark:text-slate-300">
+                        
+                        <!-- Description Content -->
+                        <div id="description-content" class="tab-content pt-4 space-y-3 text-slate-600 dark:text-slate-300">
                             {% for paragraph in offering.description %}
                             <p>{{ paragraph }}</p>
                             {% endfor %}
+                        </div>
+                        
+                        <!-- Instructor Content -->
+                        <div id="instructor-content" class="tab-content pt-4 hidden">
+                            {% if offering.instructors and offering.instructors|length > 0 %}
+                            <div class="space-y-4">
+                                {% for instructor in offering.instructors %}
+                                <div class="flex items-start gap-4 p-4 rounded-lg border border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-900/30 hover:border-leapp-yellow/50 transition-all">
+                                    <div class="bg-center bg-no-repeat bg-cover rounded-full size-16 flex-shrink-0" style="background-image: url('{{ instructor.avatar }}');"></div>
+                                    <div class="flex-1">
+                                        <p class="text-leapp-black dark:text-white font-bold text-lg mb-1">{{ instructor.name }}</p>
+                                        <a class="text-leapp-yellow text-sm hover:underline inline-flex items-center gap-1" href="{{ instructor.profile_url }}">
+                                            <span>View Profile</span>
+                                            <span class="material-symbols-outlined text-base">arrow_forward</span>
+                                        </a>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            <div class="text-center py-8 text-slate-500 dark:text-slate-400">
+                                <span class="material-symbols-outlined text-4xl mb-2 opacity-50">person_off</span>
+                                <p>No instructor information available</p>
+                            </div>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
@@ -207,6 +238,38 @@
 {% block scripts %}
 <script>
 document.addEventListener('DOMContentLoaded', () => {
+    // Tab Switching Functionality
+    const tabButtons = document.querySelectorAll('.tab-button');
+    const tabContents = document.querySelectorAll('.tab-content');
+    
+    tabButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const targetTab = button.dataset.tab;
+            
+            // Remove active state from all buttons
+            tabButtons.forEach(btn => {
+                btn.classList.remove('border-leapp-yellow');
+                btn.classList.add('border-transparent', 'text-slate-400');
+            });
+            
+            // Add active state to clicked button
+            button.classList.remove('border-transparent', 'text-slate-400');
+            button.classList.add('border-leapp-yellow');
+            
+            // Hide all tab contents
+            tabContents.forEach(content => {
+                content.classList.add('hidden');
+            });
+            
+            // Show target tab content
+            const targetContent = document.getElementById(`${targetTab}-content`);
+            if (targetContent) {
+                targetContent.classList.remove('hidden');
+            }
+        });
+    });
+    
+    // Interest Button Functionality
     const interestBtn = document.getElementById('interest-btn');
     if (!interestBtn) return;
     

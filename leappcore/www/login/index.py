@@ -88,9 +88,9 @@ def login_user():
     
     # Redirect based on user type
     if frappe.response.get("message") == "Logged In":
-        frappe.local.flags.redirect_location = frappe.response.get("home_page", "/app")
+        frappe.local.flags.redirect_location = "/"
     elif frappe.response.get("message") == "No App":
-        frappe.local.flags.redirect_location = frappe.response.get("home_page", "/")
+        frappe.local.flags.redirect_location = "/"
     else:
         frappe.local.flags.redirect_location = "/"
     
