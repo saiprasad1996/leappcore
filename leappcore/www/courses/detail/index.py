@@ -59,6 +59,18 @@ def _load_offering(offering_id: str):
             }
         )
 
+    # Fetch areas
+    areas = []
+    for row in doc.get("areas") or []:
+        area_name = frappe.db.get_value("Area", row.area, "area_name") or row.area
+        areas.append(area_name)
+
+    # Fetch categories
+    categories = []
+    for row in doc.get("categories") or []:
+        category_name = frappe.db.get_value("Offering Category", row.offering_category, "category_name") or row.offering_category
+        categories.append(category_name)
+
     return {
         "name": doc.name,
         "title": doc.title,
@@ -72,6 +84,8 @@ def _load_offering(offering_id: str):
         "highlights": highlights,
         "instructors": instructors,
         "program_outline": program_outline,
+        "areas": areas,
+        "categories": categories,
     }
 
 

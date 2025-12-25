@@ -1,48 +1,53 @@
 {
-    "actions": [],
-    "allow_rename": 1,
-    "creation": "2024-11-26 17:15:00.000000",
-    "doctype": "DocType",
-    "engine": "InnoDB",
-    "field_order": [
-        "recurrence",
-        "start_time",
-        "end_time",
-        "days_of_week"
-    ],
-    "fields": [
-        {
-            "fieldname": "recurrence",
-            "fieldtype": "Select",
-            "label": "Recurrence",
-            "options": "Once\nWeekly\nCustom"
-        },
-        {
-            "fieldname": "start_time",
-            "fieldtype": "Time",
-            "label": "Start Time"
-        },
-        {
-            "fieldname": "end_time",
-            "fieldtype": "Time",
-            "label": "End Time"
-        },
-        {
-            "fieldname": "days_of_week",
-            "fieldtype": "Data",
-            "label": "Days of Week"
-        }
-    ],
-    "index_web_pages_for_search": 1,
-    "links": [],
-    "modified": "2024-11-26 17:15:00.000000",
-    "modified_by": "Administrator",
-    "module": "Leapp",
-    "name": "Offering Schedule",
-    "owner": "Administrator",
-    "permissions": [],
-    "istable": 1,
-    "sort_field": "modified",
-    "sort_order": "DESC",
-    "states": []
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2024-11-26 17:15:00",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "recurrence",
+  "start_time",
+  "end_time",
+  "days_of_week"
+ ],
+ "fields": [
+  {
+   "fieldname": "recurrence",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Recurrence",
+   "options": "Once\nWeekly\nCustom"
+  },
+  {
+   "fieldname": "start_time",
+   "fieldtype": "Time",
+   "in_list_view": 1,
+   "label": "Start Time"
+  },
+  {
+   "fieldname": "end_time",
+   "fieldtype": "Time",
+   "in_list_view": 1,
+   "label": "End Time"
+  },
+  {
+   "fieldname": "days_of_week",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Days of Week"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2025-12-25 16:33:03.085435",
+ "modified_by": "Administrator",
+ "module": "Leapp",
+ "name": "Offering Schedule",
+ "owner": "Administrator",
+ "permissions": [],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
 }

@@ -102,6 +102,31 @@
                 <div class="flex min-w-72 flex-col gap-3">
                     <p class="text-3xl sm:text-4xl font-black leading-tight tracking-[-0.033em]">{{ offering.title }}</p>
                     <p class="text-slate-600 dark:text-slate-400 text-base leading-normal">{{ offering.subtitle }}</p>
+                    
+                    <!-- Categories and Areas -->
+                    <div class="flex flex-wrap gap-2 mt-2">
+                        {% if offering.categories and offering.categories|length > 0 %}
+                        <div class="flex items-center gap-2">
+                            <span class="material-symbols-outlined text-leapp-yellow text-lg">category</span>
+                            {% for category in offering.categories %}
+                            <span class="px-3 py-1 rounded-full bg-leapp-yellow/20 text-leapp-black dark:text-white text-sm font-medium border border-leapp-yellow/30">
+                                {{ category }}
+                            </span>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                        
+                        {% if offering.areas and offering.areas|length > 0 %}
+                        <div class="flex items-center gap-2">
+                            <span class="material-symbols-outlined text-leapp-yellow text-lg">location_on</span>
+                            {% for area in offering.areas %}
+                            <span class="px-3 py-1 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 text-sm font-medium">
+                                {{ area }}
+                            </span>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
 

@@ -1,48 +1,59 @@
 {
-    "actions": [],
-    "allow_rename": 1,
-    "creation": "2024-11-26 17:31:00.000000",
-    "doctype": "DocType",
-    "editable_grid": 1,
-    "engine": "InnoDB",
-    "field_order": [
-        "icon",
-        "label",
-        "value",
-        "order_no"
-    ],
-    "fields": [
-        {
-            "fieldname": "icon",
-            "fieldtype": "Data",
-            "label": "Icon"
-        },
-        {
-            "fieldname": "label",
-            "fieldtype": "Data",
-            "label": "Label"
-        },
-        {
-            "fieldname": "value",
-            "fieldtype": "Data",
-            "label": "Value"
-        },
-        {
-            "fieldname": "order_no",
-            "fieldtype": "Int",
-            "label": "Order"
-        }
-    ],
-    "index_web_pages_for_search": 1,
-    "istable": 1,
-    "links": [],
-    "modified": "2024-11-26 17:31:00.000000",
-    "modified_by": "Administrator",
-    "module": "Leapp",
-    "name": "Offering Highlight",
-    "owner": "Administrator",
-    "permissions": [],
-    "sort_field": "modified",
-    "sort_order": "DESC",
-    "states": []
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2024-11-26 17:31:00",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "order_no",
+  "label",
+  "column_break_cvsy",
+  "icon",
+  "value"
+ ],
+ "fields": [
+  {
+   "default": "kid_star",
+   "fieldname": "icon",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Icon"
+  },
+  {
+   "fieldname": "label",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Label"
+  },
+  {
+   "fieldname": "value",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Value"
+  },
+  {
+   "fieldname": "order_no",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Order"
+  },
+  {
+   "fieldname": "column_break_cvsy",
+   "fieldtype": "Column Break"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2025-12-25 16:40:05.706532",
+ "modified_by": "Administrator",
+ "module": "Leapp",
+ "name": "Offering Highlight",
+ "owner": "Administrator",
+ "permissions": [],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
 }

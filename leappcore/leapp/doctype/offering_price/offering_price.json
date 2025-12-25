@@ -1,43 +1,46 @@
 {
-    "actions": [],
-    "allow_rename": 1,
-    "creation": "2024-11-26 17:10:00.000000",
-    "doctype": "DocType",
-    "engine": "InnoDB",
-    "field_order": [
-        "amount",
-        "currency",
-        "billing_type"
-    ],
-    "fields": [
-        {
-            "fieldname": "amount",
-            "fieldtype": "Currency",
-            "in_list_view": 1,
-            "label": "Amount"
-        },
-        {
-            "fieldname": "currency",
-            "fieldtype": "Data",
-            "label": "Currency"
-        },
-        {
-            "fieldname": "billing_type",
-            "fieldtype": "Select",
-            "label": "Billing Type",
-            "options": "per_session\nper_month\npackage"
-        }
-    ],
-    "index_web_pages_for_search": 1,
-    "links": [],
-    "modified": "2024-11-26 17:10:00.000000",
-    "modified_by": "Administrator",
-    "module": "Leapp",
-    "name": "Offering Price",
-    "owner": "Administrator",
-    "permissions": [],
-    "istable": 1,
-    "sort_field": "modified",
-    "sort_order": "DESC",
-    "states": []
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2024-11-26 17:10:00",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "amount",
+  "currency",
+  "billing_type"
+ ],
+ "fields": [
+  {
+   "fieldname": "amount",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Amount"
+  },
+  {
+   "fieldname": "currency",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Currency"
+  },
+  {
+   "fieldname": "billing_type",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Billing Type",
+   "options": "per_session\nper_month\npackage"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2025-12-25 16:29:27.113296",
+ "modified_by": "Administrator",
+ "module": "Leapp",
+ "name": "Offering Price",
+ "owner": "Administrator",
+ "permissions": [],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
 }
