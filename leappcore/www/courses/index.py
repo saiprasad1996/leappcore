@@ -39,6 +39,8 @@ def _init_page_context(context):
     page_context = PageContext(context)
     context = page_context.get_context()
     context.csrf_token = frappe.sessions.get_csrf_token()
+    # Prevent caching since page contains user-specific navigation
+    context.no_cache = 1
     return context
 
 

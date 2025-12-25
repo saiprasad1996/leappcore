@@ -404,20 +404,18 @@
                 }
             }).then(response => {
                 if (response.ok) {
-                    // Force a hard reload to prevent caching issues on mobile
-                    window.location.replace('/?t=' + new Date().getTime());
-                    // Use reload(true) as fallback for browsers that support it
+                    // Wait for server to process logout before redirecting
                     setTimeout(() => {
-                        window.location.reload(true);
-                    }, 100);
+                        // Use location.href with cache buster for compatibility
+                        window.location.href = '/?_=' + Date.now();
+                    }, 500);
                 }
             }).catch(error => {
                 console.error('Logout error:', error);
-                // Fallback: redirect with cache-busting anyway
-                window.location.replace('/?t=' + new Date().getTime());
+                // Fallback: redirect anyway after delay
                 setTimeout(() => {
-                    window.location.reload(true);
-                }, 100);
+                    window.location.href = '/?_=' + Date.now();
+                }, 500);
             });
         }
     </script>

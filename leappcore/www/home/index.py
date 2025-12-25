@@ -6,6 +6,9 @@ def get_context(context):
     # Initialize shared context
     page_context = PageContext(context)
     context = page_context.get_context()
+    
+    # Prevent caching since page contains user-specific navigation
+    context.no_cache = 1
 
     # Stats
     context.courses_count = frappe.db.count("Offering", {"active": 1})
