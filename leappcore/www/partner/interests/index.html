@@ -9,12 +9,57 @@
     .material-symbols-outlined {
         font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
     }
+    
+    .status-pill {
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    
+    .status-pill:hover {
+        transform: scale(1.05);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+    
+    .status-dropdown {
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-10px);
+        transition: all 0.2s ease;
+    }
+    
+    .status-dropdown.active {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+    }
+    
+    .history-panel {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease;
+    }
+    
+    .history-panel.open {
+        max-height: 400px;
+    }
+    
+    .toast {
+        animation: slideIn 0.3s ease;
+    }
+    
+    @keyframes slideIn {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+    }
 </style>
 {% endblock %}
 
 {% block content %}
 <main class="flex-1 w-full bg-background-light dark:bg-background-dark text-leapp-black dark:text-white">
     <div class="w-full px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Toast Container -->
+        <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2"></div>
+        
         <!-- Header -->
         <div class="mb-8">
             <div class="flex items-center justify-between mb-4">
@@ -99,6 +144,9 @@
                 <a href="/partner/interests?status=CONFIRMED" class="px-4 py-2 rounded-lg {% if current_status == 'CONFIRMED' %}bg-green-500 text-white{% else %}bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300{% endif %} text-sm font-medium hover:opacity-90 transition-opacity">
                     Confirmed
                 </a>
+                <a href="/partner/interests?status=CLOSED" class="px-4 py-2 rounded-lg {% if current_status == 'CLOSED' %}bg-gray-500 text-white{% else %}bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300{% endif %} text-sm font-medium hover:opacity-90 transition-opacity">
+                    Closed
+                </a>
             </div>
             <p class="text-sm text-gray-600 dark:text-gray-400">
                 Showing {{ interests|length }} {% if current_status %}{{ current_status.lower() }}{% endif %} interest{{ 's' if interests|length != 1 }}
@@ -109,61 +157,103 @@
         {% if interests and interests|length > 0 %}
         <div class="space-y-4">
             {% for interest in interests %}
-            <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-background-dark p-6 shadow-lg hover:shadow-xl transition-shadow">
-                <div class="flex flex-col md:flex-row gap-6">
-                    <!-- Customer Info -->
-                    <div class="flex items-start gap-4 flex-1">
-                        <div class="w-16 h-16 rounded-full bg-leapp-yellow flex items-center justify-center text-leapp-black font-bold text-xl flex-shrink-0">
-                            {% if interest.customer_image %}
-                            <img src="{{ interest.customer_image }}" alt="{{ interest.customer_name }}" class="w-16 h-16 rounded-full object-cover">
-                            {% else %}
-                            {{ interest.customer_name[0].upper() }}
-                            {% endif %}
+            <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-background-dark shadow-lg hover:shadow-xl transition-shadow" data-interest-id="{{ interest.name }}">
+                <div class="p-6">
+                    <div class="flex flex-col md:flex-row gap-6">
+                        <!-- Customer Info -->
+                        <div class="flex items-start gap-4 flex-1">
+                            <div class="w-16 h-16 rounded-full bg-leapp-yellow flex items-center justify-center text-leapp-black font-bold text-xl flex-shrink-0">
+                                {% if interest.customer_image %}
+                                <img src="{{ interest.customer_image }}" alt="{{ interest.customer_name }}" class="w-16 h-16 rounded-full object-cover">
+                                {% else %}
+                                {{ interest.customer_name[0].upper() }}
+                                {% endif %}
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <h3 class="text-lg font-bold text-leapp-black dark:text-white mb-1">{{ interest.customer_name }}</h3>
+                                <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">{{ interest.customer_email }}</p>
+                                {% if interest.customer_phone %}
+                                <p class="text-sm text-gray-600 dark:text-gray-400 flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-xs">call</span>
+                                    {{ interest.customer_phone }}
+                                </p>
+                                {% endif %}
+                            </div>
                         </div>
+
+                        <!-- Offering Info -->
                         <div class="flex-1 min-w-0">
-                            <h3 class="text-lg font-bold text-leapp-black dark:text-white mb-1">{{ interest.customer_name }}</h3>
-                            <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">{{ interest.customer_email }}</p>
-                            {% if interest.customer_phone %}
-                            <p class="text-sm text-gray-600 dark:text-gray-400 flex items-center gap-1">
-                                <span class="material-symbols-outlined text-xs">call</span>
-                                {{ interest.customer_phone }}
-                            </p>
-                            {% endif %}
+                            <p class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">Interested In</p>
+                            <h4 class="font-bold text-leapp-black dark:text-white mb-2">{{ interest.offering_title }}</h4>
+                            <p class="text-sm text-leapp-yellow font-bold">₹{{ "%.0f"|format(interest.offering_price) }} per session</p>
+                        </div>
+
+                        <!-- Status & Actions -->
+                        <div class="flex flex-col items-end justify-between gap-3">
+                            <!-- Clickable Status Dropdown -->
+                            <div class="relative">
+                                <button onclick="toggleStatusDropdown('{{ interest.name }}')" class="status-pill px-4 py-2 rounded-full text-xs font-bold flex items-center gap-1
+                                    {% if interest.status == 'NEW' %}bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200
+                                    {% elif interest.status == 'CONTACTED' %}bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200
+                                    {% elif interest.status == 'CONFIRMED' %}bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200
+                                    {% elif interest.status == 'CLOSED' %}bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200
+                                    {% endif %}">
+                                    <span class="status-text">{{ interest.status }}</span>
+                                    <span class="material-symbols-outlined text-sm">expand_more</span>
+                                </button>
+                                
+                                <!-- Status Dropdown -->
+                                <div id="status-dropdown-{{ interest.name }}" class="status-dropdown absolute right-0 top-full mt-2 w-40 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-background-dark shadow-xl z-20">
+                                    <div class="p-1">
+                                        <button onclick="updateStatus('{{ interest.name }}', 'NEW')" class="w-full px-3 py-2 text-left text-sm hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg flex items-center gap-2 {% if interest.status == 'NEW' %}bg-blue-50 dark:bg-blue-900/30{% endif %}">
+                                            <span class="w-3 h-3 rounded-full bg-blue-500"></span>
+                                            New
+                                        </button>
+                                        <button onclick="updateStatus('{{ interest.name }}', 'CONTACTED')" class="w-full px-3 py-2 text-left text-sm hover:bg-orange-50 dark:hover:bg-orange-900/30 rounded-lg flex items-center gap-2 {% if interest.status == 'CONTACTED' %}bg-orange-50 dark:bg-orange-900/30{% endif %}">
+                                            <span class="w-3 h-3 rounded-full bg-orange-500"></span>
+                                            Contacted
+                                        </button>
+                                        <button onclick="updateStatus('{{ interest.name }}', 'CONFIRMED')" class="w-full px-3 py-2 text-left text-sm hover:bg-green-50 dark:hover:bg-green-900/30 rounded-lg flex items-center gap-2 {% if interest.status == 'CONFIRMED' %}bg-green-50 dark:bg-green-900/30{% endif %}">
+                                            <span class="w-3 h-3 rounded-full bg-green-500"></span>
+                                            Confirmed
+                                        </button>
+                                        <button onclick="updateStatus('{{ interest.name }}', 'CLOSED')" class="w-full px-3 py-2 text-left text-sm hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg flex items-center gap-2 {% if interest.status == 'CLOSED' %}bg-gray-50 dark:bg-gray-800{% endif %}">
+                                            <span class="w-3 h-3 rounded-full bg-gray-500"></span>
+                                            Closed
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <p class="text-xs text-gray-500 dark:text-gray-400">{{ interest.created_ago }}</p>
+                            <div class="flex gap-2">
+                                <button onclick="toggleHistory('{{ interest.name }}')" class="px-3 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-800 transition-all flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-sm">history</span>
+                                </button>
+                                <a href="mailto:{{ interest.customer_email }}" class="px-4 py-2 bg-leapp-yellow text-leapp-black rounded-lg text-sm font-medium hover:bg-leapp-yellow/90 transition-all flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-sm">mail</span>
+                                    <span>Email</span>
+                                </a>
+                                {% if interest.customer_phone %}
+                                <a href="tel:{{ interest.customer_phone }}" class="px-4 py-2 border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-800 transition-all flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-sm">call</span>
+                                    <span>Call</span>
+                                </a>
+                                {% endif %}
+                            </div>
                         </div>
                     </div>
-
-                    <!-- Offering Info -->
-                    <div class="flex-1 min-w-0">
-                        <p class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">Interested In</p>
-                        <h4 class="font-bold text-leapp-black dark:text-white mb-2">{{ interest.offering_title }}</h4>
-                        <p class="text-sm text-leapp-yellow font-bold">₹{{ "%.0f"|format(interest.offering_price) }} per session</p>
-                    </div>
-
-                    <!-- Status & Actions -->
-                    <div class="flex flex-col items-end justify-between gap-3">
-                        <div class="flex items-center gap-2">
-                            {% if interest.status == 'NEW' %}
-                            <span class="px-3 py-1 bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 text-xs font-bold rounded-full">New</span>
-                            {% elif interest.status == 'CONTACTED' %}
-                            <span class="px-3 py-1 bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200 text-xs font-bold rounded-full">Contacted</span>
-                            {% elif interest.status == 'CONFIRMED' %}
-                            <span class="px-3 py-1 bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 text-xs font-bold rounded-full">Confirmed</span>
-                            {% elif interest.status == 'CLOSED' %}
-                            <span class="px-3 py-1 bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200 text-xs font-bold rounded-full">Closed</span>
-                            {% endif %}
+                </div>
+                
+                <!-- Status History Panel -->
+                <div id="history-panel-{{ interest.name }}" class="history-panel border-t border-gray-200 dark:border-gray-700">
+                    <div class="p-4 bg-gray-50 dark:bg-gray-900/50">
+                        <div class="flex items-center gap-2 mb-3">
+                            <span class="material-symbols-outlined text-gray-500 dark:text-gray-400">history</span>
+                            <h5 class="text-sm font-bold text-gray-700 dark:text-gray-300">Status History</h5>
                         </div>
-                        <p class="text-xs text-gray-500 dark:text-gray-400">{{ interest.created_ago }}</p>
-                        <div class="flex gap-2">
-                            <a href="mailto:{{ interest.customer_email }}" class="px-4 py-2 bg-leapp-yellow text-leapp-black rounded-lg text-sm font-medium hover:bg-leapp-yellow/90 transition-all flex items-center gap-1">
-                                <span class="material-symbols-outlined text-sm">mail</span>
-                                <span>Email</span>
-                            </a>
-                            {% if interest.customer_phone %}
-                            <a href="tel:{{ interest.customer_phone }}" class="px-4 py-2 border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-800 transition-all flex items-center gap-1">
-                                <span class="material-symbols-outlined text-sm">call</span>
-                                <span>Call</span>
-                            </a>
-                            {% endif %}
+                        <div id="history-content-{{ interest.name }}" class="space-y-2">
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Loading...</p>
                         </div>
                     </div>
                 </div>
@@ -195,4 +285,148 @@
         {% endif %}
     </div>
 </main>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const csrfToken = '{{ csrf_token }}';
+    
+    // Status colors mapping
+    const statusColors = {
+        'NEW': { bg: 'bg-blue-100', text: 'text-blue-800', darkBg: 'dark:bg-blue-900', darkText: 'dark:text-blue-200' },
+        'CONTACTED': { bg: 'bg-orange-100', text: 'text-orange-800', darkBg: 'dark:bg-orange-900', darkText: 'dark:text-orange-200' },
+        'CONFIRMED': { bg: 'bg-green-100', text: 'text-green-800', darkBg: 'dark:bg-green-900', darkText: 'dark:text-green-200' },
+        'CLOSED': { bg: 'bg-gray-100', text: 'text-gray-800', darkBg: 'dark:bg-gray-800', darkText: 'dark:text-gray-200' }
+    };
+    
+    function toggleStatusDropdown(interestId) {
+        const dropdown = document.getElementById(`status-dropdown-${interestId}`);
+        
+        // Close all other dropdowns
+        document.querySelectorAll('.status-dropdown').forEach(d => {
+            if (d.id !== `status-dropdown-${interestId}`) {
+                d.classList.remove('active');
+            }
+        });
+        
+        dropdown.classList.toggle('active');
+    }
+    
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.status-pill') && !e.target.closest('.status-dropdown')) {
+            document.querySelectorAll('.status-dropdown').forEach(d => d.classList.remove('active'));
+        }
+    });
+    
+    async function updateStatus(interestId, newStatus) {
+        const dropdown = document.getElementById(`status-dropdown-${interestId}`);
+        dropdown.classList.remove('active');
+        
+        try {
+            const response = await fetch('/api/method/leappcore.api.interest.update_interest_status', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Frappe-CSRF-Token': csrfToken
+                },
+                body: JSON.stringify({
+                    interest_id: interestId,
+                    new_status: newStatus
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (data.message && data.message.success) {
+                // Update the pill UI
+                const card = document.querySelector(`[data-interest-id="${interestId}"]`);
+                const pill = card.querySelector('.status-pill');
+                const statusText = pill.querySelector('.status-text');
+                
+                // Remove old colors
+                pill.className = 'status-pill px-4 py-2 rounded-full text-xs font-bold flex items-center gap-1';
+                
+                // Add new colors
+                const colors = statusColors[newStatus];
+                pill.classList.add(colors.bg, colors.text, colors.darkBg, colors.darkText);
+                statusText.textContent = newStatus;
+                
+                // Show toast
+                showToast(`Status updated to ${newStatus}`, 'success');
+            } else {
+                showToast('Failed to update status', 'error');
+            }
+        } catch (error) {
+            console.error('Error updating status:', error);
+            showToast('Failed to update status', 'error');
+        }
+    }
+    
+    function toggleHistory(interestId) {
+        const panel = document.getElementById(`history-panel-${interestId}`);
+        
+        if (panel.classList.contains('open')) {
+            panel.classList.remove('open');
+        } else {
+            panel.classList.add('open');
+            loadHistory(interestId);
+        }
+    }
+    
+    async function loadHistory(interestId) {
+        const contentDiv = document.getElementById(`history-content-${interestId}`);
+        
+        try {
+            const response = await fetch(`/api/method/leappcore.api.interest.get_interest_history?interest_id=${interestId}`, {
+                headers: {
+                    'X-Frappe-CSRF-Token': csrfToken
+                }
+            });
+            
+            const data = await response.json();
+            
+            if (data.message && data.message.length > 0) {
+                contentDiv.innerHTML = data.message.map(h => `
+                    <div class="flex items-center gap-3 text-sm">
+                        <div class="w-2 h-2 rounded-full ${getStatusDot(h.new_value)}"></div>
+                        <span class="text-gray-600 dark:text-gray-400">${h.old_value} → ${h.new_value}</span>
+                        <span class="text-gray-400 dark:text-gray-500 text-xs">${h.timestamp_ago}</span>
+                    </div>
+                `).join('');
+            } else {
+                contentDiv.innerHTML = '<p class="text-sm text-gray-500 dark:text-gray-400">No status changes recorded yet.</p>';
+            }
+        } catch (error) {
+            console.error('Error loading history:', error);
+            contentDiv.innerHTML = '<p class="text-sm text-red-500">Failed to load history.</p>';
+        }
+    }
+    
+    function getStatusDot(status) {
+        const dots = {
+            'NEW': 'bg-blue-500',
+            'CONTACTED': 'bg-orange-500',
+            'CONFIRMED': 'bg-green-500',
+            'CLOSED': 'bg-gray-500'
+        };
+        return dots[status] || 'bg-gray-500';
+    }
+    
+    function showToast(message, type = 'success') {
+        const container = document.getElementById('toast-container');
+        const toast = document.createElement('div');
+        toast.className = `toast px-4 py-3 rounded-lg shadow-lg flex items-center gap-2 ${type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'}`;
+        toast.innerHTML = `
+            <span class="material-symbols-outlined text-sm">${type === 'success' ? 'check_circle' : 'error'}</span>
+            <span class="text-sm font-medium">${message}</span>
+        `;
+        container.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    }
+</script>
 {% endblock %}

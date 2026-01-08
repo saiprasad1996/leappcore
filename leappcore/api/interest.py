@@ -269,3 +269,86 @@ def send_event_interest_notification(customer, organizer, event):
         )
     except Exception as e:
         frappe.log_error(frappe.get_traceback(), "Event Interest Notification Email Error")
+
+@frappe.whitelist(allow_guest=False)
+def update_interest_status(interest_id, new_status):
+    """Update the status of a customer interest"""
+    # Validate status
+    valid_statuses = ["NEW", "CONTACTED", "CONFIRMED", "CLOSED"]
+    if new_status not in valid_statuses:
+        frappe.throw(_("Invalid status. Must be one of: ") + ", ".join(valid_statuses))
+    
+    # Check if interest exists
+    if not frappe.db.exists("Customer Interest", interest_id):
+        frappe.throw(_("Interest not found"), frappe.DoesNotExistError)
+    
+    # Get the interest document
+    interest = frappe.get_doc("Customer Interest", interest_id)
+    
+    # Check if current user is the provider
+    if interest.provider != frappe.session.user:
+        frappe.throw(_("You do not have permission to update this interest"), frappe.PermissionError)
+    
+    # Store old status for history
+    old_status = interest.status
+    
+    # Update the status
+    interest.status = new_status
+    interest.save(ignore_permissions=True)
+    frappe.db.commit()
+    
+    return {
+        "success": True,
+        "message": _("Status updated successfully"),
+        "old_status": old_status,
+        "new_status": new_status
+    }
+
+
+@frappe.whitelist(allow_guest=False)
+def get_interest_history(interest_id):
+    """Get the version history of a customer interest"""
+    # Check if interest exists
+    if not frappe.db.exists("Customer Interest", interest_id):
+        frappe.throw(_("Interest not found"), frappe.DoesNotExistError)
+    
+    # Get the interest document
+    interest = frappe.get_doc("Customer Interest", interest_id)
+    
+    # Check if current user is the provider
+    if interest.provider != frappe.session.user:
+        frappe.throw(_("You do not have permission to view this interest"), frappe.PermissionError)
+    
+    # Get version history
+    versions = frappe.get_all(
+        "Version",
+        filters={
+            "docname": interest_id,
+            "ref_doctype": "Customer Interest"
+        },
+        fields=["name", "creation", "owner", "data"],
+        order_by="creation desc",
+        limit=20
+    )
+    
+    history = []
+    for v in versions:
+        try:
+            import json
+            data = json.loads(v.data) if v.data else {}
+            changed = data.get("changed", [])
+            
+            # Find status changes
+            for change in changed:
+                if len(change) >= 3 and change[0] == "status":
+                    history.append({
+                        "timestamp": v.creation,
+                        "timestamp_ago": frappe.utils.pretty_date(v.creation),
+                        "old_value": change[1],
+                        "new_value": change[2],
+                        "user": v.owner
+                    })
+        except:
+            pass
+    
+    return history

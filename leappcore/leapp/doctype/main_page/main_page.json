@@ -7,15 +7,15 @@
  "field_order": [
   "facebook_link",
   "x_link",
+  "aboutus_content_short",
   "privacy_policy",
   "terms_and_conditions",
-  "aboutus_content_long",
-  "aboutus_content_short",
   "index_image",
   "column_break_uuiv",
   "linkedin_link",
   "contact_phone",
-  "payment_policy"
+  "payment_policy",
+  "aboutus_content_long"
  ],
  "fields": [
   {
@@ -40,17 +40,17 @@
   },
   {
    "fieldname": "privacy_policy",
-   "fieldtype": "Text",
+   "fieldtype": "HTML Editor",
    "label": "Privacy Policy"
   },
   {
    "fieldname": "payment_policy",
-   "fieldtype": "Text",
+   "fieldtype": "HTML Editor",
    "label": "Payment Policy"
   },
   {
    "fieldname": "terms_and_conditions",
-   "fieldtype": "Text",
+   "fieldtype": "HTML Editor",
    "label": "Terms & Conditions"
   },
   {
@@ -60,7 +60,7 @@
   },
   {
    "fieldname": "aboutus_content_short",
-   "fieldtype": "Small Text",
+   "fieldtype": "HTML Editor",
    "label": "About (Short)"
   },
   {
@@ -76,7 +76,7 @@
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2026-01-04 18:11:02.709124",
+ "modified": "2026-01-09 01:20:21.321942",
  "modified_by": "Administrator",
  "module": "Leapp",
  "name": "Main Page",

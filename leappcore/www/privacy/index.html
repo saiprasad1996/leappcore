@@ -83,26 +83,26 @@
         <!-- Header -->
         <div class="mb-8 text-center">
             <h1 class="text-4xl sm:text-5xl font-black text-leapp-black dark:text-white mb-4">
-                Terms & Conditions
+                Privacy Policy
             </h1>
             <p class="text-gray-600 dark:text-gray-400">
-                Please read these terms carefully before using our services.
+                Learn how we collect, use, and protect your personal information.
             </p>
         </div>
 
         <!-- Content Card -->
         <div class="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-background-dark p-8 sm:p-12 shadow-lg">
-            {% if terms_content %}
+            {% if privacy_content %}
             <div class="policy-content text-leapp-black dark:text-white">
-                {{ terms_content | safe }}
+                {{ privacy_content | safe }}
             </div>
             {% else %}
             <div class="text-center py-12">
                 <div class="w-20 h-20 rounded-full bg-leapp-yellow/10 flex items-center justify-center mx-auto mb-4">
-                    <span class="material-symbols-outlined text-leapp-yellow text-4xl">description</span>
+                    <span class="material-symbols-outlined text-leapp-yellow text-4xl">shield</span>
                 </div>
                 <h2 class="text-xl font-bold text-leapp-black dark:text-white mb-2">Content Coming Soon</h2>
-                <p class="text-gray-600 dark:text-gray-400">Terms and conditions content will be available soon.</p>
+                <p class="text-gray-600 dark:text-gray-400">Privacy policy content will be available soon.</p>
             </div>
             {% endif %}
         </div>

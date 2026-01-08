@@ -68,16 +68,16 @@
                         </div>
                         <div class="flex flex-1 justify-end gap-8">
                             <!-- Desktop Navigation -->
-                            <div class="hidden md:flex items-center gap-9">
-                                <a class="text-leapp-black dark:text-white text-sm font-medium leading-normal"
+                            <div class="hidden md:flex items-center gap-2">
+                                <a class="px-4 py-2 rounded-lg text-sm font-medium leading-normal transition-all {% if frappe.request.path == '/' or frappe.request.path == '/index' %}bg-leapp-yellow text-leapp-black{% else %}text-leapp-black dark:text-white hover:bg-leapp-yellow/10{% endif %}"
                                     href="/">Home</a>
-                                <a class="text-leapp-black dark:text-white text-sm font-medium leading-normal"
+                                <a class="px-4 py-2 rounded-lg text-sm font-medium leading-normal transition-all {% if 'group=Learn' in (frappe.request.url or '') %}bg-leapp-yellow text-leapp-black{% else %}text-leapp-black dark:text-white hover:bg-leapp-yellow/10{% endif %}"
                                     href="/courses?group=Learn">Learn</a>
-                                <a class="text-leapp-black dark:text-white text-sm font-medium leading-normal"
+                                <a class="px-4 py-2 rounded-lg text-sm font-medium leading-normal transition-all {% if 'group=Leisure' in (frappe.request.url or '') %}bg-leapp-yellow text-leapp-black{% else %}text-leapp-black dark:text-white hover:bg-leapp-yellow/10{% endif %}"
                                     href="/courses?group=Leisure">Leisure</a>
-                                <a class="text-leapp-black dark:text-white text-sm font-medium leading-normal"
+                                <a class="px-4 py-2 rounded-lg text-sm font-medium leading-normal transition-all {% if 'group=Play' in (frappe.request.url or '') %}bg-leapp-yellow text-leapp-black{% else %}text-leapp-black dark:text-white hover:bg-leapp-yellow/10{% endif %}"
                                     href="/courses?group=Play">Play</a>
-                                <a class="text-leapp-black dark:text-white text-sm font-medium leading-normal"
+                                <a class="px-4 py-2 rounded-lg text-sm font-medium leading-normal transition-all {% if frappe.request.path.startswith('/events') %}bg-leapp-yellow text-leapp-black{% else %}text-leapp-black dark:text-white hover:bg-leapp-yellow/10{% endif %}"
                                     href="/events">Perform</a>
                             </div>
                             
@@ -184,23 +184,23 @@
                                 <!-- Navigation Links -->
                                 <nav class="flex-1 overflow-y-auto p-4">
                                     <div class="space-y-2">
-                                        <a href="/" class="flex items-center gap-3 px-4 py-3 rounded-lg text-leapp-black dark:text-white hover:bg-leapp-yellow/10 transition-colors">
+                                        <a href="/" class="flex items-center gap-3 px-4 py-3 rounded-lg transition-colors {% if frappe.request.path == '/' or frappe.request.path == '/index' %}bg-leapp-yellow/20 text-leapp-yellow{% else %}text-leapp-black dark:text-white hover:bg-leapp-yellow/10{% endif %}">
                                             <span class="material-symbols-outlined">home</span>
                                             <span class="font-medium">Home</span>
                                         </a>
-                                        <a href="/courses?group=Learn" class="flex items-center gap-3 px-4 py-3 rounded-lg text-leapp-black dark:text-white hover:bg-leapp-yellow/10 transition-colors">
+                                        <a href="/courses?group=Learn" class="flex items-center gap-3 px-4 py-3 rounded-lg transition-colors {% if 'group=Learn' in (frappe.request.url or '') %}bg-leapp-yellow/20 text-leapp-yellow{% else %}text-leapp-black dark:text-white hover:bg-leapp-yellow/10{% endif %}">
                                             <span class="material-symbols-outlined">school</span>
                                             <span class="font-medium">Learn</span>
                                         </a>
-                                        <a href="/courses?group=Leisure" class="flex items-center gap-3 px-4 py-3 rounded-lg text-leapp-black dark:text-white hover:bg-leapp-yellow/10 transition-colors">
+                                        <a href="/courses?group=Leisure" class="flex items-center gap-3 px-4 py-3 rounded-lg transition-colors {% if 'group=Leisure' in (frappe.request.url or '') %}bg-leapp-yellow/20 text-leapp-yellow{% else %}text-leapp-black dark:text-white hover:bg-leapp-yellow/10{% endif %}">
                                             <span class="material-symbols-outlined">beach_access</span>
                                             <span class="font-medium">Leisure</span>
                                         </a>
-                                        <a href="/courses?group=Play" class="flex items-center gap-3 px-4 py-3 rounded-lg text-leapp-black dark:text-white hover:bg-leapp-yellow/10 transition-colors">
+                                        <a href="/courses?group=Play" class="flex items-center gap-3 px-4 py-3 rounded-lg transition-colors {% if 'group=Play' in (frappe.request.url or '') %}bg-leapp-yellow/20 text-leapp-yellow{% else %}text-leapp-black dark:text-white hover:bg-leapp-yellow/10{% endif %}">
                                             <span class="material-symbols-outlined">sports_esports</span>
                                             <span class="font-medium">Play</span>
                                         </a>
-                                        <a href="/events" class="flex items-center gap-3 px-4 py-3 rounded-lg text-leapp-black dark:text-white hover:bg-leapp-yellow/10 transition-colors">
+                                        <a href="/events" class="flex items-center gap-3 px-4 py-3 rounded-lg transition-colors {% if frappe.request.path.startswith('/events') %}bg-leapp-yellow/20 text-leapp-yellow{% else %}text-leapp-black dark:text-white hover:bg-leapp-yellow/10{% endif %}">
                                             <span class="material-symbols-outlined">event</span>
                                             <span class="font-medium">Perform</span>
                                         </a>
@@ -292,8 +292,8 @@
                 <div>
                     <h3 class="font-bold text-white mb-4">Legal</h3>
                     <ul class="space-y-2 text-slate-400 text-sm">
-                        <li><a class="hover:text-leapp-yellow transition-colors" href="#">Privacy Policy</a></li>
-                        <li><a class="hover:text-leapp-yellow transition-colors" href="#">Terms of Service</a></li>
+                        <li><a class="hover:text-leapp-yellow transition-colors" href="/privacy">Privacy Policy</a></li>
+                        <li><a class="hover:text-leapp-yellow transition-colors" href="/terms">Terms of Service</a></li>
                     </ul>
                 </div>
                 <div>

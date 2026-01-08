@@ -28,6 +28,8 @@ def get_context(context):
             event_id = save_event(event_id)
             frappe.local.flags.redirect_location = f"/partner/event/register?id={event_id}&success=1"
             raise frappe.Redirect
+        except frappe.Redirect:
+            raise
         except Exception as e:
             frappe.clear_messages()
             context.error_message = str(e)
@@ -47,7 +49,6 @@ def get_context(context):
     
     # Load my events
     context.my_events = get_my_events()
-    context.areas = get_areas()
     
     return context
 
@@ -67,7 +68,9 @@ def get_empty_event():
         "venue_address": "",
         "long_description": "",
         "short_description": "",
+        "featured_image": "",
         "area": "",
+        "area_name": "",
         "active": 0
     }
 
@@ -83,7 +86,22 @@ def load_event(event_id):
     if event.organizer != frappe.session.user:
         frappe.throw(_("You do not have permission to edit this event"), frappe.PermissionError)
     
-    return event.as_dict()
+    data = event.as_dict()
+    
+    # Convert datetime to string for HTML inputs
+    if data.get("start_datetime"):
+        data["start_datetime"] = str(data["start_datetime"]).replace(" ", "T")[:16]
+    if data.get("end_datetime"):
+        data["end_datetime"] = str(data["end_datetime"]).replace(" ", "T")[:16]
+    
+    # Get area name for display
+    if data.get("area") and frappe.db.exists("Area", data["area"]):
+        area_doc = frappe.get_doc("Area", data["area"])
+        data["area_name"] = area_doc.area_name
+    else:
+        data["area_name"] = ""
+    
+    return data
 
 
 def get_my_events():
@@ -95,12 +113,6 @@ def get_my_events():
         order_by="start_datetime desc"
     )
     return events
-
-
-def get_areas():
-    """Get list of areas"""
-    areas = frappe.get_all("Area", fields=["name", "area_name"], order_by="area_name")
-    return areas
 
 
 def save_event(event_id=None):
@@ -132,14 +144,13 @@ def save_event(event_id=None):
         
         event.event_name = event_name
         event.heading = heading
-        event.start_datetime = start_datetime
-        event.end_datetime = end_datetime
+        event.start_datetime = start_datetime if start_datetime else None
+        event.end_datetime = end_datetime if end_datetime else None
         event.venue_address = venue_address
         event.long_description = long_description
         event.short_description = short_description
-        event.area = area
+        event.area = area if area else None
         event.active = active
-        event.save(ignore_permissions=True)
     else:
         # Create new event
         event = frappe.get_doc({
@@ -147,14 +158,33 @@ def save_event(event_id=None):
             "organizer": user,
             "event_name": event_name,
             "heading": heading,
-            "start_datetime": start_datetime,
-            "end_datetime": end_datetime,
+            "start_datetime": start_datetime if start_datetime else None,
+            "end_datetime": end_datetime if end_datetime else None,
             "venue_address": venue_address,
             "long_description": long_description,
             "short_description": short_description,
-            "area": area,
+            "area": area if area else None,
             "active": active
         })
+    
+    # Handle image upload
+    if frappe.request.files.get("featured_image"):
+        file = frappe.request.files.get("featured_image")
+        if file.filename:
+            from frappe.utils.file_manager import save_file
+            saved_file = save_file(
+                file.filename,
+                file.read(),
+                "Leapp Event",
+                event.name if event_id else None,
+                folder="Home/Attachments",
+                is_private=0
+            )
+            event.featured_image = saved_file.file_url
+    
+    if event_id:
+        event.save(ignore_permissions=True)
+    else:
         event.insert(ignore_permissions=True)
     
     frappe.db.commit()

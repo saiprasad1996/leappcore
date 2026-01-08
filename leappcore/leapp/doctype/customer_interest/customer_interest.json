@@ -1,15 +1,16 @@
 {
  "actions": [],
  "allow_rename": 1,
- "creation": "2024-11-26 17:35:00.000000",
+ "creation": "2024-11-26 17:35:00",
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
   "customer",
-  "provider",
   "interest_type",
-  "offering",
   "event",
+  "column_break_hezo",
+  "provider",
+  "offering",
   "status"
  ],
  "fields": [
@@ -50,11 +51,15 @@
    "fieldtype": "Select",
    "label": "Status",
    "options": "NEW\nCONTACTED\nCONFIRMED\nCLOSED"
+  },
+  {
+   "fieldname": "column_break_hezo",
+   "fieldtype": "Column Break"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-11-26 17:35:00.000000",
+ "modified": "2026-01-09 01:08:13.094606",
  "modified_by": "Administrator",
  "module": "Leapp",
  "name": "Customer Interest",
@@ -73,7 +78,9 @@
    "write": 1
   }
  ],
+ "row_format": "Dynamic",
  "sort_field": "modified",
  "sort_order": "DESC",
- "states": []
+ "states": [],
+ "track_changes": 1
 }

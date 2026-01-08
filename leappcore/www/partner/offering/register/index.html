@@ -9,6 +9,15 @@
     .material-symbols-outlined {
         font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
     }
+    
+    .child-table-row {
+        animation: fadeIn 0.2s ease-out;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
 </style>
 {% endblock %}
 
@@ -49,17 +58,17 @@
         </div>
         {% endif %}
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
             <!-- My Offerings Sidebar -->
             <div class="lg:col-span-1 order-2 lg:order-1">
-                <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-background-dark p-6 shadow-lg">
+                <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-background-dark p-6 shadow-lg sticky top-6">
                     <div class="flex items-center justify-between mb-4">
                         <h3 class="text-lg font-bold text-leapp-black dark:text-white">My Offerings</h3>
                         <span class="px-2 py-1 bg-leapp-yellow/10 text-leapp-yellow text-xs font-bold rounded-full">{{ my_offerings|length }}</span>
                     </div>
                     
                     {% if my_offerings %}
-                    <div class="space-y-3">
+                    <div class="space-y-3 max-h-[400px] overflow-y-auto">
                         {% for item in my_offerings %}
                         <a href="/partner/offering/register?id={{ item.name }}" 
                            class="block p-3 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-leapp-yellow hover:bg-leapp-yellow/5 transition-all {% if offering.name == item.name %}border-leapp-yellow bg-leapp-yellow/5{% endif %}">
@@ -95,12 +104,12 @@
             </div>
 
             <!-- Offering Form -->
-            <div class="lg:col-span-2 order-1 lg:order-2">
-                <form method="post" action="/partner/offering/register{% if offering.name %}?id={{ offering.name }}{% endif %}" id="offering-form" class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-background-dark p-6 shadow-lg space-y-6">
+            <div class="lg:col-span-3 order-1 lg:order-2">
+                <form method="post" action="/partner/offering/register{% if offering.name %}?id={{ offering.name }}{% endif %}" id="offering-form" enctype="multipart/form-data" class="space-y-6">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
                     
                     <!-- Basic Information -->
-                    <div class="space-y-4">
+                    <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-background-dark p-6 shadow-lg space-y-4">
                         <div class="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-gray-700">
                             <span class="material-symbols-outlined text-leapp-yellow">school</span>
                             <h3 class="text-lg font-bold text-leapp-black dark:text-white">Basic Information</h3>
@@ -108,35 +117,51 @@
                         
                         <label class="flex flex-col">
                             <p class="text-leapp-black dark:text-white text-base font-medium leading-normal pb-2">Title <span class="text-red-500">*</span></p>
-                            <input
-                                name="title"
-                                value="{{ offering.title or '' }}"
-                                required
+                            <input name="title" value="{{ offering.title or '' }}" required
                                 class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark h-14 p-[15px] text-base font-normal leading-normal text-leapp-black dark:text-white placeholder:text-gray-400 focus:border-leapp-yellow focus:outline-0 focus:ring-2 focus:ring-leapp-yellow/50"
                                 placeholder="e.g., Creative Arts Workshop for Kids" type="text" />
                         </label>
                         
                         <label class="flex flex-col">
                             <p class="text-leapp-black dark:text-white text-base font-medium leading-normal pb-2">Subtitle / Tagline</p>
-                            <input
-                                name="subtitle"
-                                value="{{ offering.subtitle or '' }}"
+                            <input name="subtitle" value="{{ offering.subtitle or '' }}"
                                 class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark h-14 p-[15px] text-base font-normal leading-normal text-leapp-black dark:text-white placeholder:text-gray-400 focus:border-leapp-yellow focus:outline-0 focus:ring-2 focus:ring-leapp-yellow/50"
                                 placeholder="A short catchy description" type="text" />
                         </label>
                         
                         <label class="flex flex-col">
                             <p class="text-leapp-black dark:text-white text-base font-medium leading-normal pb-2">Description</p>
-                            <textarea
-                                name="description"
-                                rows="5"
+                            <textarea name="description" rows="5"
                                 class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark p-[15px] text-base font-normal leading-normal text-leapp-black dark:text-white placeholder:text-gray-400 focus:border-leapp-yellow focus:outline-0 focus:ring-2 focus:ring-leapp-yellow/50"
                                 placeholder="Detailed description of your offering">{{ offering.description or '' }}</textarea>
                         </label>
+                        
+                        <!-- Image Upload -->
+                        <div class="flex flex-col">
+                            <p class="text-leapp-black dark:text-white text-base font-medium leading-normal pb-2">Cover Image</p>
+                            <div class="flex items-start gap-4">
+                                <div id="image-preview" class="w-32 h-32 rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 flex items-center justify-center overflow-hidden bg-gray-50 dark:bg-gray-800">
+                                    {% if offering.image %}
+                                    <img src="{{ offering.image }}" alt="Preview" class="w-full h-full object-cover" />
+                                    {% else %}
+                                    <span class="material-symbols-outlined text-gray-400 text-4xl">image</span>
+                                    {% endif %}
+                                </div>
+                                <div class="flex-1">
+                                    <input type="file" name="image" id="image-input" accept="image/*" class="hidden" />
+                                    <button type="button" onclick="document.getElementById('image-input').click()"
+                                        class="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-all flex items-center gap-2">
+                                        <span class="material-symbols-outlined text-sm">upload</span>
+                                        <span class="text-sm">Upload Image</span>
+                                    </button>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">Recommended: 800x600px, max 2MB</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Pricing & Details -->
-                    <div class="space-y-4">
+                    <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-background-dark p-6 shadow-lg space-y-4">
                         <div class="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-gray-700">
                             <span class="material-symbols-outlined text-leapp-yellow">payments</span>
                             <h3 class="text-lg font-bold text-leapp-black dark:text-white">Pricing & Details</h3>
@@ -144,25 +169,15 @@
                         
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <label class="flex flex-col">
-                                <p class="text-leapp-black dark:text-white text-base font-medium leading-normal pb-2">Price (₹)</p>
-                                <input
-                                    name="price"
-                                    value="{{ offering.price or 0 }}"
-                                    type="number"
-                                    min="0"
-                                    step="0.01"
+                                <p class="text-leapp-black dark:text-white text-base font-medium leading-normal pb-2">Base Price (₹)</p>
+                                <input name="price" value="{{ offering.price or 0 }}" type="number" min="0" step="0.01"
                                     class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark h-14 p-[15px] text-base font-normal leading-normal text-leapp-black dark:text-white placeholder:text-gray-400 focus:border-leapp-yellow focus:outline-0 focus:ring-2 focus:ring-leapp-yellow/50"
                                     placeholder="0.00" />
                             </label>
                             
                             <label class="flex flex-col">
                                 <p class="text-leapp-black dark:text-white text-base font-medium leading-normal pb-2">Duration (hours)</p>
-                                <input
-                                    name="duration_hours"
-                                    value="{{ offering.duration_hours or 0 }}"
-                                    type="number"
-                                    min="0"
-                                    step="0.5"
+                                <input name="duration_hours" value="{{ offering.duration_hours or 0 }}" type="number" min="0" step="0.5"
                                     class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark h-14 p-[15px] text-base font-normal leading-normal text-leapp-black dark:text-white placeholder:text-gray-400 focus:border-leapp-yellow focus:outline-0 focus:ring-2 focus:ring-leapp-yellow/50"
                                     placeholder="0" />
                             </label>
@@ -171,8 +186,7 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <label class="flex flex-col">
                                 <p class="text-leapp-black dark:text-white text-base font-medium leading-normal pb-2">Skill Level</p>
-                                <select
-                                    name="level"
+                                <select name="level"
                                     class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark h-14 p-[15px] text-base font-normal leading-normal text-leapp-black dark:text-white focus:border-leapp-yellow focus:outline-0 focus:ring-2 focus:ring-leapp-yellow/50">
                                     <option value="Beginner" {% if offering.level == 'Beginner' %}selected{% endif %}>Beginner</option>
                                     <option value="Intermediate" {% if offering.level == 'Intermediate' %}selected{% endif %}>Intermediate</option>
@@ -182,48 +196,214 @@
                             
                             <label class="flex flex-col">
                                 <p class="text-leapp-black dark:text-white text-base font-medium leading-normal pb-2">Total Sessions</p>
-                                <input
-                                    name="total_sessions"
-                                    value="{{ offering.total_sessions or 0 }}"
-                                    type="number"
-                                    min="0"
+                                <input name="total_sessions" value="{{ offering.total_sessions or 0 }}" type="number" min="0"
                                     class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark h-14 p-[15px] text-base font-normal leading-normal text-leapp-black dark:text-white placeholder:text-gray-400 focus:border-leapp-yellow focus:outline-0 focus:ring-2 focus:ring-leapp-yellow/50"
                                     placeholder="0" />
                             </label>
                         </div>
                     </div>
 
+                    <!-- Categories & Areas -->
+                    <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-background-dark p-6 shadow-lg space-y-4">
+                        <div class="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-gray-700">
+                            <span class="material-symbols-outlined text-leapp-yellow">category</span>
+                            <h3 class="text-lg font-bold text-leapp-black dark:text-white">Categories & Areas</h3>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="flex flex-col">
+                                <p class="text-leapp-black dark:text-white text-base font-medium leading-normal pb-2">Categories</p>
+                                <select id="categories-select" multiple
+                                    class="form-input w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark p-3 text-base text-leapp-black dark:text-white focus:border-leapp-yellow focus:outline-0 focus:ring-2 focus:ring-leapp-yellow/50 min-h-[120px]">
+                                    {% for cat in categories %}
+                                    <option value="{{ cat.name }}" {% if cat.name in offering.categories %}selected{% endif %}>{{ cat.category_name }} ({{ cat.parent_group or 'General' }})</option>
+                                    {% endfor %}
+                                </select>
+                                <input type="hidden" name="categories" id="categories-input" value='{{ offering.categories | tojson }}'>
+                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Hold Ctrl/Cmd to select multiple</p>
+                            </div>
+                            
+                            <div class="flex flex-col">
+                                <p class="text-leapp-black dark:text-white text-base font-medium leading-normal pb-2">Areas</p>
+                                <select id="areas-select" multiple
+                                    class="form-input w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark p-3 text-base text-leapp-black dark:text-white focus:border-leapp-yellow focus:outline-0 focus:ring-2 focus:ring-leapp-yellow/50 min-h-[120px]">
+                                    {% for area in areas %}
+                                    <option value="{{ area.name }}" {% if area.name in offering.areas %}selected{% endif %}>{{ area.area_name }}</option>
+                                    {% endfor %}
+                                </select>
+                                <input type="hidden" name="areas" id="areas-input" value='{{ offering.areas | tojson }}'>
+                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Hold Ctrl/Cmd to select multiple</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Instructors -->
+                    <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-background-dark p-6 shadow-lg space-y-4">
+                        <div class="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-gray-700">
+                            <span class="material-symbols-outlined text-leapp-yellow">person</span>
+                            <h3 class="text-lg font-bold text-leapp-black dark:text-white">Instructors</h3>
+                        </div>
+                        
+                        <select id="instructors-select" multiple
+                            class="form-input w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark p-3 text-base text-leapp-black dark:text-white focus:border-leapp-yellow focus:outline-0 focus:ring-2 focus:ring-leapp-yellow/50 min-h-[100px]">
+                            {% for inst in instructors %}
+                            <option value="{{ inst.name }}" {% if inst.name in offering.instructors %}selected{% endif %}>{{ inst.full_name or inst.name }} ({{ inst.email }})</option>
+                            {% endfor %}
+                        </select>
+                        <input type="hidden" name="instructors" id="instructors-input" value='{{ offering.instructors | tojson }}'>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">Hold Ctrl/Cmd to select multiple instructors</p>
+                    </div>
+
+                    <!-- Highlights -->
+                    <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-background-dark p-6 shadow-lg space-y-4">
+                        <div class="flex items-center justify-between pb-2 border-b border-gray-200 dark:border-gray-700">
+                            <div class="flex items-center gap-2">
+                                <span class="material-symbols-outlined text-leapp-yellow">kid_star</span>
+                                <h3 class="text-lg font-bold text-leapp-black dark:text-white">Highlights</h3>
+                            </div>
+                            <button type="button" onclick="addHighlightRow()" class="px-3 py-1 bg-leapp-yellow text-leapp-black rounded-lg text-sm font-medium hover:bg-leapp-yellow/90 transition-all flex items-center gap-1">
+                                <span class="material-symbols-outlined text-sm">add</span>
+                                Add
+                            </button>
+                        </div>
+                        
+                        <div id="highlights-container" class="space-y-3">
+                            {% for h in offering.highlights %}
+                            <div class="child-table-row grid grid-cols-12 gap-2 items-center" data-index="{{ loop.index0 }}">
+                                <input type="number" placeholder="Order" value="{{ h.order_no or loop.index0 }}" class="col-span-2 form-input rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark h-10 px-2 text-sm highlight-order" />
+                                <input type="text" placeholder="Icon" value="{{ h.icon or 'kid_star' }}" class="col-span-2 form-input rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark h-10 px-2 text-sm highlight-icon" />
+                                <input type="text" placeholder="Label" value="{{ h.label or '' }}" class="col-span-3 form-input rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark h-10 px-2 text-sm highlight-label" />
+                                <input type="text" placeholder="Value" value="{{ h.value or '' }}" class="col-span-4 form-input rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark h-10 px-2 text-sm highlight-value" />
+                                <button type="button" onclick="this.parentElement.remove()" class="col-span-1 text-red-500 hover:text-red-700"><span class="material-symbols-outlined">delete</span></button>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <input type="hidden" name="highlights" id="highlights-input" value='{{ offering.highlights | tojson }}'>
+                    </div>
+
+                    <!-- Program Outline -->
+                    <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-background-dark p-6 shadow-lg space-y-4">
+                        <div class="flex items-center justify-between pb-2 border-b border-gray-200 dark:border-gray-700">
+                            <div class="flex items-center gap-2">
+                                <span class="material-symbols-outlined text-leapp-yellow">list_alt</span>
+                                <h3 class="text-lg font-bold text-leapp-black dark:text-white">Program Outline</h3>
+                            </div>
+                            <button type="button" onclick="addProgramRow()" class="px-3 py-1 bg-leapp-yellow text-leapp-black rounded-lg text-sm font-medium hover:bg-leapp-yellow/90 transition-all flex items-center gap-1">
+                                <span class="material-symbols-outlined text-sm">add</span>
+                                Add
+                            </button>
+                        </div>
+                        
+                        <div id="program-container" class="space-y-3">
+                            {% for p in offering.program_outline %}
+                            <div class="child-table-row grid grid-cols-12 gap-2 items-start" data-index="{{ loop.index0 }}">
+                                <input type="number" placeholder="Order" value="{{ p.order_no or loop.index0 }}" class="col-span-1 form-input rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark h-10 px-2 text-sm program-order" />
+                                <input type="text" placeholder="Title" value="{{ p.title or '' }}" class="col-span-3 form-input rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark h-10 px-2 text-sm program-title" />
+                                <textarea placeholder="Description" class="col-span-5 form-input rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark px-2 py-1 text-sm program-desc" rows="2">{{ p.description or '' }}</textarea>
+                                <input type="number" placeholder="Duration (mins)" value="{{ p.duration or 0 }}" class="col-span-2 form-input rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark h-10 px-2 text-sm program-duration" />
+                                <button type="button" onclick="this.parentElement.remove()" class="col-span-1 text-red-500 hover:text-red-700"><span class="material-symbols-outlined">delete</span></button>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <input type="hidden" name="program_outline" id="program-input" value='{{ offering.program_outline | tojson }}'>
+                    </div>
+
+                    <!-- Prices -->
+                    <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-background-dark p-6 shadow-lg space-y-4">
+                        <div class="flex items-center justify-between pb-2 border-b border-gray-200 dark:border-gray-700">
+                            <div class="flex items-center gap-2">
+                                <span class="material-symbols-outlined text-leapp-yellow">sell</span>
+                                <h3 class="text-lg font-bold text-leapp-black dark:text-white">Pricing Plans</h3>
+                            </div>
+                            <button type="button" onclick="addPriceRow()" class="px-3 py-1 bg-leapp-yellow text-leapp-black rounded-lg text-sm font-medium hover:bg-leapp-yellow/90 transition-all flex items-center gap-1">
+                                <span class="material-symbols-outlined text-sm">add</span>
+                                Add
+                            </button>
+                        </div>
+                        
+                        <div id="prices-container" class="space-y-3">
+                            {% for pr in offering.prices %}
+                            <div class="child-table-row grid grid-cols-12 gap-2 items-center" data-index="{{ loop.index0 }}">
+                                <input type="number" placeholder="Amount" value="{{ pr.amount or 0 }}" class="col-span-4 form-input rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark h-10 px-2 text-sm price-amount" />
+                                <input type="text" placeholder="Currency" value="{{ pr.currency or 'INR' }}" class="col-span-3 form-input rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark h-10 px-2 text-sm price-currency" />
+                                <select class="col-span-4 form-input rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark h-10 px-2 text-sm price-billing">
+                                    <option value="per_session" {% if pr.billing_type == 'per_session' %}selected{% endif %}>Per Session</option>
+                                    <option value="per_month" {% if pr.billing_type == 'per_month' %}selected{% endif %}>Per Month</option>
+                                    <option value="package" {% if pr.billing_type == 'package' %}selected{% endif %}>Package</option>
+                                </select>
+                                <button type="button" onclick="this.parentElement.remove()" class="col-span-1 text-red-500 hover:text-red-700"><span class="material-symbols-outlined">delete</span></button>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <input type="hidden" name="prices" id="prices-input" value='{{ offering.prices | tojson }}'>
+                    </div>
+
+                    <!-- Schedules -->
+                    <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-background-dark p-6 shadow-lg space-y-4">
+                        <div class="flex items-center justify-between pb-2 border-b border-gray-200 dark:border-gray-700">
+                            <div class="flex items-center gap-2">
+                                <span class="material-symbols-outlined text-leapp-yellow">schedule</span>
+                                <h3 class="text-lg font-bold text-leapp-black dark:text-white">Schedules</h3>
+                            </div>
+                            <button type="button" onclick="addScheduleRow()" class="px-3 py-1 bg-leapp-yellow text-leapp-black rounded-lg text-sm font-medium hover:bg-leapp-yellow/90 transition-all flex items-center gap-1">
+                                <span class="material-symbols-outlined text-sm">add</span>
+                                Add
+                            </button>
+                        </div>
+                        
+                        <div id="schedules-container" class="space-y-3">
+                            {% for s in offering.schedules %}
+                            <div class="child-table-row grid grid-cols-12 gap-2 items-center" data-index="{{ loop.index0 }}">
+                                <select class="col-span-3 form-input rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark h-10 px-2 text-sm schedule-recurrence">
+                                    <option value="Once" {% if s.recurrence == 'Once' %}selected{% endif %}>Once</option>
+                                    <option value="Weekly" {% if s.recurrence == 'Weekly' %}selected{% endif %}>Weekly</option>
+                                    <option value="Custom" {% if s.recurrence == 'Custom' %}selected{% endif %}>Custom</option>
+                                </select>
+                                <input type="time" value="{{ s.start_time or '' }}" class="col-span-2 form-input rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark h-10 px-2 text-sm schedule-start" />
+                                <input type="time" value="{{ s.end_time or '' }}" class="col-span-2 form-input rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark h-10 px-2 text-sm schedule-end" />
+                                <input type="text" placeholder="Days (Mon,Tue...)" value="{{ s.days_of_week or '' }}" class="col-span-4 form-input rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark h-10 px-2 text-sm schedule-days" />
+                                <button type="button" onclick="this.parentElement.remove()" class="col-span-1 text-red-500 hover:text-red-700"><span class="material-symbols-outlined">delete</span></button>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <input type="hidden" name="schedules" id="schedules-input" value='{{ offering.schedules | tojson }}'>
+                    </div>
+
                     <!-- Status -->
-                    <div class="space-y-4">
+                    <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-background-dark p-6 shadow-lg space-y-4">
                         <div class="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-gray-700">
                             <span class="material-symbols-outlined text-leapp-yellow">toggle_on</span>
                             <h3 class="text-lg font-bold text-leapp-black dark:text-white">Status</h3>
                         </div>
                         
-                        <div class="flex items-center gap-3">
-                            <input
-                                type="checkbox"
-                                id="active"
-                                name="active"
-                                {% if offering.active %}checked{% endif %}
-                                class="h-5 w-5 rounded border-gray-300 dark:border-gray-600 text-leapp-yellow focus:ring-leapp-yellow focus:ring-2" />
-                            <label for="active" class="text-base text-gray-700 dark:text-gray-300">
-                                <span class="font-medium">Make this offering active</span>
-                                <p class="text-sm text-gray-500 dark:text-gray-400">Active offerings will be visible to all users on the platform</p>
-                            </label>
+                        <div class="space-y-3">
+                            <div class="flex items-center gap-3">
+                                <input type="checkbox" id="active" name="active" {% if offering.active %}checked{% endif %}
+                                    class="h-5 w-5 rounded border-gray-300 dark:border-gray-600 text-leapp-yellow focus:ring-leapp-yellow focus:ring-2" />
+                                <label for="active" class="text-base text-gray-700 dark:text-gray-300">
+                                    <span class="font-medium">Make this offering active</span>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">Active offerings will be visible to all users</p>
+                                </label>
+                            </div>
+                            
+                            <div class="flex items-center gap-3">
+                                <input type="checkbox" id="featured" name="featured" {% if offering.featured %}checked{% endif %}
+                                    class="h-5 w-5 rounded border-gray-300 dark:border-gray-600 text-leapp-yellow focus:ring-leapp-yellow focus:ring-2" />
+                                <label for="featured" class="text-base text-gray-700 dark:text-gray-300">
+                                    <span class="font-medium">Mark as Featured</span>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">Featured offerings get highlighted on the homepage</p>
+                                </label>
+                            </div>
                         </div>
                     </div>
 
                     <!-- Submit Buttons -->
-                    <div class="flex flex-col sm:flex-row justify-end gap-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-                        <button
-                            type="button"
-                            onclick="window.location.href='/partner/profile'"
+                    <div class="flex flex-col sm:flex-row justify-end gap-4 pt-4">
+                        <button type="button" onclick="window.location.href='/partner/profile'"
                             class="px-6 py-3 border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-xl font-bold hover:bg-gray-50 dark:hover:bg-gray-800 transition-all">
                             Cancel
                         </button>
-                        <button
-                            type="submit"
+                        <button type="submit"
                             class="flex items-center justify-center gap-2 px-6 py-3 bg-leapp-yellow text-leapp-black rounded-xl font-bold hover:bg-leapp-yellow/90 transition-all">
                             <span class="material-symbols-outlined">save</span>
                             <span>{% if is_edit %}Update Offering{% else %}Create Offering{% endif %}</span>
@@ -247,6 +427,146 @@
                 setTimeout(() => successAlert.remove(), 300);
             }, 5000);
         }
+        
+        // Image preview
+        document.getElementById('image-input').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('image-preview').innerHTML = 
+                        `<img src="${e.target.result}" alt="Preview" class="w-full h-full object-cover" />`;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+        
+        // Form submission - collect all child table data
+        document.getElementById('offering-form').addEventListener('submit', function(e) {
+            // Collect categories
+            const catSelect = document.getElementById('categories-select');
+            const selectedCats = Array.from(catSelect.selectedOptions).map(o => o.value);
+            document.getElementById('categories-input').value = JSON.stringify(selectedCats);
+            
+            // Collect areas
+            const areaSelect = document.getElementById('areas-select');
+            const selectedAreas = Array.from(areaSelect.selectedOptions).map(o => o.value);
+            document.getElementById('areas-input').value = JSON.stringify(selectedAreas);
+            
+            // Collect instructors
+            const instSelect = document.getElementById('instructors-select');
+            const selectedInst = Array.from(instSelect.selectedOptions).map(o => o.value);
+            document.getElementById('instructors-input').value = JSON.stringify(selectedInst);
+            
+            // Collect highlights
+            const highlights = [];
+            document.querySelectorAll('#highlights-container .child-table-row').forEach(row => {
+                highlights.push({
+                    order_no: row.querySelector('.highlight-order')?.value || 0,
+                    icon: row.querySelector('.highlight-icon')?.value || 'kid_star',
+                    label: row.querySelector('.highlight-label')?.value || '',
+                    value: row.querySelector('.highlight-value')?.value || ''
+                });
+            });
+            document.getElementById('highlights-input').value = JSON.stringify(highlights);
+            
+            // Collect program outline
+            const program = [];
+            document.querySelectorAll('#program-container .child-table-row').forEach(row => {
+                program.push({
+                    order_no: row.querySelector('.program-order')?.value || 0,
+                    title: row.querySelector('.program-title')?.value || '',
+                    description: row.querySelector('.program-desc')?.value || '',
+                    duration: row.querySelector('.program-duration')?.value || 0
+                });
+            });
+            document.getElementById('program-input').value = JSON.stringify(program);
+            
+            // Collect prices
+            const prices = [];
+            document.querySelectorAll('#prices-container .child-table-row').forEach(row => {
+                prices.push({
+                    amount: row.querySelector('.price-amount')?.value || 0,
+                    currency: row.querySelector('.price-currency')?.value || 'INR',
+                    billing_type: row.querySelector('.price-billing')?.value || 'per_session'
+                });
+            });
+            document.getElementById('prices-input').value = JSON.stringify(prices);
+            
+            // Collect schedules
+            const schedules = [];
+            document.querySelectorAll('#schedules-container .child-table-row').forEach(row => {
+                schedules.push({
+                    recurrence: row.querySelector('.schedule-recurrence')?.value || 'Once',
+                    start_time: row.querySelector('.schedule-start')?.value || '',
+                    end_time: row.querySelector('.schedule-end')?.value || '',
+                    days_of_week: row.querySelector('.schedule-days')?.value || ''
+                });
+            });
+            document.getElementById('schedules-input').value = JSON.stringify(schedules);
+        });
     });
+    
+    // Add dynamic rows
+    function addHighlightRow() {
+        const container = document.getElementById('highlights-container');
+        const idx = container.children.length;
+        container.insertAdjacentHTML('beforeend', `
+            <div class="child-table-row grid grid-cols-12 gap-2 items-center" data-index="${idx}">
+                <input type="number" placeholder="Order" value="${idx}" class="col-span-2 form-input rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark h-10 px-2 text-sm highlight-order" />
+                <input type="text" placeholder="Icon" value="kid_star" class="col-span-2 form-input rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark h-10 px-2 text-sm highlight-icon" />
+                <input type="text" placeholder="Label" class="col-span-3 form-input rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark h-10 px-2 text-sm highlight-label" />
+                <input type="text" placeholder="Value" class="col-span-4 form-input rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark h-10 px-2 text-sm highlight-value" />
+                <button type="button" onclick="this.parentElement.remove()" class="col-span-1 text-red-500 hover:text-red-700"><span class="material-symbols-outlined">delete</span></button>
+            </div>
+        `);
+    }
+    
+    function addProgramRow() {
+        const container = document.getElementById('program-container');
+        const idx = container.children.length;
+        container.insertAdjacentHTML('beforeend', `
+            <div class="child-table-row grid grid-cols-12 gap-2 items-start" data-index="${idx}">
+                <input type="number" placeholder="Order" value="${idx}" class="col-span-1 form-input rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark h-10 px-2 text-sm program-order" />
+                <input type="text" placeholder="Title" class="col-span-3 form-input rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark h-10 px-2 text-sm program-title" />
+                <textarea placeholder="Description" class="col-span-5 form-input rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark px-2 py-1 text-sm program-desc" rows="2"></textarea>
+                <input type="number" placeholder="Duration (mins)" value="0" class="col-span-2 form-input rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark h-10 px-2 text-sm program-duration" />
+                <button type="button" onclick="this.parentElement.remove()" class="col-span-1 text-red-500 hover:text-red-700"><span class="material-symbols-outlined">delete</span></button>
+            </div>
+        `);
+    }
+    
+    function addPriceRow() {
+        const container = document.getElementById('prices-container');
+        container.insertAdjacentHTML('beforeend', `
+            <div class="child-table-row grid grid-cols-12 gap-2 items-center">
+                <input type="number" placeholder="Amount" value="0" class="col-span-4 form-input rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark h-10 px-2 text-sm price-amount" />
+                <input type="text" placeholder="Currency" value="INR" class="col-span-3 form-input rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark h-10 px-2 text-sm price-currency" />
+                <select class="col-span-4 form-input rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark h-10 px-2 text-sm price-billing">
+                    <option value="per_session">Per Session</option>
+                    <option value="per_month">Per Month</option>
+                    <option value="package">Package</option>
+                </select>
+                <button type="button" onclick="this.parentElement.remove()" class="col-span-1 text-red-500 hover:text-red-700"><span class="material-symbols-outlined">delete</span></button>
+            </div>
+        `);
+    }
+    
+    function addScheduleRow() {
+        const container = document.getElementById('schedules-container');
+        container.insertAdjacentHTML('beforeend', `
+            <div class="child-table-row grid grid-cols-12 gap-2 items-center">
+                <select class="col-span-3 form-input rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark h-10 px-2 text-sm schedule-recurrence">
+                    <option value="Once">Once</option>
+                    <option value="Weekly">Weekly</option>
+                    <option value="Custom">Custom</option>
+                </select>
+                <input type="time" class="col-span-2 form-input rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark h-10 px-2 text-sm schedule-start" />
+                <input type="time" class="col-span-2 form-input rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark h-10 px-2 text-sm schedule-end" />
+                <input type="text" placeholder="Days (Mon,Tue...)" class="col-span-4 form-input rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark h-10 px-2 text-sm schedule-days" />
+                <button type="button" onclick="this.parentElement.remove()" class="col-span-1 text-red-500 hover:text-red-700"><span class="material-symbols-outlined">delete</span></button>
+            </div>
+        `);
+    }
 </script>
 {% endblock %}
