@@ -30,13 +30,29 @@ def get_context(context):
     if frappe.request.method == "POST":
         try:
             signup_partner()
+        except frappe.Redirect:
+            raise
         except frappe.ValidationError as e:
             frappe.clear_messages()
             context.error_message = str(e)
+            context.full_name = frappe.form_dict.get("full_name", "")
+            context.email = frappe.form_dict.get("email", "")
+            context.phone = frappe.form_dict.get("phone", "")
+            context.country_code = frappe.form_dict.get("country_code", "+91")
+            context.organization_name = frappe.form_dict.get("organization_name", "")
+            context.city = frappe.form_dict.get("city", "")
+            context.address = frappe.form_dict.get("address", "")
             return context
         except Exception as e:
             frappe.clear_messages()
             context.error_message = _("An error occurred during signup. Please try again.")
+            context.full_name = frappe.form_dict.get("full_name", "")
+            context.email = frappe.form_dict.get("email", "")
+            context.phone = frappe.form_dict.get("phone", "")
+            context.country_code = frappe.form_dict.get("country_code", "+91")
+            context.organization_name = frappe.form_dict.get("organization_name", "")
+            context.city = frappe.form_dict.get("city", "")
+            context.address = frappe.form_dict.get("address", "")
             frappe.log_error(frappe.get_traceback(), "Partner Signup Error")
             return context
 
@@ -92,6 +108,7 @@ def signup_partner():
     confirm_password = frappe.form_dict.get("confirm_password")
     organization_name = frappe.form_dict.get("organization_name")
     phone = frappe.form_dict.get("phone")
+    country_code = frappe.form_dict.get("country_code", "+91")
     address = frappe.form_dict.get("address")
     city = frappe.form_dict.get("city")
     
@@ -110,7 +127,8 @@ def signup_partner():
         frappe.throw(_("User with this email already exists"), frappe.ValidationError)
     
     try:
-        # Create user
+        # Create user with full phone number
+        full_phone = f"{country_code}{phone}" if phone else None
         user = frappe.get_doc({
             "doctype": "User",
             "email": email,
@@ -122,6 +140,7 @@ def signup_partner():
             "user_type": "Website User",
             "send_welcome_email": 0,
             "phone": phone,
+            "mobile_no": full_phone,
         })
         
         # Add Leapp Partner role
@@ -166,6 +185,8 @@ def signup_partner():
         frappe.local.flags.redirect_location = "/signup-success?message=" + frappe.utils.quote(success_message)
         raise frappe.Redirect
         
+    except frappe.Redirect:
+        raise
     except Exception as e:
         frappe.db.rollback()
         frappe.log_error(frappe.get_traceback(), "Partner Signup Error")

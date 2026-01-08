@@ -268,7 +268,7 @@
                             
                             <div class="doctype-grid">
                                 {% for doctype in category.doctypes %}
-                                <a href="/app/{{ doctype.name.lower().replace(' ', '') }}" 
+                                <a href="{{ doctype.href }}" 
                                    class="doctype-card rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-background-dark shadow-md hover-lift">
                                     <span class="material-symbols-outlined">{{ doctype.icon }}</span>
                                     <span class="text-leapp-black dark:text-white">{{ doctype.label }}</span>

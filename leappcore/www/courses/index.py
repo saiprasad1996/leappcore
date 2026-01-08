@@ -9,9 +9,9 @@ def get_context(context):
 
     page = max(int(frappe.form_dict.get("page", 1)), 1)
     per_page = 12
-    search_query, category_filter, location_filter, view_mode = _parse_filters()
+    search_query, category_filter, location_filter, group_filter, view_mode = _parse_filters()
 
-    where_clause, params = _build_conditions(search_query, category_filter, location_filter)
+    where_clause, params = _build_conditions(search_query, category_filter, location_filter, group_filter)
     start = (page - 1) * per_page
 
     offerings = _fetch_offerings(where_clause, params, start, per_page)
@@ -25,13 +25,14 @@ def get_context(context):
     context.total_pages = (context.total_count + per_page - 1) // per_page
     context.view_mode = view_mode
 
-    context.categories = _list_categories()
+    context.categories = _list_categories(group_filter)
     context.locations = _list_locations()
 
     context.search_query = search_query
     context.category_filter = category_filter
     context.location_filter = location_filter
-    context.filter_query = _build_filter_query(search_query, category_filter, location_filter)
+    context.group_filter = group_filter
+    context.filter_query = _build_filter_query(search_query, category_filter, location_filter, group_filter)
     return context
 
 
@@ -48,8 +49,9 @@ def _parse_filters():
     search_query = (frappe.form_dict.get("search") or "").strip()
     category_filter = _as_list("category")
     location_filter = _as_list("location")
+    group_filter = (frappe.form_dict.get("group") or "").strip()
     view_mode = frappe.form_dict.get("view", "gallery")
-    return search_query, category_filter, location_filter, view_mode
+    return search_query, category_filter, location_filter, group_filter, view_mode
 
 
 def _as_list(key):
@@ -63,7 +65,7 @@ def _as_list(key):
     return [raw] if raw else []
 
 
-def _build_conditions(search_query, category_filter, location_filter):
+def _build_conditions(search_query, category_filter, location_filter, group_filter):
     conditions = ["o.active = 1"]
     params = {}
 
@@ -91,6 +93,17 @@ def _build_conditions(search_query, category_filter, location_filter):
             )
         """)
         params["location_filter"] = tuple(location_filter)
+
+    if group_filter:
+        conditions.append("""
+            EXISTS (
+                SELECT 1
+                FROM `tabOffering Category Table` oct
+                JOIN `tabOffering Category` oc ON oc.name = oct.offering_category
+                WHERE oct.parent = o.name AND oc.parent_group = %(group_filter)s
+            )
+        """)
+        params["group_filter"] = group_filter
 
     return " AND ".join(conditions), params
 
@@ -129,9 +142,14 @@ def _count_offerings(where_clause, params):
     """, params, as_dict=True)[0].total
 
 
-def _list_categories():
+def _list_categories(group_filter=None):
+    filters = {}
+    if group_filter:
+        filters["parent_group"] = group_filter
+    
     return frappe.get_all(
         "Offering Category",
+        filters=filters,
         fields=["category_name", "parent_group"],
         order_by="parent_group, category_name",
     )
@@ -145,7 +163,7 @@ def _list_locations():
     )
 
 
-def _build_filter_query(search_query, category_filter, location_filter):
+def _build_filter_query(search_query, category_filter, location_filter, group_filter):
     def _encode_list(params, key):
         return "".join([f"&{key}={quote(str(val))}" for val in params])
 
@@ -154,4 +172,6 @@ def _build_filter_query(search_query, category_filter, location_filter):
         filter_query += f"&search={quote(search_query)}"
     filter_query += _encode_list(category_filter, "category")
     filter_query += _encode_list(location_filter, "location")
+    if group_filter:
+        filter_query += f"&group={quote(group_filter)}"
     return filter_query

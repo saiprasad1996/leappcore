@@ -30,13 +30,26 @@ def get_context(context):
     if frappe.request.method == "POST":
         try:
             signup_user()
+        except frappe.Redirect:
+            # Allow redirect to propagate
+            raise
         except frappe.ValidationError as e:
             frappe.clear_messages()
             context.error_message = str(e)
+            # Preserve form data
+            context.full_name = frappe.form_dict.get("full_name", "")
+            context.email = frappe.form_dict.get("email", "")
+            context.phone = frappe.form_dict.get("phone", "")
+            context.country_code = frappe.form_dict.get("country_code", "+91")
             return context
         except Exception as e:
             frappe.clear_messages()
             context.error_message = _("An error occurred during signup. Please try again.")
+            # Preserve form data
+            context.full_name = frappe.form_dict.get("full_name", "")
+            context.email = frappe.form_dict.get("email", "")
+            context.phone = frappe.form_dict.get("phone", "")
+            context.country_code = frappe.form_dict.get("country_code", "+91")
             return context
 
 
@@ -88,6 +101,7 @@ def signup_user():
     full_name = frappe.form_dict.get("full_name")
     email = frappe.form_dict.get("email")
     phone = frappe.form_dict.get("phone")
+    country_code = frappe.form_dict.get("country_code", "+91")
     password = frappe.form_dict.get("password")
     confirm_password = frappe.form_dict.get("confirm_password")
     
@@ -110,6 +124,9 @@ def signup_user():
         frappe.throw(_("User with this email already exists"), frappe.ValidationError)
     
     try:
+        # Combine country code and phone number
+        full_phone_number = f"{country_code}{phone}"
+        
         # Create user
         user = frappe.get_doc({
             "doctype": "User",
@@ -118,7 +135,7 @@ def signup_user():
             "last_name": " ".join(full_name.split()[1:]) if len(full_name.split()) > 1 else "",
             "full_name": full_name,
             "phone": phone,
-            "mobile_no": phone,
+            "mobile_no": full_phone_number,  # Store with country code
             "enabled": 1,
             "new_password": password,
             "user_type": "Website User",
@@ -148,6 +165,9 @@ def signup_user():
         frappe.local.flags.redirect_location = "/signup-success?message=" + frappe.utils.quote(success_message)
         raise frappe.Redirect
         
+    except frappe.Redirect:
+        # Allow redirect to propagate without rollback
+        raise
     except Exception as e:
         frappe.db.rollback()
         frappe.log_error(frappe.get_traceback(), "User Signup Error")

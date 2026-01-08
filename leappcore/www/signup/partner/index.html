@@ -60,6 +60,7 @@
                         <input
                             name="full_name"
                             required
+                            value="{{ full_name or '' }}"
                             class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark h-14 p-[15px] text-base font-normal leading-normal text-leapp-black dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-400 focus:border-leapp-yellow focus:outline-0 focus:ring-2 focus:ring-leapp-yellow/50"
                             placeholder="Enter your full name" type="text" />
                     </label>
@@ -69,16 +70,32 @@
                         <input
                             name="email"
                             required
+                            value="{{ email or '' }}"
                             class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark h-14 p-[15px] text-base font-normal leading-normal text-leapp-black dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-400 focus:border-leapp-yellow focus:outline-0 focus:ring-2 focus:ring-leapp-yellow/50"
                             placeholder="Enter your email address" type="email" />
                     </label>
                     
                     <label class="flex flex-col">
                         <p class="text-leapp-black dark:text-white text-base font-medium leading-normal pb-2">Phone Number</p>
-                        <input
-                            name="phone"
-                            class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark h-14 p-[15px] text-base font-normal leading-normal text-leapp-black dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-400 focus:border-leapp-yellow focus:outline-0 focus:ring-2 focus:ring-leapp-yellow/50"
-                            placeholder="Enter your phone number" type="tel" />
+                        <div class="flex gap-2">
+                            <div class="relative" style="width: 140px;">
+                                <input id="country-code-input" type="text" readonly value="{{ country_code or '+91' }}"
+                                    class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark h-14 px-3 text-base font-normal leading-normal text-leapp-black dark:text-white cursor-pointer focus:border-leapp-yellow focus:outline-0 focus:ring-2 focus:ring-leapp-yellow/50"
+                                    placeholder="+91" />
+                                <span class="absolute right-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-gray-500 dark:text-gray-400 pointer-events-none">expand_more</span>
+                                <div id="country-code-dropdown" class="hidden absolute top-full left-0 mt-1 w-80 max-h-96 overflow-hidden rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark shadow-lg z-50">
+                                    <div class="p-3 border-b border-gray-200 dark:border-gray-700">
+                                        <input id="country-code-search" type="text" placeholder="Search country..."
+                                            class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark text-leapp-black dark:text-white focus:border-leapp-yellow focus:outline-0 focus:ring-1 focus:ring-leapp-yellow/50" />
+                                    </div>
+                                    <div id="country-code-list" class="overflow-y-auto max-h-80"></div>
+                                </div>
+                            </div>
+                            <input type="hidden" id="country-code" name="country_code" value="{{ country_code or '+91' }}" />
+                            <input name="phone" value="{{ phone or '' }}"
+                                class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark h-14 p-[15px] text-base font-normal leading-normal text-leapp-black dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-400 focus:border-leapp-yellow focus:outline-0 focus:ring-2 focus:ring-leapp-yellow/50"
+                                placeholder="Enter your phone number" type="tel" />
+                        </div>
                     </label>
                 </div>
 
@@ -94,6 +111,7 @@
                         <input
                             name="organization_name"
                             required
+                            value="{{ organization_name or '' }}"
                             class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark h-14 p-[15px] text-base font-normal leading-normal text-leapp-black dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-400 focus:border-leapp-yellow focus:outline-0 focus:ring-2 focus:ring-leapp-yellow/50"
                             placeholder="Enter your organization or business name" type="text" />
                     </label>
@@ -103,6 +121,7 @@
                             <p class="text-leapp-black dark:text-white text-base font-medium leading-normal pb-2">City</p>
                             <input
                                 name="city"
+                                value="{{ city or '' }}"
                                 class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark h-14 p-[15px] text-base font-normal leading-normal text-leapp-black dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-400 focus:border-leapp-yellow focus:outline-0 focus:ring-2 focus:ring-leapp-yellow/50"
                                 placeholder="City" type="text" />
                         </label>
@@ -111,6 +130,7 @@
                             <p class="text-leapp-black dark:text-white text-base font-medium leading-normal pb-2">Address</p>
                             <input
                                 name="address"
+                                value="{{ address or '' }}"
                                 class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark h-14 p-[15px] text-base font-normal leading-normal text-leapp-black dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-400 focus:border-leapp-yellow focus:outline-0 focus:ring-2 focus:ring-leapp-yellow/50"
                                 placeholder="Street address" type="text" />
                         </label>
@@ -283,6 +303,77 @@
                 return false;
             }
         });
+        // Country Code Dropdown
+        const countryCodes = [
+            { name: 'India', code: '+91', flag: '🇮🇳' },
+            { name: 'United States', code: '+1', flag: '🇺🇸' },
+            { name: 'United Kingdom', code: '+44', flag: '🇬🇧' },
+            { name: 'Canada', code: '+1', flag: '🇨🇦' },
+            { name: 'Australia', code: '+61', flag: '🇦🇺' },
+            { name: 'Germany', code: '+49', flag: '🇩🇪' },
+            { name: 'France', code: '+33', flag: '🇫🇷' },
+            { name: 'Japan', code: '+81', flag: '🇯🇵' },
+            { name: 'China', code: '+86', flag: '🇨🇳' },
+            { name: 'South Korea', code: '+82', flag: '🇰🇷' },
+            { name: 'Singapore', code: '+65', flag: '🇸🇬' },
+            { name: 'UAE', code: '+971', flag: '🇦🇪' },
+            { name: 'Saudi Arabia', code: '+966', flag: '��🇦' },
+            { name: 'Pakistan', code: '+92', flag: '🇵🇰' },
+            { name: 'Bangladesh', code: '+880', flag: '🇧🇩' },
+            { name: 'Sri Lanka', code: '+94', flag: '🇱🇰' },
+            { name: 'Nepal', code: '+977', flag: '🇳🇵' },
+            { name: 'Malaysia', code: '+60', flag: '🇲🇾' },
+            { name: 'Indonesia', code: '+62', flag: '🇮🇩' },
+            { name: 'Thailand', code: '+66', flag: '🇹🇭' },
+            { name: 'Philippines', code: '+63', flag: '🇵🇭' },
+            { name: 'Vietnam', code: '+84', flag: '🇻🇳' },
+            { name: 'South Africa', code: '+27', flag: '🇿🇦' },
+            { name: 'Brazil', code: '+55', flag: '🇧🇷' },
+            { name: 'Mexico', code: '+52', flag: '🇲🇽' },
+            { name: 'Russia', code: '+7', flag: '🇷🇺' },
+            { name: 'Italy', code: '+39', flag: '🇮🇹' },
+            { name: 'Spain', code: '+34', flag: '🇪🇸' },
+            { name: 'Netherlands', code: '+31', flag: '🇳🇱' },
+            { name: 'Switzerland', code: '+41', flag: '🇨🇭' },
+            { name: 'Sweden', code: '+46', flag: '🇸��' },
+            { name: 'Norway', code: '+47', flag: '🇳🇴' },
+            { name: 'Denmark', code: '+45', flag: '🇩🇰' },
+            { name: 'New Zealand', code: '+64', flag: '🇳🇿' },
+        ];
+        const countryCodeInput = document.getElementById('country-code-input');
+        const countryCodeDropdown = document.getElementById('country-code-dropdown');
+        const countryCodeSearch = document.getElementById('country-code-search');
+        const countryCodeList = document.getElementById('country-code-list');
+        const countryCodeHidden = document.getElementById('country-code');
+        if (countryCodeInput && countryCodeDropdown) {
+            function populateCountryList(filter = '') {
+                const filteredCountries = countryCodes.filter(c => c.name.toLowerCase().includes(filter.toLowerCase()) || c.code.includes(filter));
+                countryCodeList.innerHTML = filteredCountries.map(c => `<div class="country-option flex items-center gap-3 px-4 py-3 hover:bg-leapp-yellow/10 cursor-pointer transition-colors" data-code="${c.code}"><span class="text-2xl">${c.flag}</span><div class="flex-1"><div class="text-sm font-medium text-leapp-black dark:text-white">${c.name}</div><div class="text-xs text-gray-500 dark:text-gray-400">${c.code}</div></div></div>`).join('');
+                document.querySelectorAll('.country-option').forEach(opt => {
+                    opt.addEventListener('click', () => {
+                        countryCodeInput.value = opt.dataset.code;
+                        countryCodeHidden.value = opt.dataset.code;
+                        countryCodeDropdown.classList.add('hidden');
+                        countryCodeSearch.value = '';
+                        populateCountryList();
+                    });
+                });
+            }
+            populateCountryList();
+            countryCodeInput.addEventListener('click', () => {
+                countryCodeDropdown.classList.toggle('hidden');
+                if (!countryCodeDropdown.classList.contains('hidden')) countryCodeSearch.focus();
+            });
+            countryCodeSearch.addEventListener('input', (e) => populateCountryList(e.target.value));
+            document.addEventListener('click', (e) => {
+                if (!countryCodeInput.contains(e.target) && !countryCodeDropdown.contains(e.target)) {
+                    countryCodeDropdown.classList.add('hidden');
+                    countryCodeSearch.value = '';
+                    populateCountryList();
+                }
+            });
+            countryCodeDropdown.addEventListener('click', (e) => e.stopPropagation());
+        }
     });
 </script>
 {% endblock %}

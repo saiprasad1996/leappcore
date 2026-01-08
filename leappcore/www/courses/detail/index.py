@@ -35,7 +35,7 @@ def _load_offering(offering_id: str):
         "Offering Highlight",
         filters={"parent": doc.name},
         fields=["icon", "label", "value", "order_no"],
-        order_by="COALESCE(order_no, 1000), creation",
+        order_by="order_no asc, creation asc",
     )
     if not highlights:
         highlights = _default_highlights(doc)
@@ -44,7 +44,7 @@ def _load_offering(offering_id: str):
         "Offering Program Outline",
         filters={"parent": doc.name},
         fields=["title", "description", "duration", "order_no"],
-        order_by="COALESCE(order_no, 1000), creation",
+        order_by="order_no asc, creation asc",
     )
 
     instructors = []

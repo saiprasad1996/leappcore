@@ -43,53 +43,53 @@ def get_doctype_categories():
         {
             "name": "Content Management",
             "doctypes": [
-                {"name": "Offering", "icon": "school", "label": "Offerings"},
-                {"name": "Leapp Event", "icon": "event", "label": "Events"},
-                {"name": "Offering Category", "icon": "category", "label": "Categories"},
-                {"name": "News & Blogs", "icon": "article", "label": "News & Blogs"},
-                {"name": "FAQ", "icon": "help", "label": "FAQs"},
-                {"name": "Testimonials", "icon": "stars", "label": "Testimonials"},
+                {"name": "Offering", "icon": "school", "label": "Offerings", "href": "/app/offering"},
+                {"name": "Leapp Event", "icon": "event", "label": "Events", "href": "/app/leapp-event"},
+                {"name": "Offering Category", "icon": "category", "label": "Categories", "href": "/app/offering-category"},
+                {"name": "News & Blogs", "icon": "article", "label": "News & Blogs", "href": "/app/newsblogs"},
+                {"name": "FAQ", "icon": "help", "label": "FAQs", "href": "/app/faq"},
+                {"name": "Testimonials", "icon": "stars", "label": "Testimonials", "href": "/app/testimonials"},
             ]
         },
         {
             "name": "User Management",
             "doctypes": [
-                {"name": "User Profile", "icon": "person", "label": "User Profiles"},
-                {"name": "Partner Profile", "icon": "groups", "label": "Partner Profiles"},
-                {"name": "Customer Interest", "icon": "favorite", "label": "Customer Interests"},
-                {"name": "Event Registration", "icon": "app_registration", "label": "Event Registrations"},
-                {"name": "Event Claim", "icon": "verified", "label": "Event Claims"},
+                {"name": "User Profile", "icon": "person", "label": "User Profiles", "href": "/app/user-profile"},
+                {"name": "Partner Profile", "icon": "groups", "label": "Partner Profiles", "href": "/app/partner-profile"},
+                {"name": "Customer Interest", "icon": "favorite", "label": "Customer Interests", "href": "/app/customer-interest"},
+                {"name": "Event Registration", "icon": "app_registration", "label": "Event Registrations", "href": "/app/event-registration"},
+                {"name": "Event Claim", "icon": "verified", "label": "Event Claims", "href": "/app/event-claim"},
             ]
         },
         {
             "name": "Location & Area",
             "doctypes": [
-                {"name": "Area", "icon": "map", "label": "Areas"},
-                {"name": "Location", "icon": "location_on", "label": "Locations"},
+                {"name": "Area", "icon": "map", "label": "Areas", "href": "/app/area"},
+                {"name": "Location", "icon": "location_on", "label": "Locations", "href": "/app/location"},
             ]
         },
         {
             "name": "Website Management",
             "doctypes": [
-                {"name": "Main Page", "icon": "home", "label": "Main Page"},
-                {"name": "Website Menu", "icon": "menu", "label": "Website Menus"},
-                {"name": "Website Submenu", "icon": "menu_open", "label": "Website Submenus"},
+                {"name": "Main Page", "icon": "home", "label": "Main Page", "href": "/app/main-page"},
+                # {"name": "Website Menu", "icon": "menu", "label": "Website Menus", "href": "/app/websitemenu"},
+                # {"name": "Website Submenu", "icon": "menu_open", "label": "Website Submenus", "href": "/app/website-submenu"},
             ]
         },
         {
             "name": "Communication",
             "doctypes": [
-                {"name": "Contact Response", "icon": "contact_mail", "label": "Contact Responses"},
-                {"name": "Conversation", "icon": "chat", "label": "Conversations"},
-                {"name": "Message", "icon": "mail", "label": "Messages"},
-                {"name": "Fulfilment Comment", "icon": "comment", "label": "Fulfilment Comments"},
-                {"name": "Partner Review", "icon": "rate_review", "label": "Partner Reviews"},
+                {"name": "Contact Response", "icon": "contact_mail", "label": "Contact Responses", "href": "/app/contactresponse"},
+                # {"name": "Conversation", "icon": "chat", "label": "Conversations", "href": "/app/conversation"},
+                {"name": "Message", "icon": "mail", "label": "Messages", "href": "/app/message"},
+                {"name": "Fulfilment Comment", "icon": "comment", "label": "Fulfilment Comments", "href": "/app/fulfilment-comment"},
+                {"name": "Partner Review", "icon": "rate_review", "label": "Partner Reviews", "href": "/app/partner-review"},
             ]
         },
         {
             "name": "System",
             "doctypes": [
-                {"name": "Team", "icon": "team_dashboard", "label": "Teams"},
+                {"name": "Team", "icon": "team_dashboard", "label": "Teams", "href": "/app/team"},
             ]
         }
     ]
