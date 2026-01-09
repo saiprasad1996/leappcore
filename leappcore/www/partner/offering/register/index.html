@@ -201,6 +201,36 @@
                                     placeholder="0" />
                             </label>
                         </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <label class="flex flex-col">
+                                <p class="text-leapp-black dark:text-white text-base font-medium leading-normal pb-2">Language</p>
+                                <select name="language"
+                                    class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark h-14 p-[15px] text-base font-normal leading-normal text-leapp-black dark:text-white focus:border-leapp-yellow focus:outline-0 focus:ring-2 focus:ring-leapp-yellow/50">
+                                    <option value="">Select Language</option>
+                                    <option value="Arabic" {% if offering.language == 'Arabic' %}selected{% endif %}>Arabic</option>
+                                    <option value="Bengali" {% if offering.language == 'Bengali' %}selected{% endif %}>Bengali</option>
+                                    <option value="English" {% if offering.language == 'English' %}selected{% endif %}>English</option>
+                                    <option value="French" {% if offering.language == 'French' %}selected{% endif %}>French</option>
+                                    <option value="German" {% if offering.language == 'German' %}selected{% endif %}>German</option>
+                                    <option value="Gujarati" {% if offering.language == 'Gujarati' %}selected{% endif %}>Gujarati</option>
+                                    <option value="Hindi" {% if offering.language == 'Hindi' %}selected{% endif %}>Hindi</option>
+                                    <option value="Italian" {% if offering.language == 'Italian' %}selected{% endif %}>Italian</option>
+                                    <option value="Japanese" {% if offering.language == 'Japanese' %}selected{% endif %}>Japanese</option>
+                                    <option value="Mandarin Chinese" {% if offering.language == 'Mandarin Chinese' %}selected{% endif %}>Mandarin Chinese</option>
+                                    <option value="Malayalam" {% if offering.language == 'Malayalam' %}selected{% endif %}>Malayalam</option>
+                                    <option value="Marathi" {% if offering.language == 'Marathi' %}selected{% endif %}>Marathi</option>
+                                    <option value="Odia" {% if offering.language == 'Odia' %}selected{% endif %}>Odia</option>
+                                    <option value="Portuguese" {% if offering.language == 'Portuguese' %}selected{% endif %}>Portuguese</option>
+                                    <option value="Punjabi" {% if offering.language == 'Punjabi' %}selected{% endif %}>Punjabi</option>
+                                    <option value="Russian" {% if offering.language == 'Russian' %}selected{% endif %}>Russian</option>
+                                    <option value="Spanish" {% if offering.language == 'Spanish' %}selected{% endif %}>Spanish</option>
+                                    <option value="Tamil" {% if offering.language == 'Tamil' %}selected{% endif %}>Tamil</option>
+                                    <option value="Telugu" {% if offering.language == 'Telugu' %}selected{% endif %}>Telugu</option>
+                                    <option value="Urdu" {% if offering.language == 'Urdu' %}selected{% endif %}>Urdu</option>
+                                </select>
+                            </label>
+                        </div>
                     </div>
 
                     <!-- Categories & Areas -->

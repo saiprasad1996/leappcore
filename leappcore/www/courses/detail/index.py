@@ -32,14 +32,17 @@ def _load_offering(offering_id: str):
     description_paragraphs = (doc.description or "").split("\n\n")
     description_paragraphs = [p.strip() for p in description_paragraphs if p.strip()]
 
-    highlights = frappe.get_all(
+    # Always include core highlights (Duration, Level, Language, Sessions) first
+    highlights = _default_highlights(doc)
+    
+    # Add any custom highlights after the defaults
+    custom_highlights = frappe.get_all(
         "Offering Highlight",
         filters={"parent": doc.name},
         fields=["icon", "label", "value", "order_no"],
         order_by="order_no asc, creation asc",
     )
-    if not highlights:
-        highlights = _default_highlights(doc)
+    highlights.extend(custom_highlights)
 
     program_outline = frappe.get_all(
         "Offering Program Outline",
@@ -81,6 +84,7 @@ def _load_offering(offering_id: str):
         "price": doc.price or 0,
         "duration_hours": doc.duration_hours,
         "level": doc.level,
+        "language": doc.language or "",
         "total_sessions": doc.total_sessions,
         "highlights": highlights,
         "instructors": instructors,
@@ -96,6 +100,8 @@ def _default_highlights(doc):
         parts.append({"icon": "schedule", "label": "Duration", "value": f"{doc.duration_hours} hours"})
     if doc.level:
         parts.append({"icon": "bar_chart", "label": "Level", "value": doc.level})
+    if doc.language:
+        parts.append({"icon": "translate", "label": "Language", "value": doc.language})
     if doc.total_sessions:
         parts.append({"icon": "list_alt", "label": "Sessions", "value": f"{doc.total_sessions} Sessions"})
     return parts

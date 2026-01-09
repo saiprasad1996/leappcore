@@ -71,6 +71,7 @@ def get_empty_offering():
         "price": 0,
         "duration_hours": 0,
         "level": "Beginner",
+        "language": "",
         "total_sessions": 0,
         "active": 0,
         "featured": 0,
@@ -185,6 +186,7 @@ def save_offering(offering_id=None):
     price = frappe.form_dict.get("price", 0)
     duration_hours = frappe.form_dict.get("duration_hours", 0)
     level = frappe.form_dict.get("level", "Beginner")
+    language = frappe.form_dict.get("language", "")
     total_sessions = frappe.form_dict.get("total_sessions", 0)
     active = 1 if frappe.form_dict.get("active") else 0
     featured = 1 if frappe.form_dict.get("featured") else 0
@@ -216,6 +218,7 @@ def save_offering(offering_id=None):
         offering.price = price
         offering.duration_hours = duration_hours
         offering.level = level
+        offering.language = language
         offering.total_sessions = total_sessions
         offering.active = active
         offering.featured = featured
@@ -240,6 +243,7 @@ def save_offering(offering_id=None):
             "price": price,
             "duration_hours": duration_hours,
             "level": level,
+            "language": language,
             "total_sessions": total_sessions,
             "active": active,
             "featured": featured
