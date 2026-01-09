@@ -346,18 +346,21 @@ document.addEventListener('DOMContentLoaded', () => {
             if (data.message && data.message.success) {
                 updateButtonState(true);
                 showToast(data.message.message, 'success');
-            } else if (data.exc_type === 'AuthenticationError') {
-                // User not logged in
-                showToast('Please log in to show interest', 'error');
+            } else if (response.status === 403 || response.status === 401) {
+                // User not logged in or forbidden
+                showToast('You need to login to show interest', 'error');
                 setTimeout(() => {
                     window.location.href = `/login?redirect-to=/courses/detail?offering=${offeringId}`;
                 }, 1500);
             } else {
-                throw new Error(data.exception || 'Unknown error');
+                // Any other error - show generic message
+                showToast('Something went wrong. Please try again.', 'error');
+                interestBtn.disabled = false;
+                interestText.textContent = "I'm Interested";
             }
         } catch (error) {
-            console.error('Error recording interest:', error);
-            showToast(error.message || 'Failed to record interest. Please try again.', 'error');
+            console.error('Error:', error);
+            showToast('Something went wrong. Please try again.', 'error');
             interestBtn.disabled = false;
             interestText.textContent = "I'm Interested";
         }

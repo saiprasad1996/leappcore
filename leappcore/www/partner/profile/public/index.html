@@ -1,0 +1,226 @@
+{% extends 'templates/htmlbase/base.html' %}
+
+{% block head %}
+<style type="text/css">
+    body {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+    
+    .hero-gradient {
+        background: linear-gradient(135deg, rgba(255, 199, 0, 0.1) 0%, rgba(255, 199, 0, 0.05) 50%, transparent 100%);
+    }
+    
+    .offering-card:hover {
+        transform: translateY(-4px);
+    }
+    
+    .event-card:hover {
+        border-color: #ffc700;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="flex-1 w-full bg-background-light dark:bg-background-dark text-leapp-black dark:text-white">
+    {% if show_404 %}
+    <!-- 404 / Error State -->
+    <div class="w-full min-h-[60vh] flex items-center justify-center px-4 py-16">
+        <div class="text-center space-y-6">
+            <div class="w-24 h-24 rounded-full bg-leapp-yellow/10 flex items-center justify-center mx-auto">
+                <span class="material-symbols-outlined text-leapp-yellow text-5xl">person_off</span>
+            </div>
+            <h1 class="text-3xl font-black text-leapp-black dark:text-white">Partner Not Found</h1>
+            <p class="text-gray-600 dark:text-gray-400 max-w-md">{{ error_message or "The partner profile you're looking for doesn't exist or is not available." }}</p>
+            <a href="/courses" class="inline-flex items-center gap-2 px-6 py-3 bg-leapp-yellow text-leapp-black rounded-xl font-bold hover:bg-leapp-yellow/90 transition-all">
+                <span class="material-symbols-outlined">school</span>
+                <span>Browse Courses</span>
+            </a>
+        </div>
+    </div>
+    {% else %}
+    
+    <!-- Hero Section -->
+    <div class="hero-gradient border-b border-gray-200 dark:border-gray-800">
+        <div class="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div class="flex flex-col md:flex-row items-center md:items-start gap-8">
+                <!-- Avatar -->
+                <div class="flex-shrink-0">
+                    {% if partner.image %}
+                    <img src="{{ partner.image }}" alt="{{ partner.full_name }}" class="w-32 h-32 md:w-40 md:h-40 rounded-2xl object-cover border-4 border-leapp-yellow shadow-xl" />
+                    {% else %}
+                    <div class="w-32 h-32 md:w-40 md:h-40 rounded-2xl bg-gradient-to-br from-leapp-yellow to-yellow-500 flex items-center justify-center border-4 border-leapp-yellow shadow-xl">
+                        <span class="text-5xl md:text-6xl font-black text-leapp-black">{{ partner.full_name[0].upper() }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Info -->
+                <div class="flex-1 text-center md:text-left">
+                    <div class="flex flex-wrap items-center justify-center md:justify-start gap-2 mb-2">
+                        <span class="px-3 py-1 bg-leapp-yellow text-leapp-black text-xs font-bold rounded-full">PARTNER</span>
+                    </div>
+                    <h1 class="text-3xl md:text-4xl font-black text-leapp-black dark:text-white mb-2">{{ partner.full_name }}</h1>
+                    
+                    {% if partner.location %}
+                    <p class="text-gray-600 dark:text-gray-400 flex items-center justify-center md:justify-start gap-1 mb-3">
+                        <span class="material-symbols-outlined text-lg">location_on</span>
+                        {{ partner.location }}
+                    </p>
+                    {% endif %}
+                    
+                    {% if partner.bio %}
+                    <p class="text-gray-700 dark:text-gray-300 max-w-2xl mb-4">{{ partner.bio }}</p>
+                    {% endif %}
+                    
+                    <!-- Stats -->
+                    <div class="flex flex-wrap items-center justify-center md:justify-start gap-6 mt-4">
+                        <div class="text-center">
+                            <p class="text-2xl font-black text-leapp-yellow">{{ stats.offerings }}</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">Offerings</p>
+                        </div>
+                        <div class="w-px h-10 bg-gray-300 dark:bg-gray-700"></div>
+                        <div class="text-center">
+                            <p class="text-2xl font-black text-leapp-yellow">{{ stats.events }}</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">Events</p>
+                        </div>
+                        <div class="w-px h-10 bg-gray-300 dark:bg-gray-700"></div>
+                        <div class="text-center">
+                            <p class="text-2xl font-black text-leapp-yellow">{{ stats.interests }}</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">Interests</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-16">
+        
+        <!-- Offerings Section -->
+        {% if offerings and offerings|length > 0 %}
+        <section>
+            <div class="flex items-center justify-between mb-6">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-lg bg-leapp-yellow/10 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-leapp-yellow">school</span>
+                    </div>
+                    <h2 class="text-2xl font-black text-leapp-black dark:text-white">Offerings</h2>
+                </div>
+                <span class="text-sm text-gray-500 dark:text-gray-400">{{ offerings|length }} available</span>
+            </div>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {% for offering in offerings %}
+                <a href="/courses/detail?offering={{ offering.name }}" class="offering-card group rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-background-dark overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300">
+                    <div class="aspect-video bg-cover bg-center" style="background-image: url('{{ offering.image or '/assets/leappcore/images/placeholder.jpg' }}');">
+                        <div class="w-full h-full bg-gradient-to-t from-black/60 to-transparent flex items-end p-4">
+                            {% if offering.categories and offering.categories|length > 0 %}
+                            <span class="px-2 py-1 bg-leapp-yellow text-leapp-black text-xs font-bold rounded-full">{{ offering.categories[0] }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="p-5">
+                        <h3 class="font-bold text-leapp-black dark:text-white mb-1 group-hover:text-leapp-yellow transition-colors">{{ offering.title }}</h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-400 mb-3 line-clamp-2">{{ offering.subtitle or '' }}</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-leapp-yellow font-bold">₹{{ "%.0f"|format(offering.price) }}</span>
+                            <div class="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400">
+                                {% if offering.duration_hours %}
+                                <span class="flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-sm">schedule</span>
+                                    {{ offering.duration_hours }}h
+                                </span>
+                                {% endif %}
+                                {% if offering.level %}
+                                <span class="px-2 py-0.5 bg-gray-100 dark:bg-gray-800 rounded">{{ offering.level }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        </section>
+        {% endif %}
+        
+        <!-- Events Section -->
+        {% if events and events|length > 0 %}
+        <section>
+            <div class="flex items-center justify-between mb-6">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-lg bg-leapp-yellow/10 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-leapp-yellow">event</span>
+                    </div>
+                    <h2 class="text-2xl font-black text-leapp-black dark:text-white">Upcoming Events</h2>
+                </div>
+                <span class="text-sm text-gray-500 dark:text-gray-400">{{ events|length }} upcoming</span>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {% for event in events %}
+                <a href="/events/detail?event={{ event.name }}" class="event-card flex gap-4 p-4 rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-background-dark hover:shadow-lg transition-all duration-300">
+                    <!-- Date Badge -->
+                    <div class="flex-shrink-0 w-16 h-16 rounded-xl bg-leapp-yellow flex flex-col items-center justify-center text-leapp-black">
+                        <span class="text-2xl font-black leading-none">{{ event.start_datetime.strftime('%d') if event.start_datetime else '--' }}</span>
+                        <span class="text-xs font-bold uppercase">{{ event.start_datetime.strftime('%b') if event.start_datetime else '' }}</span>
+                    </div>
+                    
+                    <div class="flex-1 min-w-0">
+                        <h3 class="font-bold text-leapp-black dark:text-white mb-1 truncate">{{ event.event_name }}</h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-400 mb-2 line-clamp-1">{{ event.short_description or event.heading or '' }}</p>
+                        <div class="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400">
+                            {% if event.formatted_time %}
+                            <span class="flex items-center gap-1">
+                                <span class="material-symbols-outlined text-sm">schedule</span>
+                                {{ event.formatted_time }}
+                            </span>
+                            {% endif %}
+                            {% if event.venue_address %}
+                            <span class="flex items-center gap-1 truncate">
+                                <span class="material-symbols-outlined text-sm">location_on</span>
+                                {{ event.venue_address[:30] }}{% if event.venue_address|length > 30 %}...{% endif %}
+                            </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        </section>
+        {% endif %}
+        
+        <!-- Empty State -->
+        {% if (not offerings or offerings|length == 0) and (not events or events|length == 0) %}
+        <div class="text-center py-16">
+            <div class="w-20 h-20 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center mx-auto mb-4">
+                <span class="material-symbols-outlined text-gray-400 text-4xl">inventory_2</span>
+            </div>
+            <h3 class="text-xl font-bold text-leapp-black dark:text-white mb-2">No Content Yet</h3>
+            <p class="text-gray-600 dark:text-gray-400">This partner hasn't published any offerings or events yet.</p>
+        </div>
+        {% endif %}
+        
+        <!-- Contact CTA -->
+        <section class="rounded-2xl bg-gradient-to-r from-leapp-yellow/20 to-leapp-yellow/5 border border-leapp-yellow/30 p-8 text-center">
+            <h3 class="text-2xl font-black text-leapp-black dark:text-white mb-2">Interested in {{ partner.full_name }}'s offerings?</h3>
+            <p class="text-gray-600 dark:text-gray-400 mb-6">Browse their courses and events to find something that interests you!</p>
+            <div class="flex flex-wrap items-center justify-center gap-4">
+                <a href="/courses" class="inline-flex items-center gap-2 px-6 py-3 bg-leapp-yellow text-leapp-black rounded-xl font-bold hover:bg-leapp-yellow/90 transition-all">
+                    <span class="material-symbols-outlined">search</span>
+                    <span>Explore All Courses</span>
+                </a>
+                <a href="/events" class="inline-flex items-center gap-2 px-6 py-3 border-2 border-leapp-yellow text-leapp-black dark:text-white rounded-xl font-bold hover:bg-leapp-yellow/10 transition-all">
+                    <span class="material-symbols-outlined">event</span>
+                    <span>View All Events</span>
+                </a>
+            </div>
+        </section>
+    </div>
+    
+    {% endif %}
+</main>
+{% endblock %}

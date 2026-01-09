@@ -1,0 +1,491 @@
+{% extends 'templates/htmlbase/base.html' %}
+
+{% block head %}
+<style type="text/css">
+    body {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+    
+    .status-pill {
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    
+    .status-pill:hover {
+        transform: scale(1.05);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+    
+    .status-dropdown {
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-10px);
+        transition: all 0.2s ease;
+    }
+    
+    .status-dropdown.active {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+    }
+    
+    .toast {
+        animation: slideIn 0.3s ease;
+    }
+    
+    @keyframes slideIn {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="flex-1 w-full bg-background-light dark:bg-background-dark text-leapp-black dark:text-white">
+    <div class="w-full px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Toast Container -->
+        <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2"></div>
+        
+        <!-- Header -->
+        <div class="mb-8">
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="px-2 py-1 bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 text-xs font-bold rounded-full">ADMIN</span>
+                    </div>
+                    <h1 class="text-3xl sm:text-4xl font-black text-leapp-black dark:text-white">All Customer Interests</h1>
+                    <p class="text-gray-600 dark:text-gray-400 mt-2">View and manage all customer interests across all partners</p>
+                </div>
+                <a href="/admin" class="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-800 transition-all flex items-center gap-2">
+                    <span class="material-symbols-outlined text-sm">arrow_back</span>
+                    <span>Back to Admin</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
+            <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-background-dark p-4 shadow-lg">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-xs text-gray-600 dark:text-gray-400 mb-1">Total</p>
+                        <p class="text-2xl font-black text-leapp-black dark:text-white">{{ interest_stats.total }}</p>
+                    </div>
+                    <div class="w-10 h-10 rounded-lg bg-leapp-yellow/10 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-leapp-yellow">favorite</span>
+                    </div>
+                </div>
+            </div>
+
+            <a href="/admin/interests?status=INTERESTED" class="rounded-xl border {% if current_status == 'INTERESTED' %}border-blue-500{% else %}border-gray-200 dark:border-gray-700{% endif %} bg-white dark:bg-background-dark p-4 shadow-lg hover:shadow-xl transition-shadow">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-xs text-gray-600 dark:text-gray-400 mb-1">Interested</p>
+                        <p class="text-2xl font-black text-blue-500">{{ interest_stats.interested }}</p>
+                    </div>
+                    <div class="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-blue-500">favorite</span>
+                    </div>
+                </div>
+            </a>
+
+            <a href="/admin/interests?status=CONTACTED" class="rounded-xl border {% if current_status == 'CONTACTED' %}border-orange-500{% else %}border-gray-200 dark:border-gray-700{% endif %} bg-white dark:bg-background-dark p-4 shadow-lg hover:shadow-xl transition-shadow">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-xs text-gray-600 dark:text-gray-400 mb-1">Contacted</p>
+                        <p class="text-2xl font-black text-orange-500">{{ interest_stats.contacted }}</p>
+                    </div>
+                    <div class="w-10 h-10 rounded-lg bg-orange-500/10 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-orange-500">mail</span>
+                    </div>
+                </div>
+            </a>
+
+            <a href="/admin/interests?status=CONFIRMED" class="rounded-xl border {% if current_status == 'CONFIRMED' %}border-green-500{% else %}border-gray-200 dark:border-gray-700{% endif %} bg-white dark:bg-background-dark p-4 shadow-lg hover:shadow-xl transition-shadow">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-xs text-gray-600 dark:text-gray-400 mb-1">Confirmed</p>
+                        <p class="text-2xl font-black text-green-500">{{ interest_stats.confirmed }}</p>
+                    </div>
+                    <div class="w-10 h-10 rounded-lg bg-green-500/10 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-green-500">check_circle</span>
+                    </div>
+                </div>
+            </a>
+
+            <a href="/admin/interests?status=CLOSED" class="rounded-xl border {% if current_status == 'CLOSED' %}border-gray-500{% else %}border-gray-200 dark:border-gray-700{% endif %} bg-white dark:bg-background-dark p-4 shadow-lg hover:shadow-xl transition-shadow">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-xs text-gray-600 dark:text-gray-400 mb-1">Closed</p>
+                        <p class="text-2xl font-black text-gray-500">{{ interest_stats.closed }}</p>
+                    </div>
+                    <div class="w-10 h-10 rounded-lg bg-gray-500/10 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-gray-500">close</span>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- Filter Bar -->
+        <div class="flex flex-wrap items-center justify-between gap-4 mb-6 p-4 rounded-xl bg-white dark:bg-background-dark border border-gray-200 dark:border-gray-700">
+            <div class="flex flex-wrap items-center gap-2">
+                <span class="text-sm text-gray-500 dark:text-gray-400">Status:</span>
+                <a href="/admin/interests{% if current_provider %}?provider={{ current_provider }}{% endif %}" class="px-3 py-1.5 rounded-lg {% if not current_status %}bg-leapp-yellow text-leapp-black{% else %}bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300{% endif %} text-sm font-medium hover:opacity-90 transition-opacity">
+                    All
+                </a>
+                <a href="/admin/interests?status=INTERESTED{% if current_provider %}&provider={{ current_provider }}{% endif %}" class="px-3 py-1.5 rounded-lg {% if current_status == 'INTERESTED' %}bg-blue-500 text-white{% else %}bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300{% endif %} text-sm font-medium">
+                    New
+                </a>
+                <a href="/admin/interests?status=CONTACTED{% if current_provider %}&provider={{ current_provider }}{% endif %}" class="px-3 py-1.5 rounded-lg {% if current_status == 'CONTACTED' %}bg-orange-500 text-white{% else %}bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300{% endif %} text-sm font-medium">
+                    Contacted
+                </a>
+                <a href="/admin/interests?status=IN_PROGRESS{% if current_provider %}&provider={{ current_provider }}{% endif %}" class="px-3 py-1.5 rounded-lg {% if current_status == 'IN_PROGRESS' %}bg-purple-500 text-white{% else %}bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300{% endif %} text-sm font-medium">
+                    In Progress
+                </a>
+                <a href="/admin/interests?status=CONFIRMED{% if current_provider %}&provider={{ current_provider }}{% endif %}" class="px-3 py-1.5 rounded-lg {% if current_status == 'CONFIRMED' %}bg-green-500 text-white{% else %}bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300{% endif %} text-sm font-medium">
+                    Confirmed
+                </a>
+                <a href="/admin/interests?status=CLOSED{% if current_provider %}&provider={{ current_provider }}{% endif %}" class="px-3 py-1.5 rounded-lg {% if current_status == 'CLOSED' %}bg-gray-500 text-white{% else %}bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300{% endif %} text-sm font-medium">
+                    Closed
+                </a>
+            </div>
+            
+            <div class="flex items-center gap-2">
+                <span class="text-sm text-gray-500 dark:text-gray-400">Partner:</span>
+                <div class="relative">
+                    <input type="hidden" id="provider-value" value="{{ current_provider or '' }}" />
+                    <input
+                        type="text"
+                        id="provider-search"
+                        value="{% if current_provider %}{% for p in providers %}{% if p.provider == current_provider %}{{ p.full_name or p.provider }}{% endif %}{% endfor %}{% endif %}"
+                        autocomplete="off"
+                        class="w-48 px-3 py-1.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark text-sm text-leapp-black dark:text-white placeholder:text-gray-400 focus:border-leapp-yellow focus:outline-0 focus:ring-1 focus:ring-leapp-yellow/50"
+                        placeholder="Search partners..." />
+                    <div id="provider-dropdown" class="hidden absolute top-full left-0 right-0 mt-1 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark shadow-lg z-50 max-h-48 overflow-y-auto">
+                        <div class="provider-option px-3 py-2 cursor-pointer hover:bg-leapp-yellow/10 text-sm text-leapp-black dark:text-white" data-value="">
+                            All Partners
+                        </div>
+                        {% for p in providers %}
+                        <div class="provider-option px-3 py-2 cursor-pointer hover:bg-leapp-yellow/10 text-sm text-leapp-black dark:text-white" data-value="{{ p.provider }}" data-name="{{ p.full_name or p.provider }}">
+                            {{ p.full_name or p.provider }}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Interests List -->
+        {% if interests and interests|length > 0 %}
+        <div class="space-y-4">
+            {% for interest in interests %}
+            <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-background-dark shadow-lg hover:shadow-xl transition-shadow" data-interest-id="{{ interest.name }}">
+                <div class="p-5">
+                    <div class="flex flex-col lg:flex-row gap-4">
+                        <!-- Customer Info -->
+                        <div class="flex items-start gap-3 flex-1 min-w-0">
+                            <div class="w-12 h-12 rounded-full bg-leapp-yellow flex items-center justify-center text-leapp-black font-bold text-lg flex-shrink-0">
+                                {% if interest.customer_image %}
+                                <img src="{{ interest.customer_image }}" alt="{{ interest.customer_name }}" class="w-12 h-12 rounded-full object-cover">
+                                {% else %}
+                                {{ interest.customer_name[0].upper() if interest.customer_name else 'U' }}
+                                {% endif %}
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="font-bold text-leapp-black dark:text-white truncate">{{ interest.customer_name }}</p>
+                                <p class="text-xs text-gray-600 dark:text-gray-400 truncate">{{ interest.customer_email }}</p>
+                                {% if interest.customer_phone %}
+                                <p class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1 mt-1">
+                                    <span class="material-symbols-outlined text-xs">call</span>
+                                    {{ interest.customer_phone }}
+                                </p>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Partner Info -->
+                        <div class="flex-1 min-w-0 px-4 border-l border-gray-200 dark:border-gray-700">
+                            <p class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">Partner</p>
+                            <p class="font-semibold text-leapp-black dark:text-white truncate">{{ interest.provider_name }}</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 truncate">{{ interest.provider_email }}</p>
+                        </div>
+
+                        <!-- Offering Info -->
+                        <div class="flex-1 min-w-0 px-4 border-l border-gray-200 dark:border-gray-700">
+                            <p class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">Offering</p>
+                            <p class="font-semibold text-leapp-black dark:text-white truncate">{{ interest.offering_title }}</p>
+                            <p class="text-xs text-leapp-yellow font-bold">₹{{ "%.0f"|format(interest.offering_price) }}</p>
+                        </div>
+
+                        <!-- Status & Actions -->
+                        <div class="flex flex-col items-end justify-between gap-2">
+                            <div class="flex items-center gap-2">
+                                <!-- History Button -->
+                                <button onclick="toggleHistory('{{ interest.name }}')" class="px-2 py-1.5 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg text-xs font-medium hover:bg-gray-50 dark:hover:bg-gray-800 transition-all flex items-center gap-1" title="View History">
+                                    <span class="material-symbols-outlined text-sm">history</span>
+                                </button>
+                                <!-- Status Pill -->
+                                <div class="relative">
+                                    <button onclick="toggleStatusDropdown('{{ interest.name }}')" class="status-pill px-3 py-1.5 rounded-full text-xs font-bold flex items-center gap-1
+                                    {% if interest.status == 'INTERESTED' %}bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200
+                                    {% elif interest.status == 'CONTACTED' %}bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200
+                                    {% elif interest.status == 'CONFIRMED' %}bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200
+                                    {% elif interest.status == 'CLOSED' %}bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200
+                                    {% endif %}">
+                                    <span class="status-text">{{ interest.status }}</span>
+                                    <span class="material-symbols-outlined text-sm">expand_more</span>
+                                </button>
+                                
+                                <!-- Status Dropdown -->
+                                <div id="status-dropdown-{{ interest.name }}" class="status-dropdown absolute right-0 top-full mt-2 w-36 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-background-dark shadow-xl z-20">
+                                    <div class="p-1">
+                                        <button onclick="updateStatus('{{ interest.name }}', 'INTERESTED')" class="w-full px-3 py-2 text-left text-sm hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg flex items-center gap-2">
+                                            <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                                            Interested
+                                        </button>
+                                        <button onclick="updateStatus('{{ interest.name }}', 'CONTACTED')" class="w-full px-3 py-2 text-left text-sm hover:bg-orange-50 dark:hover:bg-orange-900/30 rounded-lg flex items-center gap-2">
+                                            <span class="w-2 h-2 rounded-full bg-orange-500"></span>
+                                            Contacted
+                                        </button>
+                                        <button onclick="updateStatus('{{ interest.name }}', 'IN_PROGRESS')" class="w-full px-3 py-2 text-left text-sm hover:bg-purple-50 dark:hover:bg-purple-900/30 rounded-lg flex items-center gap-2">
+                                            <span class="w-2 h-2 rounded-full bg-purple-500"></span>
+                                            In Progress
+                                        </button>
+                                        <button onclick="updateStatus('{{ interest.name }}', 'CONFIRMED')" class="w-full px-3 py-2 text-left text-sm hover:bg-green-50 dark:hover:bg-green-900/30 rounded-lg flex items-center gap-2">
+                                            <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                                            Confirmed
+                                        </button>
+                                        <button onclick="updateStatus('{{ interest.name }}', 'CLOSED')" class="w-full px-3 py-2 text-left text-sm hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg flex items-center gap-2">
+                                            <span class="w-2 h-2 rounded-full bg-gray-500"></span>
+                                            Closed
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            </div>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">{{ interest.created_ago }}</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Status History Panel -->
+                <div id="history-panel-{{ interest.name }}" class="history-panel border-t border-gray-200 dark:border-gray-700 max-h-0 overflow-hidden transition-all duration-300">
+                    <div class="p-4 bg-gray-50 dark:bg-gray-900/50">
+                        <div class="flex items-center gap-2 mb-3">
+                            <span class="material-symbols-outlined text-gray-500 dark:text-gray-400">history</span>
+                            <h5 class="text-sm font-bold text-gray-700 dark:text-gray-300">Status History</h5>
+                        </div>
+                        <div id="history-content-{{ interest.name }}" class="space-y-2">
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Loading...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <p class="text-center text-sm text-gray-500 dark:text-gray-400 mt-6">
+            Showing {{ interests|length }} interest{{ 's' if interests|length != 1 }}
+        </p>
+        {% else %}
+        <!-- Empty State -->
+        <div class="text-center py-16 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-background-dark">
+            <div class="flex justify-center mb-6">
+                <div class="w-20 h-20 rounded-full bg-leapp-yellow/10 flex items-center justify-center">
+                    <span class="material-symbols-outlined text-leapp-yellow text-5xl">favorite_border</span>
+                </div>
+            </div>
+            <h2 class="text-2xl font-bold text-leapp-black dark:text-white mb-3">No Interests Found</h2>
+            <p class="text-gray-600 dark:text-gray-400 mb-6">
+                {% if current_status or current_provider %}
+                No matching interests found with the current filters.
+                {% else %}
+                No customer interests have been recorded yet.
+                {% endif %}
+            </p>
+            {% if current_status or current_provider %}
+            <a href="/admin/interests" class="inline-flex items-center gap-2 px-6 py-3 bg-leapp-yellow text-leapp-black rounded-xl font-bold hover:bg-leapp-yellow/90 transition-all">
+                <span>Clear Filters</span>
+            </a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</main>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const csrfToken = '{{ csrf_token }}';
+    
+    const statusColors = {
+        'INTERESTED': { bg: 'bg-blue-100', text: 'text-blue-800', darkBg: 'dark:bg-blue-900', darkText: 'dark:text-blue-200' },
+        'CONTACTED': { bg: 'bg-orange-100', text: 'text-orange-800', darkBg: 'dark:bg-orange-900', darkText: 'dark:text-orange-200' },
+        'IN_PROGRESS': { bg: 'bg-purple-100', text: 'text-purple-800', darkBg: 'dark:bg-purple-900', darkText: 'dark:text-purple-200' },
+        'CONFIRMED': { bg: 'bg-green-100', text: 'text-green-800', darkBg: 'dark:bg-green-900', darkText: 'dark:text-green-200' },
+        'CLOSED': { bg: 'bg-gray-100', text: 'text-gray-800', darkBg: 'dark:bg-gray-800', darkText: 'dark:text-gray-200' }
+    };
+    
+    // Searchable Partner Dropdown
+    const providerSearch = document.getElementById('provider-search');
+    const providerValue = document.getElementById('provider-value');
+    const providerDropdown = document.getElementById('provider-dropdown');
+    const providerOptions = document.querySelectorAll('.provider-option');
+    
+    if (providerSearch) {
+        providerSearch.addEventListener('focus', () => {
+            providerDropdown.classList.remove('hidden');
+            filterProviderOptions('');
+        });
+        
+        providerSearch.addEventListener('input', (e) => {
+            providerDropdown.classList.remove('hidden');
+            filterProviderOptions(e.target.value.toLowerCase());
+        });
+        
+        providerOptions.forEach(opt => {
+            opt.addEventListener('click', () => {
+                const value = opt.dataset.value;
+                const name = opt.dataset.name || 'All Partners';
+                providerValue.value = value;
+                providerSearch.value = value ? name : '';
+                providerDropdown.classList.add('hidden');
+                filterByProvider(value);
+            });
+        });
+        
+        document.addEventListener('click', (e) => {
+            if (!providerSearch.contains(e.target) && !providerDropdown.contains(e.target)) {
+                providerDropdown.classList.add('hidden');
+            }
+        });
+    }
+    
+    function filterProviderOptions(query) {
+        providerOptions.forEach(opt => {
+            const text = opt.textContent.toLowerCase();
+            opt.style.display = text.includes(query) ? 'block' : 'none';
+        });
+    }
+    
+    function filterByProvider(provider) {
+        const currentStatus = '{{ current_status }}';
+        let url = '/admin/interests?';
+        if (provider) url += `provider=${encodeURIComponent(provider)}&`;
+        if (currentStatus) url += `status=${currentStatus}`;
+        window.location.href = url.replace(/&$/, '').replace(/\?$/, '');
+    }
+    
+    function toggleStatusDropdown(interestId) {
+        const dropdown = document.getElementById(`status-dropdown-${interestId}`);
+        document.querySelectorAll('.status-dropdown').forEach(d => {
+            if (d.id !== `status-dropdown-${interestId}`) d.classList.remove('active');
+        });
+        dropdown.classList.toggle('active');
+    }
+    
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.status-pill') && !e.target.closest('.status-dropdown')) {
+            document.querySelectorAll('.status-dropdown').forEach(d => d.classList.remove('active'));
+        }
+    });
+    
+    async function updateStatus(interestId, newStatus) {
+        const dropdown = document.getElementById(`status-dropdown-${interestId}`);
+        dropdown.classList.remove('active');
+        
+        try {
+            const response = await fetch('/api/method/leappcore.api.interest.admin_update_interest_status', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Frappe-CSRF-Token': csrfToken
+                },
+                body: JSON.stringify({ interest_id: interestId, new_status: newStatus })
+            });
+            
+            const data = await response.json();
+            
+            if (data.message && data.message.success) {
+                const card = document.querySelector(`[data-interest-id="${interestId}"]`);
+                const pill = card.querySelector('.status-pill');
+                const statusText = pill.querySelector('.status-text');
+                
+                pill.className = 'status-pill px-3 py-1.5 rounded-full text-xs font-bold flex items-center gap-1';
+                const colors = statusColors[newStatus];
+                pill.classList.add(colors.bg, colors.text, colors.darkBg, colors.darkText);
+                statusText.textContent = newStatus;
+                
+                showToast(`Status updated to ${newStatus}`, 'success');
+            } else {
+                showToast('Failed to update status', 'error');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            showToast('Failed to update status', 'error');
+        }
+    }
+    
+    function toggleHistory(interestId) {
+        const panel = document.getElementById(`history-panel-${interestId}`);
+        if (panel.style.maxHeight && panel.style.maxHeight !== '0px') {
+            panel.style.maxHeight = '0px';
+        } else {
+            panel.style.maxHeight = '300px';
+            loadHistory(interestId);
+        }
+    }
+    
+    async function loadHistory(interestId) {
+        const contentDiv = document.getElementById(`history-content-${interestId}`);
+        
+        try {
+            const response = await fetch(`/api/method/leappcore.api.interest.get_interest_history?interest_id=${interestId}`, {
+                headers: { 'X-Frappe-CSRF-Token': csrfToken }
+            });
+            
+            const data = await response.json();
+            
+            if (data.message && data.message.length > 0) {
+                contentDiv.innerHTML = data.message.map(h => `
+                    <div class="flex items-center gap-3 text-sm">
+                        <div class="w-2 h-2 rounded-full ${getStatusDot(h.new_value)}"></div>
+                        <span class="text-gray-600 dark:text-gray-400">${h.old_value} → ${h.new_value}</span>
+                        <span class="text-gray-400 dark:text-gray-500 text-xs">${h.timestamp_ago}</span>
+                    </div>
+                `).join('');
+            } else {
+                contentDiv.innerHTML = '<p class="text-sm text-gray-500 dark:text-gray-400">No status changes recorded yet.</p>';
+            }
+        } catch (error) {
+            console.error('Error loading history:', error);
+            contentDiv.innerHTML = '<p class="text-sm text-red-500">Failed to load history.</p>';
+        }
+    }
+    
+    function getStatusDot(status) {
+        const dots = { 'INTERESTED': 'bg-blue-500', 'CONTACTED': 'bg-orange-500', 'IN_PROGRESS': 'bg-purple-500', 'CONFIRMED': 'bg-green-500', 'CLOSED': 'bg-gray-500' };
+        return dots[status] || 'bg-gray-500';
+    }
+    
+    function showToast(message, type = 'success') {
+        const container = document.getElementById('toast-container');
+        const toast = document.createElement('div');
+        toast.className = `toast px-4 py-3 rounded-lg shadow-lg flex items-center gap-2 ${type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'}`;
+        toast.innerHTML = `
+            <span class="material-symbols-outlined text-sm">${type === 'success' ? 'check_circle' : 'error'}</span>
+            <span class="text-sm font-medium">${message}</span>
+        `;
+        container.appendChild(toast);
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    }
+</script>
+{% endblock %}

@@ -3,17 +3,24 @@ from frappe import _
 
 
 def get_context(context):
-    """Partner interests page - shows all customer interests"""
+    """Partner interests page - shows customer interests for this partner"""
     
     # Check if user is logged in
     if frappe.session.user == "Guest":
         frappe.local.flags.redirect_location = "/login?redirect-to=/partner/interests"
         raise frappe.Redirect
     
+    user_roles = frappe.get_roles(frappe.session.user)
+    
+    # Check if user is Admin/System Manager - redirect to admin interests
+    if frappe.session.user == "Administrator" or "System Manager" in user_roles:
+        frappe.local.flags.redirect_location = "/admin/interests"
+        raise frappe.Redirect
+    
     # Check if user has Leapp Partner role
-    if not has_partner_role():
-        # Redirect customers to courses page
-        frappe.local.flags.redirect_location = "/courses"
+    if "Leapp Partner" not in user_roles:
+        # Regular customer - redirect to profile
+        frappe.local.flags.redirect_location = "/user/profile"
         raise frappe.Redirect
     
     context.csrf_token = frappe.sessions.get_csrf_token()
@@ -28,11 +35,6 @@ def get_context(context):
     context.current_status = status_filter
     
     return context
-
-
-def has_partner_role():
-    """Check if current user has Leapp Partner role"""
-    return "Leapp Partner" in frappe.get_roles(frappe.session.user)
 
 
 def get_partner_interests(status_filter=""):
@@ -89,16 +91,22 @@ def get_interest_stats():
         "interest_type": "OFFERING"
     })
     
-    new = frappe.db.count("Customer Interest", {
+    interested = frappe.db.count("Customer Interest", {
         "provider": partner,
         "interest_type": "OFFERING",
-        "status": "NEW"
+        "status": "INTERESTED"
     })
     
     contacted = frappe.db.count("Customer Interest", {
         "provider": partner,
         "interest_type": "OFFERING",
         "status": "CONTACTED"
+    })
+    
+    in_progress = frappe.db.count("Customer Interest", {
+        "provider": partner,
+        "interest_type": "OFFERING",
+        "status": "IN_PROGRESS"
     })
     
     confirmed = frappe.db.count("Customer Interest", {
@@ -109,7 +117,8 @@ def get_interest_stats():
     
     return {
         "total": total,
-        "new": new,
+        "interested": interested,
         "contacted": contacted,
+        "in_progress": in_progress,
         "confirmed": confirmed
     }

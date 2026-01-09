@@ -1,4 +1,5 @@
 import frappe
+from urllib.parse import quote
 from frappe.exceptions import DoesNotExistError
 from leappcore.backend.common.context import PageContext
 
@@ -55,7 +56,7 @@ def _load_offering(offering_id: str):
             {
                 "name": full_name,
                 "avatar": avatar,
-                "profile_url": f"/app/user/{row.instructor}",
+                "profile_url": f"/partner/profile/public?partner_id={quote(row.instructor, safe='')}",
             }
         )
 

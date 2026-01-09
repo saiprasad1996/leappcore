@@ -50,7 +50,7 @@
    "fieldname": "status",
    "fieldtype": "Select",
    "label": "Status",
-   "options": "NEW\nCONTACTED\nCONFIRMED\nCLOSED"
+   "options": "INTERESTED\nCONTACTED\nIN_PROGRESS\nCONFIRMED\nCLOSED"
   },
   {
    "fieldname": "column_break_hezo",

@@ -274,7 +274,7 @@ def send_event_interest_notification(customer, organizer, event):
 def update_interest_status(interest_id, new_status):
     """Update the status of a customer interest"""
     # Validate status
-    valid_statuses = ["NEW", "CONTACTED", "CONFIRMED", "CLOSED"]
+    valid_statuses = ["INTERESTED", "CONTACTED", "IN_PROGRESS", "CONFIRMED", "CLOSED"]
     if new_status not in valid_statuses:
         frappe.throw(_("Invalid status. Must be one of: ") + ", ".join(valid_statuses))
     
@@ -315,8 +315,10 @@ def get_interest_history(interest_id):
     # Get the interest document
     interest = frappe.get_doc("Customer Interest", interest_id)
     
-    # Check if current user is the provider
-    if interest.provider != frappe.session.user:
+    # Check if current user is the provider OR is Admin/System Manager
+    user_roles = frappe.get_roles(frappe.session.user)
+    is_admin = frappe.session.user == "Administrator" or "System Manager" in user_roles
+    if interest.provider != frappe.session.user and not is_admin:
         frappe.throw(_("You do not have permission to view this interest"), frappe.PermissionError)
     
     # Get version history
@@ -352,3 +354,36 @@ def get_interest_history(interest_id):
             pass
     
     return history
+
+
+@frappe.whitelist(allow_guest=False)
+def admin_update_interest_status(interest_id, new_status):
+    """Update the status of a customer interest (Admin only)"""
+    user_roles = frappe.get_roles(frappe.session.user)
+    
+    # Check if user is Admin or System Manager
+    if frappe.session.user != "Administrator" and "System Manager" not in user_roles:
+        frappe.throw(_("You do not have permission to perform this action"), frappe.PermissionError)
+    
+    # Validate status
+    valid_statuses = ["INTERESTED", "CONTACTED", "IN_PROGRESS", "CONFIRMED", "CLOSED"]
+    if new_status not in valid_statuses:
+        frappe.throw(_("Invalid status"))
+    
+    # Check if interest exists
+    if not frappe.db.exists("Customer Interest", interest_id):
+        frappe.throw(_("Interest not found"))
+    
+    # Get and update the interest
+    interest = frappe.get_doc("Customer Interest", interest_id)
+    old_status = interest.status
+    interest.status = new_status
+    interest.save(ignore_permissions=True)
+    frappe.db.commit()
+    
+    return {
+        "success": True,
+        "message": _("Status updated successfully"),
+        "old_status": old_status,
+        "new_status": new_status
+    }

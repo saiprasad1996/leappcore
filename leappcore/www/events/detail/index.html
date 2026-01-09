@@ -159,7 +159,7 @@
                                 <span class="material-symbols-outlined text-leapp-yellow mt-1">person</span>
                                 <div>
                                     <p class="text-sm text-gray-500 dark:text-gray-400">Organizer</p>
-                                    <p class="font-semibold text-leapp-black dark:text-white">{{ event.organizer_name }}</p>
+                                    <a href="/partner/profile/public?partner_id={{ event.organizer | urlencode }}" class="font-semibold text-leapp-black dark:text-white hover:text-leapp-yellow transition-colors">{{ event.organizer_name }}</a>
                                 </div>
                             </div>
                             {% endif %}
@@ -201,7 +201,7 @@
                                 {% endif %}
                                 <div>
                                     <p class="font-semibold text-leapp-black dark:text-white">{{ event.organizer_name }}</p>
-                                    <p class="text-sm text-gray-500 dark:text-gray-400">Event Organizer</p>
+                                    <a href="/partner/profile/public?partner_id={{ event.organizer | urlencode }}" class="text-sm text-leapp-yellow hover:underline">View Profile</a>
                                 </div>
                             </div>
                         </div>
@@ -274,18 +274,20 @@ document.addEventListener('DOMContentLoaded', () => {
             if (result.message && result.message.success) {
                 setInterestedState();
                 showToast(result.message.message, 'success');
-            } else if (result.exc_type === 'AuthenticationError') {
-                // Redirect to login
-                showToast('Please log in to show interest', 'error');
+            } else if (response.status === 403 || response.status === 401) {
+                // User not logged in
+                showToast('You need to login to show interest', 'error');
                 setTimeout(() => {
                     window.location.href = '/login?redirect-to=' + encodeURIComponent(window.location.pathname + window.location.search);
-                }, 2000);
+                }, 1500);
             } else {
-                throw new Error(result.exception || 'Failed to record interest');
+                // Any other error
+                showToast('Something went wrong. Please try again.', 'error');
+                resetButtonState();
             }
         } catch (error) {
-            console.error('Error recording interest:', error);
-            showToast('Failed to record interest. Please try again.', 'error');
+            console.error('Error:', error);
+            showToast('Something went wrong. Please try again.', 'error');
             resetButtonState();
         } finally {
             interestBtn.disabled = false;
