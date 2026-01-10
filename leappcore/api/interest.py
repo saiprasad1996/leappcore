@@ -54,7 +54,7 @@ def record_offering_interest(offering_id):
             "provider": provider,
             "interest_type": "OFFERING",
             "offering": offering_id,
-            "status": "NEW"
+            "status": "INTERESTED"
         })
         interest.insert(ignore_permissions=True)
         frappe.db.commit()
@@ -108,7 +108,7 @@ def record_event_interest(event_id):
             "provider": organizer,
             "interest_type": "EVENT",
             "event": event_id,
-            "status": "NEW"
+            "status": "INTERESTED"
         })
         interest.insert(ignore_permissions=True)
         frappe.db.commit()
