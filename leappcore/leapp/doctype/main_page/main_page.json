@@ -5,19 +5,33 @@
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
+  "social_links_section",
   "facebook_link",
+  "column_break_uuiv",
   "x_link",
+  "column_break_amql",
+  "linkedin_link",
+  "contact_section",
+  "contact_email",
+  "contact_address",
+  "column_break_content",
+  "contact_phone",
+  "content_section",
+  "aboutus_content_long",
+  "index_image",
+  "column_break_policies",
   "aboutus_content_short",
+  "policies_section",
   "privacy_policy",
   "terms_and_conditions",
-  "index_image",
-  "column_break_uuiv",
-  "linkedin_link",
-  "contact_phone",
-  "payment_policy",
-  "aboutus_content_long"
+  "payment_policy"
  ],
  "fields": [
+  {
+   "fieldname": "social_links_section",
+   "fieldtype": "Section Break",
+   "label": "Social Links"
+  },
   {
    "fieldname": "facebook_link",
    "fieldtype": "Data",
@@ -34,28 +48,57 @@
    "label": "X Link"
   },
   {
-   "fieldname": "contact_phone",
+   "fieldname": "column_break_uuiv",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "contact_section",
+   "fieldtype": "Section Break",
+   "label": "Contact Information"
+  },
+  {
+   "fieldname": "contact_email",
    "fieldtype": "Data",
+   "label": "Contact Email",
+   "options": "Email"
+  },
+  {
+   "fieldname": "contact_phone",
+   "fieldtype": "Phone",
    "label": "Contact Phone"
   },
   {
+   "fieldname": "contact_address",
+   "fieldtype": "Small Text",
+   "label": "Contact Address"
+  },
+  {
+   "fieldname": "column_break_content",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "content_section",
+   "fieldtype": "Section Break",
+   "label": "Content"
+  },
+  {
    "fieldname": "privacy_policy",
-   "fieldtype": "HTML Editor",
+   "fieldtype": "Text Editor",
    "label": "Privacy Policy"
   },
   {
    "fieldname": "payment_policy",
-   "fieldtype": "HTML Editor",
+   "fieldtype": "Text Editor",
    "label": "Payment Policy"
   },
   {
    "fieldname": "terms_and_conditions",
-   "fieldtype": "HTML Editor",
+   "fieldtype": "Text Editor",
    "label": "Terms & Conditions"
   },
   {
    "fieldname": "aboutus_content_long",
-   "fieldtype": "HTML Editor",
+   "fieldtype": "Text Editor",
    "label": "About (Long)"
   },
   {
@@ -69,14 +112,23 @@
    "label": "Index Image"
   },
   {
-   "fieldname": "column_break_uuiv",
+   "fieldname": "column_break_policies",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "policies_section",
+   "fieldtype": "Section Break",
+   "label": "Policies"
+  },
+  {
+   "fieldname": "column_break_amql",
    "fieldtype": "Column Break"
   }
  ],
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2026-01-09 01:20:21.321942",
+ "modified": "2026-01-10 21:26:53.702636",
  "modified_by": "Administrator",
  "module": "Leapp",
  "name": "Main Page",

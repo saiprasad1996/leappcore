@@ -134,8 +134,13 @@
                 <!-- Sidebar Card -->
                 <div class="lg:col-span-1 space-y-8">
                     <div class="flex flex-col rounded-xl border border-slate-200 dark:border-slate-800 bg-background-light dark:bg-background-dark shadow-lg overflow-hidden">
-                        <div class="w-full bg-center bg-no-repeat aspect-video sm:aspect-[16/7] bg-cover -mx-6 sm:-mx-6 lg:-mx-8" style="background-image: url('{{ offering.image }}');"></div>
+                        <div class="w-full aspect-video sm:aspect-[16/7] overflow-hidden bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
+                            <img src="{{ offering.image or 'https://placehold.co/600x400?text=No+Image' }}" 
+                                 alt="{{ offering.title }}" 
+                                 class="w-full h-full object-contain">
+                        </div>
                          <div class="p-6 space-y-4">
+                            {% if has_leapp_customer_role %}
                             <button id="interest-btn" 
                                     data-offering-id="{{ offering.name }}"
                                     data-csrf-token="{{ csrf_token }}"
@@ -143,6 +148,7 @@
                                 <span class="material-symbols-outlined" id="interest-icon">favorite_border</span>
                                 <span class="truncate" id="interest-text">I'm Interested</span>
                             </button>
+                            {% endif %}
                             <p class="text-center text-sm text-gray-600 dark:text-gray-400">
                                 <span class="font-bold text-leapp-yellow">₹{{ "%.0f"|format(offering.price) }}</span> per session
                             </p>

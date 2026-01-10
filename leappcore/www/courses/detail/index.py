@@ -8,6 +8,14 @@ def get_context(context):
     """Render offering detail with live data."""
     context = PageContext(context).get_context()
     context.csrf_token = frappe.sessions.get_csrf_token()
+    
+    # Check if user has Leapp Customer role
+    context.has_leapp_customer_role = False
+    if frappe.session.user != "Guest":
+        user_roles = frappe.get_roles(frappe.session.user)
+        context.has_leapp_customer_role = "Leapp Customer" in user_roles
+        if frappe.session.user == "Administrator":
+            context.has_leapp_customer_role = False
 
     offering_id = frappe.form_dict.get("offering")
     if not offering_id:

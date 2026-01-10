@@ -29,8 +29,12 @@ def get_context(context):
 def get_analytics_data():
     """Fetch analytics counts for dashboard cards"""
     analytics = {
-        "customers": frappe.db.count("Customer Interest"),
-        "partners": frappe.db.count("Partner Profile"),
+        "customers": frappe.db.count("User", filters=[
+            ["Has Role", "role", "=", "Leapp Customer"]
+        ]),
+        "partners": frappe.db.count("User", filters=[
+            ["Has Role", "role", "=", "Leapp Partner"]
+        ]),
         "offerings": frappe.db.count("Offering"),
         "events": frappe.db.count("Leapp Event")
     }
@@ -54,9 +58,9 @@ def get_doctype_categories():
         {
             "name": "User Management",
             "doctypes": [
-                {"name": "User Profile", "icon": "person", "label": "User Profiles", "href": "/app/user-profile"},
-                {"name": "Partner Profile", "icon": "groups", "label": "Partner Profiles", "href": "/app/partner-profile"},
-                {"name": "Customer Interest", "icon": "favorite", "label": "Customer Interests", "href": "/app/customer-interest"},
+                {"name": "User Profile", "icon": "person", "label": "User Profiles", "href": "/desk/user?enabled=1&role=Leapp+Customer"},
+                {"name": "Partner Profile", "icon": "groups", "label": "Partner Profiles", "href": "/desk/user?enabled=1&role=Leapp+Partner"},
+                {"name": "Customer Interest", "icon": "favorite", "label": "Customer Interests", "href": "/partner/interests"},
                 {"name": "Event Registration", "icon": "app_registration", "label": "Event Registrations", "href": "/app/event-registration"},
                 {"name": "Event Claim", "icon": "verified", "label": "Event Claims", "href": "/app/event-claim"},
             ]
