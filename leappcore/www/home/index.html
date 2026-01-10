@@ -18,76 +18,86 @@
     </div>
 </div>
 
-<!-- Categories Section (Static for now as per design, but could be dynamic later) -->
+<!-- Categories Section -->
 <div class="grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] gap-6 p-4">
     <div class="flex flex-col gap-3 pb-3">
-        <div class="w-full bg-center bg-no-repeat aspect-video bg-cover rounded-xl"
-            data-alt="Child painting on a canvas"
-            style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAoyH-tj6T8J4m55C_wD3u6olX0_AmaWJowr2BlbyubAdAiXMzQjZASgnJfFVCisg5g4Lz67AkJMHoPri4WqP1NZbRZq8gb3Bpo1BIh0Vi6fsdUj9Kh7MxCYPIfFfpJpABAEvUD5hNuHPo4b1YhOeU8iwv1Ng_cwvW1SPUtUd3KnK89OD0bTzT1IR1TD8ZLPdMtvwI_3nb1vKZLc3N82kTimTeB0aZWUz17D6Q3Zs7vv6n485js2doZRtHAR5dlvHsWx27St7wgsKSy");'>
-        </div>
+        <a href="{{ main_page.category1_link or '#' }}" class="block w-full aspect-video rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 flex items-center justify-center transition-all duration-300 hover:shadow-xl hover:shadow-leapp-yellow/30 hover:-translate-y-1">
+            <img src="{{ main_page.category1_image or 'https://placehold.co/600x400?text=Category+1' }}" 
+                 alt="{{ main_page.category1_heading or 'Category 1' }}" 
+                 class="w-full h-full object-contain">
+        </a>
         <div>
-            <p class="text-leapp-black dark:text-white text-xl font-bold leading-normal">Hobbies
-            </p>
+            <a href="{{ main_page.category1_link or '#' }}" class="hover:text-leapp-yellow transition-colors">
+                <p class="text-leapp-black dark:text-white text-xl font-bold leading-normal">{{ main_page.category1_heading or "Hobbies" }}</p>
+            </a>
             <p class="text-[#4c809a] dark:text-slate-400 text-base font-normal leading-normal">
-                Explore a world of creative expression and fun.</p>
+                {{ main_page.category1_subtext or "Explore a world of creative expression and fun." }}</p>
         </div>
     </div>
     <div class="flex flex-col gap-3 pb-3">
-        <div class="w-full bg-center bg-no-repeat aspect-video bg-cover rounded-xl"
-            data-alt="Children playing soccer on a field"
-            style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAl5RIgeQNN9rqcDrvf0iWMkoaCREvlLB3CrF_DqivqtgOobTMlP9SxeIAxgcA0H026xa08PG8oqFCSPrhNcb-hsFK3ENj-Sp6Umslq_GxOG4hH7teU0oSQjzEaT4eMoWKnhgRxZnfan4ZiH1K_F_Ia57V4wcNGqa3JPzYPyMXqPPGJQi6hXOsLxnGIX8QhwANSoYHdmxl2mQaqvBjGNPvfM0JHrRQoPC3l_T_e7UBRBuZercoXpy7Q0_8AUnwnw707D1TRAHgWHz4V");'>
-        </div>
+        <a href="{{ main_page.category2_link or '#' }}" class="block w-full aspect-video rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 flex items-center justify-center transition-all duration-300 hover:shadow-xl hover:shadow-leapp-yellow/30 hover:-translate-y-1">
+            <img src="{{ main_page.category2_image or 'https://placehold.co/600x400?text=Category+2' }}" 
+                 alt="{{ main_page.category2_heading or 'Category 2' }}" 
+                 class="w-full h-full object-contain">
+        </a>
         <div>
-            <p class="text-leapp-black dark:text-white text-xl font-bold leading-normal">Sports
-            </p>
+            <a href="{{ main_page.category2_link or '#' }}" class="hover:text-leapp-yellow transition-colors">
+                <p class="text-leapp-black dark:text-white text-xl font-bold leading-normal">{{ main_page.category2_heading or "Sports" }}</p>
+            </a>
             <p class="text-[#4c809a] dark:text-slate-400 text-base font-normal leading-normal">
-                Get active, build teamwork, and stay healthy.</p>
+                {{ main_page.category2_subtext or "Get active, build teamwork, and stay healthy." }}</p>
         </div>
     </div>
     <div class="flex flex-col gap-3 pb-3">
-        <div class="w-full bg-center bg-no-repeat aspect-video bg-cover rounded-xl"
-            data-alt="Child using a laptop for learning"
-            style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBsSJhmDcgKaSrfOkiKE9UFtntNoNTQAhBWlO3Ks5pe2BR_xcYAKxvDe-5OZr52839KtQTWlaIm9GQhYc3lrR1CTBnjfyXbeci_iTmYxrf9TtgfCj_9eDn9zsWCTcpRktANYFPs_Kp_lRnhUFXmA1Rk1gqFJq_-bPfOHF2LHl7cDEiRZOqjQf9x4P5SRtwCdb5Mv6yi3OIeeyUYOjakH9kPZBUgpeCu3OV5OqReLCBV7elqOTZ8PcIn2M3hliSiI6DOZdFxbTozEq4h");'>
-        </div>
+        <a href="{{ main_page.category3_link or '#' }}" class="block w-full aspect-video rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 flex items-center justify-center transition-all duration-300 hover:shadow-xl hover:shadow-leapp-yellow/30 hover:-translate-y-1">
+            <img src="{{ main_page.category3_image or 'https://placehold.co/600x400?text=Category+3' }}" 
+                 alt="{{ main_page.category3_heading or 'Category 3' }}" 
+                 class="w-full h-full object-contain">
+        </a>
         <div>
-            <p class="text-leapp-black dark:text-white text-xl font-bold leading-normal">
-                Academics</p>
+            <a href="{{ main_page.category3_link or '#' }}" class="hover:text-leapp-yellow transition-colors">
+                <p class="text-leapp-black dark:text-white text-xl font-bold leading-normal">{{ main_page.category3_heading or "Academics" }}</p>
+            </a>
             <p class="text-[#4c809a] dark:text-slate-400 text-base font-normal leading-normal">
-                Boost learning with engaging educational activities.</p>
+                {{ main_page.category3_subtext or "Boost learning with engaging educational activities." }}</p>
         </div>
     </div>
 </div>
 
-<!-- Special Offers (Static for now) -->
+<!-- Special Offers -->
+{% if main_page.show_special_offers %}
 <div class="px-4 py-8">
     <h2 class="text-leapp-black dark:text-white text-[22px] font-bold leading-tight tracking-[-0.015em] pb-3">
-        This Month's Special Offers</h2>
+        {{ main_page.special_offers_section_heading or "This Month's Special Offers" }}</h2>
     <div class="p-4 @container gradient-bg rounded-xl shadow-[0_0_12px_rgba(255,199,0,0.3)]">
         <div
             class="flex flex-col items-stretch justify-start rounded-xl @[480px]:flex-row @[480px]:items-start bg-white/80 dark:bg-leapp-black/80 backdrop-blur-sm p-4">
-            <div class="w-full @[480px]:w-1/3 bg-center bg-no-repeat aspect-video @[480px]:aspect-auto @[480px]:h-full bg-cover rounded-xl"
-                data-alt="Students in a classroom working together"
-                style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCoQRDgEUFOoJMU6mBQPzg7Rqjk0V6lRFnHaYnoRBB0abyiAkrqALidOyIaRhj2RqDNkm6bddiGoIbI8d4IhqH1v4qAmRmgZClcA593VWRmnI1cn5XLq8wGRJs2oHyWNnYM_uEcLt1kBXL3PjgOMJCv0rdKcTDL0hFnG--96zi3V1zO5fpPaEJkfpJfKFpZNdcVefQfS5YVnQMWsYEPEcZreUYFUtS3ucXmjleptXRLtXvcMJk1mOF_VBq-VgXqgKCSi0aMxTv30LAe");'>
+            {% if main_page.special_offers_image %}
+            <div class="w-full @[480px]:w-1/3 aspect-video @[480px]:aspect-auto @[480px]:h-full rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 flex items-center justify-center flex-shrink-0">
+                <img src="{{ main_page.special_offers_image }}" 
+                     alt="Special Offers" 
+                     class="w-full h-full object-contain">
             </div>
+            {% endif %}
             <div class="flex w-full min-w-72 grow flex-col items-stretch justify-center gap-1 py-4 px-4 @[480px]:px-6">
-                <p class="text-leapp-black dark:text-leapp-yellow font-bold">LIMITED TIME OFFER
+                <p class="text-leapp-black dark:text-leapp-yellow font-bold">{{ main_page.special_offers_heading or "LIMITED TIME OFFER" }}
                 </p>
                 <p class="text-leapp-black dark:text-white text-xl font-bold leading-tight tracking-[-0.015em]">
-                    20% off all Academic Programs</p>
+                    {{ main_page.special_offers_subheading or "20% off all Academic Programs" }}</p>
                 <div class="flex flex-col @[480px]:flex-row items-start @[480px]:items-end gap-3 justify-between mt-2">
                     <p class="text-leapp-black/80 dark:text-slate-300 text-base font-normal leading-normal flex-grow">
-                        Enroll your child in any of our engaging academic programs and get a
-                        special discount for a limited time.
+                        {{ main_page.special_offers_content or "Enroll your child in any of our engaging academic programs and get a special discount for a limited time." }}
                     </p>
-                    <button
+                    <a href="{{ main_page.special_offers_link or '#' }}"
                         class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-leapp-black text-leapp-yellow text-sm font-medium leading-normal hover:bg-leapp-black/90 transition-colors">
                         <span class="truncate">Learn More</span>
-                    </button>
+                    </a>
                 </div>
             </div>
         </div>
     </div>
 </div>
+{% endif %}
 
 <!-- Mission Section -->
 <div class="px-4 py-8">
@@ -107,7 +117,7 @@
         </div>
         <div>
             <p class="text-5xl font-extrabold gradient-text">{{ locations_count }}+</p>
-            <p class="text-leapp-black/80 dark:text-slate-400 mt-2 font-medium">Locations</p>
+            <p class="text-leapp-black/80 dark:text-slate-400 mt-2 font-medium">Cities</p>
         </div>
         <div>
             <p class="text-5xl font-extrabold gradient-text">{{ events_count }}+</p>

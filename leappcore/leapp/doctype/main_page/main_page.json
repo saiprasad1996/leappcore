@@ -5,6 +5,31 @@
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
+  "home_page_section",
+  "index_image",
+  "category_columns_section",
+  "category1_image",
+  "category1_heading",
+  "category1_subtext",
+  "category1_link",
+  "column_break_cat1",
+  "category2_image",
+  "category2_heading",
+  "category2_subtext",
+  "category2_link",
+  "column_break_cat2",
+  "category3_image",
+  "category3_heading",
+  "category3_subtext",
+  "category3_link",
+  "special_offers_section",
+  "show_special_offers",
+  "special_offers_section_heading",
+  "special_offers_image",
+  "special_offers_heading",
+  "special_offers_subheading",
+  "special_offers_content",
+  "special_offers_link",
   "social_links_section",
   "facebook_link",
   "column_break_uuiv",
@@ -17,16 +42,140 @@
   "column_break_content",
   "contact_phone",
   "content_section",
-  "aboutus_content_long",
-  "index_image",
-  "column_break_policies",
   "aboutus_content_short",
+  "aboutus_content_long",
   "policies_section",
   "privacy_policy",
+  "column_break_policies",
   "terms_and_conditions",
   "payment_policy"
  ],
  "fields": [
+  {
+   "fieldname": "home_page_section",
+   "fieldtype": "Section Break",
+   "label": "Home Page"
+  },
+  {
+   "fieldname": "index_image",
+   "fieldtype": "Attach Image",
+   "label": "Hero Background Image"
+  },
+  {
+   "fieldname": "category_columns_section",
+   "fieldtype": "Section Break",
+   "label": "Category Columns"
+  },
+  {
+   "fieldname": "category1_image",
+   "fieldtype": "Attach Image",
+   "label": "Category 1 Image"
+  },
+  {
+   "fieldname": "category1_heading",
+   "fieldtype": "Data",
+   "label": "Category 1 Heading"
+  },
+  {
+   "fieldname": "category1_subtext",
+   "fieldtype": "Small Text",
+   "label": "Category 1 Subtext"
+  },
+  {
+   "fieldname": "category1_link",
+   "fieldtype": "Data",
+   "label": "Category 1 Link"
+  },
+  {
+   "fieldname": "column_break_cat1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "category2_image",
+   "fieldtype": "Attach Image",
+   "label": "Category 2 Image"
+  },
+  {
+   "fieldname": "category2_heading",
+   "fieldtype": "Data",
+   "label": "Category 2 Heading"
+  },
+  {
+   "fieldname": "category2_subtext",
+   "fieldtype": "Small Text",
+   "label": "Category 2 Subtext"
+  },
+  {
+   "fieldname": "category2_link",
+   "fieldtype": "Data",
+   "label": "Category 2 Link"
+  },
+  {
+   "fieldname": "column_break_cat2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "category3_image",
+   "fieldtype": "Attach Image",
+   "label": "Category 3 Image"
+  },
+  {
+   "fieldname": "category3_heading",
+   "fieldtype": "Data",
+   "label": "Category 3 Heading"
+  },
+  {
+   "fieldname": "category3_subtext",
+   "fieldtype": "Small Text",
+   "label": "Category 3 Subtext"
+  },
+  {
+   "fieldname": "category3_link",
+   "fieldtype": "Data",
+   "label": "Category 3 Link"
+  },
+  {
+   "fieldname": "special_offers_section",
+   "fieldtype": "Section Break",
+   "label": "Special Offers"
+  },
+  {
+   "default": "0",
+   "fieldname": "show_special_offers",
+   "fieldtype": "Check",
+   "label": "Show Special Offers"
+  },
+  {
+   "depends_on": "show_special_offers",
+   "fieldname": "special_offers_section_heading",
+   "fieldtype": "Data",
+   "label": "Section Heading"
+  },
+  {
+   "fieldname": "special_offers_image",
+   "fieldtype": "Attach Image",
+   "label": "Offer Image"
+  },
+  {
+   "fieldname": "special_offers_heading",
+   "fieldtype": "Data",
+   "label": "Offer Heading"
+  },
+  {
+   "fieldname": "special_offers_subheading",
+   "fieldtype": "Data",
+   "label": "Offer Subheading"
+  },
+  {
+   "fieldname": "special_offers_content",
+   "fieldtype": "Small Text",
+   "label": "Offer Content"
+  },
+  {
+   "fieldname": "special_offers_link",
+   "fieldtype": "Data",
+   "label": "Learn More Link"
+  },
   {
    "fieldname": "social_links_section",
    "fieldtype": "Section Break",
@@ -79,7 +228,7 @@
   {
    "fieldname": "content_section",
    "fieldtype": "Section Break",
-   "label": "Content"
+   "label": "About Us Content"
   },
   {
    "fieldname": "privacy_policy",
@@ -107,11 +256,6 @@
    "label": "About (Short)"
   },
   {
-   "fieldname": "index_image",
-   "fieldtype": "Attach",
-   "label": "Index Image"
-  },
-  {
    "fieldname": "column_break_policies",
    "fieldtype": "Column Break"
   },
@@ -128,7 +272,7 @@
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2026-01-10 21:26:53.702636",
+ "modified": "2026-01-10 22:24:00.000000",
  "modified_by": "Administrator",
  "module": "Leapp",
  "name": "Main Page",
