@@ -20,11 +20,8 @@ def get_context(context):
     context.csrf_token = frappe.sessions.get_csrf_token()
     context.no_cache = 1
     
-    # Get redirect URL if provided
-    redirect_to = frappe.local.request.args.get("redirect-to")
-    
-    # Setup Google login
-    context.google_login = get_google_login_info(redirect_to)
+    # Setup Google login - redirect to home page after signup
+    context.google_login = get_google_login_info(redirect_to="/")
     
     # Handle signup form submission
     if frappe.request.method == "POST":
@@ -160,9 +157,8 @@ def signup_user():
         # Send welcome email
         send_welcome_email(user.name, full_name, verify_url)
         
-        # Redirect to success page
-        success_message = _("Your account has been created successfully! Please check your email to verify your account.")
-        frappe.local.flags.redirect_location = "/signup-success?message=" + frappe.utils.quote(success_message)
+        # Redirect to home page
+        frappe.local.flags.redirect_location = "/"
         raise frappe.Redirect
         
     except frappe.Redirect:

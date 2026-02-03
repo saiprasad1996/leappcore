@@ -14,6 +14,22 @@ def get_context(context):
     context.courses_count = frappe.db.count("Offering", {"active": 1})
     context.locations_count = frappe.db.count("Location")
     context.events_count = frappe.db.count("Leapp Event", {"active": 1})
+    
+    # Get cities from Location doctype
+    context.cities = frappe.get_all(
+        "Location",
+        fields=["name", "city", "image"],
+        order_by="city asc"
+    )
+    
+    # Testimonials for home page
+    context.testimonials = frappe.get_all(
+        "Testimonials",
+        filters={"active": 1},
+        fields=["customer_name", "customer_designation", "description", "image"],
+        limit=6,
+        order_by="creation desc"
+    )
 
     # Top Courses (Featured)
     context.top_courses = frappe.get_all(

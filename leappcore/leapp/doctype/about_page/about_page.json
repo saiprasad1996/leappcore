@@ -1,0 +1,120 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2026-02-03 23:35:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "vision_mission_values_section",
+  "vision_content",
+  "mission_content",
+  "values_content",
+  "why_us_section",
+  "why_us_content",
+  "journey_section",
+  "journey_items",
+  "impact_section",
+  "children_reached",
+  "column_break_impact1",
+  "activities_developed",
+  "column_break_impact2",
+  "partner_schools"
+ ],
+ "fields": [
+  {
+   "fieldname": "vision_mission_values_section",
+   "fieldtype": "Section Break",
+   "label": "Vision, Mission & Values"
+  },
+  {
+   "fieldname": "vision_content",
+   "fieldtype": "Text Editor",
+   "label": "Vision Content"
+  },
+  {
+   "fieldname": "mission_content",
+   "fieldtype": "Text Editor",
+   "label": "Mission Content"
+  },
+  {
+   "fieldname": "values_content",
+   "fieldtype": "Text Editor",
+   "label": "Values Content"
+  },
+  {
+   "fieldname": "why_us_section",
+   "fieldtype": "Section Break",
+   "label": "Why Us"
+  },
+  {
+   "fieldname": "why_us_content",
+   "fieldtype": "Text Editor",
+   "label": "Why Us Content"
+  },
+  {
+   "fieldname": "journey_section",
+   "fieldtype": "Section Break",
+   "label": "Our Journey"
+  },
+  {
+   "fieldname": "journey_items",
+   "fieldtype": "Table",
+   "label": "Journey Timeline",
+   "options": "About Page Journey"
+  },
+  {
+   "fieldname": "impact_section",
+   "fieldtype": "Section Break",
+   "label": "Impact in Numbers"
+  },
+  {
+   "fieldname": "children_reached",
+   "fieldtype": "Data",
+   "label": "Children Reached",
+   "default": "50,000+"
+  },
+  {
+   "fieldname": "column_break_impact1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "activities_developed",
+   "fieldtype": "Data",
+   "label": "Activities Developed",
+   "default": "500+"
+  },
+  {
+   "fieldname": "column_break_impact2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "partner_schools",
+   "fieldtype": "Data",
+   "label": "Partner Schools",
+   "default": "50+"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "issingle": 1,
+ "links": [],
+ "modified": "2026-02-03 23:35:00.000000",
+ "modified_by": "Administrator",
+ "module": "Leapp",
+ "name": "About Page",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

@@ -7,6 +7,9 @@ def get_context(context):
     # Main Page Data
     context.main_page = frappe.get_single("Main Page")
     
+    # About Page Data
+    context.about_page = frappe.get_single("About Page")
+    
     # Team Members
     context.team_members = frappe.get_all(
         "Team",

@@ -64,6 +64,32 @@
     </div>
 </div>
 
+<!-- Cities Section -->
+{% if cities %}
+<div class="px-4 py-8">
+    <h2 class="text-leapp-black dark:text-white text-[22px] font-bold leading-tight tracking-[-0.015em] pb-4">
+        Explore Cities</h2>
+    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+        {% for city in cities %}
+        <a href="/courses?location={{ city.city }}" class="flex flex-col items-center gap-2 group cursor-pointer">
+            <div class="w-full aspect-square rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 shadow-md group-hover:shadow-xl transition-shadow duration-300 group-hover:scale-105 transform transition-transform">
+                {% if city.image %}
+                <img src="{{ city.image }}" 
+                     alt="{{ city.city }}" 
+                     class="w-full h-full object-cover">
+                {% else %}
+                <div class="w-full h-full flex items-center justify-center text-slate-400">
+                    <span class="text-4xl">🏙️</span>
+                </div>
+                {% endif %}
+            </div>
+            <p class="text-leapp-black dark:text-white text-sm font-medium text-center group-hover:text-leapp-yellow transition-colors">{{ city.city }}</p>
+        </a>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
 <!-- Special Offers -->
 {% if main_page.show_special_offers %}
 <div class="px-4 py-8">
@@ -99,31 +125,36 @@
 </div>
 {% endif %}
 
-<!-- Mission Section -->
+<!-- Testimonials Section -->
 <div class="px-4 py-8">
-    <h2
-        class="text-leapp-black dark:text-white text-[22px] font-bold leading-tight tracking-[-0.015em] pb-3 text-center">
-        Our Mission</h2>
-    <p class="text-center text-leapp-black/80 dark:text-slate-300 max-w-3xl mx-auto">
-        {{ main_page.aboutus_content_short or "LEAPP is dedicated to fostering a vibrant community where children can
-        discover their passions, develop essential skills, and build confidence through a diverse range of engaging
-        activities. We aim to make learning and growth an exciting adventure for every child." }}
-    </p>
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center mt-10">
-        <div>
-            <p class="text-5xl font-extrabold gradient-text">{{ courses_count }}+</p>
-            <p class="text-leapp-black/80 dark:text-slate-400 mt-2 font-medium">Courses
-                Available</p>
-        </div>
-        <div>
-            <p class="text-5xl font-extrabold gradient-text">{{ locations_count }}+</p>
-            <p class="text-leapp-black/80 dark:text-slate-400 mt-2 font-medium">Cities</p>
-        </div>
-        <div>
-            <p class="text-5xl font-extrabold gradient-text">{{ events_count }}+</p>
-            <p class="text-leapp-black/80 dark:text-slate-400 mt-2 font-medium">Events Hosted
+    <h2 class="text-leapp-black dark:text-white text-[22px] font-bold leading-tight tracking-[-0.015em] pb-4 text-center">
+        What Parents Say About Us</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+        {% for testimonial in testimonials %}
+        <div class="flex flex-col gap-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-background-dark p-6 shadow-md hover:shadow-xl transition-shadow duration-300">
+            <div class="flex items-center gap-4">
+                {% if testimonial.image %}
+                <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-12"
+                    style="background-image: url('{{ testimonial.image }}');"></div>
+                {% else %}
+                <div class="bg-leapp-yellow rounded-full size-12 flex items-center justify-center">
+                    <span class="text-leapp-black font-bold text-xl">{{ testimonial.customer_name[0] if testimonial.customer_name else "?" }}</span>
+                </div>
+                {% endif %}
+                <div>
+                    <h3 class="text-leapp-black dark:text-white font-bold">{{ testimonial.customer_name }}</h3>
+                    {% if testimonial.customer_designation %}
+                    <p class="text-slate-600 dark:text-slate-400 text-sm">{{ testimonial.customer_designation }}</p>
+                    {% endif %}
+                </div>
+            </div>
+            <p class="text-slate-600 dark:text-slate-400 text-base font-normal leading-normal italic">
+                "{{ testimonial.description }}"
             </p>
         </div>
+        {% else %}
+        <div class="col-span-full text-center text-slate-500">No testimonials available yet.</div>
+        {% endfor %}
     </div>
 </div>
 

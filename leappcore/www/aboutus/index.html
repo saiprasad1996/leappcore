@@ -51,8 +51,7 @@
                         <h3 class="text-text-light dark:text-text-dark text-lg font-bold leading-tight">Our
                             Mission</h3>
                         <p class="text-slate-600 dark:text-slate-400 text-sm font-normal leading-normal">
-                            To empower parents and educators with the tools and knowledge to support
-                            holistic child development.
+                            {{ about_page.mission_content or "To empower parents and educators with the tools and knowledge to support holistic child development." }}
                         </p>
                     </div>
                 </div>
@@ -65,8 +64,7 @@
                         <h3 class="text-text-light dark:text-text-dark text-lg font-bold leading-tight">Our
                             Vision</h3>
                         <p class="text-slate-600 dark:text-slate-400 text-sm font-normal leading-normal">
-                            A world where every child has the opportunity to reach their full potential
-                            through playful and meaningful learning experiences.
+                            {{ about_page.vision_content or "A world where every child has the opportunity to reach their full potential through playful and meaningful learning experiences." }}
                         </p>
                     </div>
                 </div>
@@ -79,8 +77,7 @@
                         <h3 class="text-text-light dark:text-text-dark text-lg font-bold leading-tight">Our
                             Values</h3>
                         <p class="text-slate-600 dark:text-slate-400 text-sm font-normal leading-normal">
-                            Inclusivity, Playfulness, and Growth are the core principles that guide our work
-                            and our platform.
+                            {{ about_page.values_content or "Inclusivity, Playfulness, and Growth are the core principles that guide our work and our platform." }}
                         </p>
                     </div>
                 </div>
@@ -93,6 +90,24 @@
                 class="text-text-light dark:text-text-dark text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-12 text-center">
                 Our Journey: Nurturing Growth, One Step at a Time</h2>
             <div class="relative w-full max-w-6xl mx-auto px-4">
+                {% if about_page.journey_items %}
+                <div class="absolute left-1/2 -translate-x-1/2 w-1 bg-yellow-400 h-full"></div>
+                {% for item in about_page.journey_items %}
+                <div class="mb-12 flex justify-between items-center w-full {% if loop.index % 2 == 0 %}left-timeline{% else %}right-timeline flex-row-reverse{% endif %}">
+                    <div class="order-1 w-5/12"></div>
+                    <div class="z-10 flex items-center order-1 bg-yellow-400 shadow-xl w-8 h-8 rounded-full">
+                        <h1 class="mx-auto font-semibold text-lg text-black">{{ loop.index }}</h1>
+                    </div>
+                    <div class="order-1 bg-yellow-100 rounded-lg shadow-xl w-5/12 px-6 py-4">
+                        <h3 class="mb-3 font-bold text-yellow-800 text-xl">{{ item.year }}: {{ item.title }}</h3>
+                        <p class="text-sm leading-snug tracking-wide text-yellow-700 text-opacity-100">
+                            {{ item.description }}
+                        </p>
+                    </div>
+                </div>
+                {% endfor %}
+                {% else %}
+                <!-- Fallback to default timeline if no journey items are configured -->
                 <div class="absolute left-1/2 -translate-x-1/2 w-1 bg-yellow-400 h-full"></div>
                 <div class="mb-12 flex justify-between items-center w-full right-timeline flex-row-reverse">
                     <div class="order-1 w-5/12"></div>
@@ -156,6 +171,7 @@
                             innovative activities, strong community support, and a dedicated team.</p>
                     </div>
                 </div>
+                {% endif %}
             </div>
         </section>
 
@@ -193,7 +209,7 @@
                     <div class="flex flex-col gap-2">
                         <h3 class="text-text-light dark:text-text-dark text-lg font-bold leading-tight">
                             Children Reached</h3>
-                        <p class="text-5xl font-bold text-primary">50,000+</p>
+                        <p class="text-5xl font-bold text-primary">{{ about_page.children_reached or "50,000+" }}</p>
                         <p class="text-slate-600 dark:text-slate-400 text-sm font-normal leading-normal">
                             Empowering young minds across diverse communities.
                         </p>
@@ -207,7 +223,7 @@
                     <div class="flex flex-col gap-2">
                         <h3 class="text-text-light dark:text-text-dark text-lg font-bold leading-tight">
                             Activities Developed</h3>
-                        <p class="text-5xl font-bold text-primary">500+</p>
+                        <p class="text-5xl font-bold text-primary">{{ about_page.activities_developed or "500+" }}</p>
                         <p class="text-slate-600 dark:text-slate-400 text-sm font-normal leading-normal">
                             Innovative and engaging resources for holistic development.
                         </p>
@@ -221,7 +237,7 @@
                     <div class="flex flex-col gap-2">
                         <h3 class="text-text-light dark:text-text-dark text-lg font-bold leading-tight">
                             Partner Schools</h3>
-                        <p class="text-5xl font-bold text-primary">50+</p>
+                        <p class="text-5xl font-bold text-primary">{{ about_page.partner_schools or "50+" }}</p>
                         <p class="text-slate-600 dark:text-slate-400 text-sm font-normal leading-normal">
                             Collaborating to integrate developmental learning into education.
                         </p>

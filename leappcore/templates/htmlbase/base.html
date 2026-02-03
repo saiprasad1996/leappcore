@@ -53,7 +53,7 @@
                     <!-- Header/Navigation -->
                     <header
                         class="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#e7eff3] dark:border-b-leapp-black px-10 py-3 sticky top-0 bg-background-light/80 dark:bg-leapp-black/80 backdrop-blur-sm z-20">
-                        <div class="flex items-center gap-4 text-leapp-black dark:text-leapp-yellow">
+                        <a href="/" class="flex items-center gap-4 text-leapp-black dark:text-leapp-yellow hover:opacity-80 transition-opacity">
                             <div class="size-8 text-leapp-yellow">
                                 <svg fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
                                     <path
@@ -65,12 +65,11 @@
                                 </svg>
                             </div>
                             <h2 class="text-xl font-bold leading-tight tracking-[-0.015em]">LEAPP</h2>
-                        </div>
+                        </a>
                         <div class="flex flex-1 justify-end gap-8">
                             <!-- Desktop Navigation -->
                             <div class="hidden md:flex items-center gap-2">
-                                <a class="px-4 py-2 rounded-lg text-sm font-medium leading-normal transition-all {% if frappe.request.path == '/' or frappe.request.path == '/index' %}bg-leapp-yellow text-leapp-black{% else %}text-leapp-black dark:text-white hover:bg-leapp-yellow/10{% endif %}"
-                                    href="/">Home</a>
+
                                 <a class="px-4 py-2 rounded-lg text-sm font-medium leading-normal transition-all {% if 'group=Learn' in (frappe.request.url or '') %}bg-leapp-yellow text-leapp-black{% else %}text-leapp-black dark:text-white hover:bg-leapp-yellow/10{% endif %}"
                                     href="/courses?group=Learn">Learn</a>
                                 <a class="px-4 py-2 rounded-lg text-sm font-medium leading-normal transition-all {% if 'group=Leisure' in (frappe.request.url or '') %}bg-leapp-yellow text-leapp-black{% else %}text-leapp-black dark:text-white hover:bg-leapp-yellow/10{% endif %}"
@@ -147,10 +146,30 @@
                                 </div>
                                 {% else %}
                                 <!-- Guest user section (hidden on mobile) -->
-                                <a href="/signup"
-                                    class="hidden md:flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-leapp-yellow text-leapp-black text-sm font-bold leading-normal tracking-[0.015em] hover:bg-leapp-yellow/90 transition-colors">
-                                    <span class="truncate">Sign Up</span>
-                                </a>
+                                <div class="hidden md:block relative" id="signup-menu-container">
+                                    <button id="signup-menu-button"
+                                        class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-lg h-10 px-4 bg-leapp-yellow text-leapp-black text-sm font-bold leading-normal tracking-[0.015em] hover:bg-leapp-yellow/90 transition-colors">
+                                        <span class="truncate">Sign Up</span>
+                                        <span class="material-symbols-outlined text-lg">expand_more</span>
+                                    </button>
+                                    
+                                    <!-- Signup Dropdown Menu -->
+                                    <div id="signup-dropdown"
+                                        class="hidden absolute right-0 mt-2 w-48 rounded-lg shadow-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 overflow-hidden z-50">
+                                        <div class="py-1">
+                                            <a href="/signup"
+                                                class="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                                                <span class="material-symbols-outlined text-lg">school</span>
+                                                <span>For Learners</span>
+                                            </a>
+                                            <a href="/signup/partner"
+                                                class="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                                                <span class="material-symbols-outlined text-lg">handshake</span>
+                                                <span>For Partners</span>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
                                 <a href="/login"
                                     class="hidden md:flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-leapp-black/10 dark:bg-leapp-yellow/20 text-leapp-black dark:text-white text-sm font-bold leading-normal tracking-[0.015em] hover:bg-leapp-black/20 dark:hover:bg-leapp-yellow/30 transition-colors">
                                     <span class="truncate">Login</span>
@@ -184,10 +203,7 @@
                                 <!-- Navigation Links -->
                                 <nav class="flex-1 overflow-y-auto p-4">
                                     <div class="space-y-2">
-                                        <a href="/" class="flex items-center gap-3 px-4 py-3 rounded-lg transition-colors {% if frappe.request.path == '/' or frappe.request.path == '/index' %}bg-leapp-yellow/20 text-leapp-yellow{% else %}text-leapp-black dark:text-white hover:bg-leapp-yellow/10{% endif %}">
-                                            <span class="material-symbols-outlined">home</span>
-                                            <span class="font-medium">Home</span>
-                                        </a>
+
                                         <a href="/courses?group=Learn" class="flex items-center gap-3 px-4 py-3 rounded-lg transition-colors {% if 'group=Learn' in (frappe.request.url or '') %}bg-leapp-yellow/20 text-leapp-yellow{% else %}text-leapp-black dark:text-white hover:bg-leapp-yellow/10{% endif %}">
                                             <span class="material-symbols-outlined">school</span>
                                             <span class="font-medium">Learn</span>
@@ -228,7 +244,12 @@
                                         {% else %}
                                         <div class="border-t border-gray-200 dark:border-gray-700 my-2"></div>
                                         <a href="/signup" class="flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-leapp-yellow text-leapp-black font-bold hover:bg-leapp-yellow/90 transition-colors">
-                                            <span>Sign Up</span>
+                                            <span class="material-symbols-outlined">school</span>
+                                            <span>Sign Up as Learner</span>
+                                        </a>
+                                        <a href="/signup/partner" class="flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-leapp-yellow/80 text-leapp-black font-bold hover:bg-leapp-yellow/70 transition-colors">
+                                            <span class="material-symbols-outlined">handshake</span>
+                                            <span>Sign Up as Partner</span>
                                         </a>
                                         <a href="/login" class="flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-leapp-black/10 dark:bg-leapp-yellow/20 text-leapp-black dark:text-white font-bold hover:bg-leapp-black/20 dark:hover:bg-leapp-yellow/30 transition-colors">
                                             <span>Login</span>
@@ -373,6 +394,32 @@
             document.addEventListener('keydown', (e) => {
                 if (e.key === 'Escape') {
                     userDropdown.classList.add('hidden');
+                }
+            });
+        }
+
+        // Signup dropdown menu
+        const signupMenuButton = document.getElementById('signup-menu-button');
+        const signupDropdown = document.getElementById('signup-dropdown');
+        const signupMenuContainer = document.getElementById('signup-menu-container');
+
+        if (signupMenuButton && signupDropdown) {
+            signupMenuButton.addEventListener('click', (e) => {
+                e.stopPropagation();
+                signupDropdown.classList.toggle('hidden');
+            });
+
+            // Close dropdown when clicking outside
+            document.addEventListener('click', (e) => {
+                if (signupMenuContainer && !signupMenuContainer.contains(e.target)) {
+                    signupDropdown.classList.add('hidden');
+                }
+            });
+
+            // Close dropdown when pressing Escape
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    signupDropdown.classList.add('hidden');
                 }
             });
         }

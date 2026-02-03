@@ -75,9 +75,10 @@ def get_doctype_categories():
         {
             "name": "Website Management",
             "doctypes": [
-                {"name": "Main Page", "icon": "home", "label": "Main Page", "href": "/app/main-page"},
-                # {"name": "Website Menu", "icon": "menu", "label": "Website Menus", "href": "/app/websitemenu"},
-                # {"name": "Website Submenu", "icon": "menu_open", "label": "Website Submenus", "href": "/app/website-submenu"},
+                {"label": "Main Page", "icon": "home", "href": "/app/main-page"},
+                {"label": "About Page", "icon": "info", "href": "/app/about-page"},
+                {"label": "Team", "icon": "groups", "href": "/app/team"},
+                {"label": "Testimonials", "icon": "star", "href": "/app/testimonials"},
             ]
         },
         {
