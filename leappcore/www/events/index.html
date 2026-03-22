@@ -24,6 +24,7 @@
         <!-- Filters and Search Bar -->
         <div class="mb-8 space-y-4">
             <form method="get" action="/events" class="flex flex-col md:flex-row gap-4">
+                <input type="hidden" name="view" value="{{ view_mode }}" />
                 <!-- Search Input -->
                 <div class="flex-1">
                     <div class="relative">
@@ -37,12 +38,26 @@
                     </div>
                 </div>
 
-                <!-- Area Filter -->
-                <div class="w-full md:w-64">
+                <!-- City Filter -->
+                <div class="w-full md:w-56">
+                    <select
+                        name="location"
+                        onchange="this.form.submit()"
+                        class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark text-leapp-black dark:text-white focus:border-leapp-yellow focus:outline-0 focus:ring-2 focus:ring-leapp-yellow/50">
+                        <option value="">All Cities</option>
+                        {% for loc in locations %}
+                        <option value="{{ loc.name }}" {% if loc.name == location_filter %}selected{% endif %}>{{ loc.city }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Area Filter (options limited to selected city when set) -->
+                <div class="w-full md:w-56">
                     <select
                         name="area"
                         onchange="this.form.submit()"
-                        class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark text-leapp-black dark:text-white focus:border-leapp-yellow focus:outline-0 focus:ring-2 focus:ring-leapp-yellow/50">
+                        class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark text-leapp-black dark:text-white focus:border-leapp-yellow focus:outline-0 focus:ring-2 focus:ring-leapp-yellow/50"
+                        {% if location_filter and areas|length == 0 %}disabled title="No areas in this city"{% endif %}>
                         <option value="">All Areas</option>
                         {% for area in areas %}
                         <option value="{{ area.name }}" {% if area.name in area_filter %}selected{% endif %}>{{ area.area_name }}</option>
@@ -111,6 +126,24 @@
                     <p class="text-sm text-gray-600 dark:text-gray-400 mb-4 line-clamp-2">{{ event.short_description }}</p>
                     {% endif %}
 
+                    {% if event.categories and event.categories|length > 0 %}
+                    <div class="flex gap-2 mb-3 flex-wrap">
+                        {% for category in (event.categories or [])[:5] %}
+                        <span class="text-xs font-medium text-leapp-black dark:text-white px-2 py-1 rounded-full bg-leapp-yellow/20 border border-leapp-yellow/30">{{ category }}</span>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    {% if event.city or event.area_name %}
+                    <div class="flex gap-1.5 mb-4 flex-wrap items-center">
+                        {% if event.city %}
+                        <span class="text-xs text-slate-700 dark:text-slate-200 px-2 py-0.5 rounded-full bg-slate-200 dark:bg-slate-700">{{ event.city }}</span>
+                        {% endif %}
+                        {% if event.area_name %}
+                        <span class="text-xs text-slate-700 dark:text-slate-200 px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-600">{{ event.area_name }}</span>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+
                     <!-- Event Details -->
                     <div class="space-y-2 mb-4 text-sm">
                         {% if event.start_datetime %}
@@ -167,6 +200,24 @@
 
                                 {% if event.short_description %}
                                 <p class="text-sm text-gray-600 dark:text-gray-400 mb-4 line-clamp-2">{{ event.short_description }}</p>
+                                {% endif %}
+
+                                {% if event.categories and event.categories|length > 0 %}
+                                <div class="flex gap-2 mb-3 flex-wrap">
+                                    {% for category in (event.categories or [])[:6] %}
+                                    <span class="text-xs font-medium text-leapp-black dark:text-white px-2 py-1 rounded-full bg-leapp-yellow/20 border border-leapp-yellow/30">{{ category }}</span>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                                {% if event.city or event.area_name %}
+                                <div class="flex gap-1.5 mb-4 flex-wrap items-center">
+                                    {% if event.city %}
+                                    <span class="text-xs text-slate-700 dark:text-slate-200 px-2 py-0.5 rounded-full bg-slate-200 dark:bg-slate-700">{{ event.city }}</span>
+                                    {% endif %}
+                                    {% if event.area_name %}
+                                    <span class="text-xs text-slate-700 dark:text-slate-200 px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-600">{{ event.area_name }}</span>
+                                    {% endif %}
+                                </div>
                                 {% endif %}
 
                                 <!-- Event Details -->
@@ -239,13 +290,13 @@
             </div>
             <h2 class="text-2xl font-bold text-leapp-black dark:text-white mb-3">No Events Found</h2>
             <p class="text-gray-600 dark:text-gray-400 mb-6">
-                {% if search_query or area_filter %}
+                {% if search_query or area_filter or location_filter %}
                 Try adjusting your filters or search query.
                 {% else %}
                 Check back soon for upcoming events.
                 {% endif %}
             </p>
-            {% if search_query or area_filter %}
+            {% if search_query or area_filter or location_filter %}
             <a href="/events" class="inline-flex items-center gap-2 px-6 py-3 bg-leapp-yellow text-leapp-black rounded-xl font-bold hover:bg-leapp-yellow/90 transition-all">
                 <span class="material-symbols-outlined">refresh</span>
                 <span>Clear Filters</span>

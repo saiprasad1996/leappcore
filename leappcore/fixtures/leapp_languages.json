@@ -1,0 +1,42 @@
+[
+ {
+  "docstatus": 0,
+  "doctype": "Leapp Languages",
+  "language": "English",
+  "modified": "2026-03-22 13:15:39.884315",
+  "name": "English",
+  "symbol": "en"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Leapp Languages",
+  "language": "Hindi",
+  "modified": "2026-03-22 13:15:56.165940",
+  "name": "Hindi",
+  "symbol": "hi"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Leapp Languages",
+  "language": "Odia",
+  "modified": "2026-03-22 13:16:07.394319",
+  "name": "Odia",
+  "symbol": "od"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Leapp Languages",
+  "language": "Telugu",
+  "modified": "2026-03-22 13:16:19.797030",
+  "name": "Telugu",
+  "symbol": "tel"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Leapp Languages",
+  "language": "Bengali",
+  "modified": "2026-03-22 13:16:27.889933",
+  "name": "Bengali",
+  "symbol": "be"
+ }
+]

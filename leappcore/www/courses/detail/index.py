@@ -71,6 +71,13 @@ def _load_offering(offering_id: str):
             }
         )
 
+    # Fetch languages from Table MultiSelect child rows
+    languages = []
+    for row in doc.get("language") or []:
+        lang_name = frappe.db.get_value("Language", row.language, "language_name") or row.language
+        if lang_name:
+            languages.append(lang_name)
+
     # Fetch areas
     areas = []
     for row in doc.get("areas") or []:
@@ -83,6 +90,13 @@ def _load_offering(offering_id: str):
         category_name = frappe.db.get_value("Offering Category", row.offering_category, "category_name") or row.offering_category
         categories.append(category_name)
 
+    packages = frappe.get_all(
+        "Offering Price",
+        filters={"parent": doc.name},
+        fields=["package_name", "amount", "currency", "billing_type"],
+        order_by="idx asc",
+    )
+
     return {
         "name": doc.name,
         "title": doc.title,
@@ -90,15 +104,18 @@ def _load_offering(offering_id: str):
         "description": description_paragraphs,
         "image": doc.image or placeholder_image,
         "price": doc.price or 0,
+        "negotiable": bool(doc.negotiable),
         "duration_hours": doc.duration_hours,
-        "level": doc.level,
-        "language": doc.language or "",
+        "levels": [row.skill for row in (doc.get("level") or [])],
+        "languages": languages,
         "total_sessions": doc.total_sessions,
         "highlights": highlights,
         "instructors": instructors,
         "program_outline": program_outline,
         "areas": areas,
         "categories": categories,
+        "address": doc.address or "",
+        "packages": packages,
     }
 
 
@@ -106,10 +123,16 @@ def _default_highlights(doc):
     parts = []
     if doc.duration_hours:
         parts.append({"icon": "schedule", "label": "Duration", "value": f"{doc.duration_hours} hours"})
-    if doc.level:
-        parts.append({"icon": "bar_chart", "label": "Level", "value": doc.level})
-    if doc.language:
-        parts.append({"icon": "translate", "label": "Language", "value": doc.language})
+    level_names = [row.skill for row in (doc.get("level") or [])]
+    if level_names:
+        parts.append({"icon": "bar_chart", "label": "Level", "value": ", ".join(level_names)})
+    lang_names = []
+    for row in (doc.get("language") or []):
+        lang_name = frappe.db.get_value("Language", row.language, "language_name") or row.language
+        if lang_name:
+            lang_names.append(lang_name)
+    if lang_names:
+        parts.append({"icon": "translate", "label": "Language", "value": ", ".join(lang_names)})
     if doc.total_sessions:
         parts.append({"icon": "list_alt", "label": "Sessions", "value": f"{doc.total_sessions} Sessions"})
     return parts

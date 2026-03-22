@@ -8,6 +8,7 @@
  "field_order": [
   "event_name",
   "organizer",
+  "location",
   "area",
   "heading",
   "start_datetime",
@@ -17,7 +18,9 @@
   "column_break_bwvs",
   "short_description",
   "long_description",
-  "venue_address"
+  "venue_address",
+  "section_break_idmq",
+  "category"
  ],
  "fields": [
   {
@@ -87,11 +90,27 @@
   {
    "fieldname": "column_break_bwvs",
    "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_idmq",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "category",
+   "fieldtype": "Table",
+   "label": "Category",
+   "options": "Leapp Event Category Table"
+  },
+  {
+   "fieldname": "location",
+   "fieldtype": "Link",
+   "label": "City",
+   "options": "Location"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-12-21 14:55:20.216528",
+ "modified": "2026-03-22 14:20:50.340044",
  "modified_by": "Administrator",
  "module": "Leapp",
  "name": "Leapp Event",

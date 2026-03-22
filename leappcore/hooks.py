@@ -246,8 +246,12 @@ app_license = "gpl-3.0"
 # }
 
 
+favicon = "/assets/leappcore/images/leapp_favicon.png"
+
 
 fixtures = [
     {"dt": "Role", "filters": [["name", "in", ["Leapp Customer", "Leapp Partner"]]]},
     {"dt": "Custom DocPerm", "filters": [["role", "in", ["Leapp Customer", "Leapp Partner"]]]},
+    "Leapp Languages",
+    "Offering skills"
 ]

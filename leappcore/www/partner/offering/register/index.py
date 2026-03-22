@@ -52,6 +52,8 @@ def get_context(context):
     context.categories = get_categories()
     context.areas = get_areas()
     context.instructors = get_instructors()
+    context.languages = get_languages()
+    context.skill_levels = get_skill_levels()
     
     return context
 
@@ -71,10 +73,12 @@ def get_empty_offering():
         "price": 0,
         "duration_hours": 0,
         "level": "Beginner",
-        "language": "",
+        "levels": [],
+        "languages": [],
         "total_sessions": 0,
         "active": 0,
         "featured": 0,
+        "address": "",
         "categories": [],
         "areas": [],
         "highlights": [],
@@ -102,6 +106,9 @@ def load_offering(offering_id):
     data["categories"] = [row.offering_category for row in offering.categories]
     data["areas"] = [row.area for row in offering.areas]
     data["instructors"] = [row.instructor for row in offering.instructors]
+    data["languages"] = [row.language for row in (offering.language or [])]
+    data["address"] = offering.address or ""
+    data["levels"] = [row.skill for row in (offering.level or [])]
     
     data["highlights"] = [{
         "order_no": row.order_no or 0,
@@ -164,6 +171,25 @@ def get_areas():
     return areas
 
 
+def get_languages():
+    """Get all languages from the Language doctype"""
+    languages = frappe.get_all(
+        "Language",
+        fields=["name", "language_name"],
+        order_by="language_name"
+    )
+    return languages
+
+def get_skill_levels():
+    """Get all skill levels from the Offering skills doctype"""
+    return frappe.get_all(
+        "Offering skills",
+        fields=["name", "skill"],
+        order_by="skill"
+    )
+
+
+
 def get_instructors():
     """Get users who can be instructors (Leapp Partners)"""
     instructors = frappe.get_all(
@@ -186,7 +212,9 @@ def save_offering(offering_id=None):
     price = frappe.form_dict.get("price", 0)
     duration_hours = frappe.form_dict.get("duration_hours", 0)
     level = frappe.form_dict.get("level", "Beginner")
-    language = frappe.form_dict.get("language", "")
+    levels = json.loads(frappe.form_dict.get("levels", "[]"))
+    languages = json.loads(frappe.form_dict.get("languages", "[]"))
+    address = frappe.form_dict.get("address", "")
     total_sessions = frappe.form_dict.get("total_sessions", 0)
     active = 1 if frappe.form_dict.get("active") else 0
     featured = 1 if frappe.form_dict.get("featured") else 0
@@ -218,15 +246,17 @@ def save_offering(offering_id=None):
         offering.price = price
         offering.duration_hours = duration_hours
         offering.level = level
-        offering.language = language
         offering.total_sessions = total_sessions
         offering.active = active
         offering.featured = featured
+        offering.address = address
         
         # Clear and rebuild child tables
         offering.categories = []
         offering.areas = []
         offering.instructors = []
+        offering.level = []
+        offering.language = []
         offering.highlights = []
         offering.program_outline = []
         offering.prices = []
@@ -243,7 +273,7 @@ def save_offering(offering_id=None):
             "price": price,
             "duration_hours": duration_hours,
             "level": level,
-            "language": language,
+            "address": address,
             "total_sessions": total_sessions,
             "active": active,
             "featured": featured
@@ -261,6 +291,14 @@ def save_offering(offering_id=None):
     for inst in instructors:
         if inst:
             offering.append("instructors", {"instructor": inst})
+
+    for lang in languages:
+        if lang:
+            offering.append("language", {"language": lang})
+
+    for lvl in levels:
+        if lvl:
+            offering.append("level", {"skill": lvl})
     
     for h in highlights:
         if h.get("label") or h.get("value"):

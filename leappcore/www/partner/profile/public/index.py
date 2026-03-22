@@ -81,7 +81,7 @@ def get_partner_offerings(partner_id):
             "active": 1
         },
         fields=[
-            "name", "title", "subtitle", "image", "price", 
+            "name", "title", "subtitle", "image", "price", "negotiable",
             "duration_hours", "level", "total_sessions"
         ],
         order_by="creation desc",

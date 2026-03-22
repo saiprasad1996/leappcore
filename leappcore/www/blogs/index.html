@@ -1,0 +1,117 @@
+{% extends 'templates/htmlbase/base.html' %}
+
+{% block head %}
+<style>
+    .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+    .blog-content img {
+        max-width: 100%;
+        border-radius: 0.75rem;
+        margin: 1.5rem 0;
+    }
+    .blog-content p { margin-bottom: 1rem; line-height: 1.8; }
+    .blog-content h1, .blog-content h2, .blog-content h3 {
+        font-weight: 700;
+        margin: 1.5rem 0 0.75rem;
+    }
+    .blog-content ul, .blog-content ol {
+        padding-left: 1.5rem;
+        margin-bottom: 1rem;
+    }
+    .blog-content li { margin-bottom: 0.25rem; }
+    .blog-content a { color: #ffc700; text-decoration: underline; }
+    .blog-content blockquote {
+        border-left: 4px solid #ffc700;
+        padding-left: 1rem;
+        margin: 1.5rem 0;
+        color: #6b7280;
+        font-style: italic;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="flex-1 w-full bg-background-light dark:bg-background-dark text-leapp-black dark:text-white">
+
+    {% if show_404 %}
+    <!-- 404 -->
+    <div class="w-full min-h-[80vh] flex items-center justify-center px-4 py-16">
+        <div class="max-w-lg w-full text-center space-y-6">
+            <span class="material-symbols-outlined text-leapp-yellow" style="font-size: 96px; font-variation-settings: 'FILL' 1, 'wght' 300, 'GRAD' 0, 'opsz' 48;">article</span>
+            <h1 class="text-7xl font-black gradient-text">404</h1>
+            <h2 class="text-3xl font-bold text-leapp-black dark:text-white">Article Not Found</h2>
+            <p class="text-slate-600 dark:text-slate-400">
+                We couldn't find the article you're looking for. It may have been removed or is no longer published.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center pt-2">
+                <a href="/blogs/list"
+                   class="flex items-center justify-center gap-2 px-8 py-4 bg-leapp-yellow text-leapp-black rounded-xl font-bold hover:bg-leapp-yellow/90 transition-all shadow-lg hover:scale-105">
+                    <span class="material-symbols-outlined">article</span>
+                    Browse All Articles
+                </a>
+                <a href="/"
+                   class="flex items-center justify-center gap-2 px-8 py-4 bg-leapp-black/10 dark:bg-leapp-yellow/20 text-leapp-black dark:text-white rounded-xl font-bold hover:bg-leapp-black/20 dark:hover:bg-leapp-yellow/30 transition-all">
+                    <span class="material-symbols-outlined">home</span>
+                    Go to Home
+                </a>
+            </div>
+        </div>
+    </div>
+
+    {% else %}
+    <!-- Blog Detail -->
+    <div class="w-full px-4 sm:px-6 lg:px-8 py-8">
+        <div class="max-w-3xl mx-auto">
+
+            <!-- Breadcrumbs -->
+            <div class="flex flex-wrap gap-2 mb-6 text-sm text-slate-500 dark:text-slate-400">
+                <a class="hover:text-leapp-yellow transition-colors" href="/">Home</a>
+                <span>/</span>
+                <a class="hover:text-leapp-yellow transition-colors" href="/blogs/list">News &amp; Blogs</a>
+                <span>/</span>
+                <span class="text-leapp-black dark:text-white truncate max-w-[200px]">{{ blog.title }}</span>
+            </div>
+
+            <!-- Hero Image -->
+            {% if blog.image %}
+            <div class="w-full rounded-2xl overflow-hidden mb-8 shadow-lg">
+                <img src="{{ blog.image }}" alt="{{ blog.title }}" class="w-full object-cover max-h-[480px]" />
+            </div>
+            {% endif %}
+
+            <!-- Title & Meta -->
+            <h1 class="text-3xl sm:text-4xl font-black text-leapp-black dark:text-white leading-tight mb-4">
+                {{ blog.title }}
+            </h1>
+            <div class="flex flex-wrap items-center gap-4 text-sm text-slate-500 dark:text-slate-400 mb-8 pb-8 border-b border-slate-200 dark:border-slate-800">
+                <span class="flex items-center gap-1.5">
+                    <span class="material-symbols-outlined text-base">person</span>
+                    {{ blog.author or "Unknown Author" }}
+                </span>
+                <span class="flex items-center gap-1.5">
+                    <span class="material-symbols-outlined text-base">calendar_today</span>
+                    {{ frappe.utils.formatdate(blog.creation, "long") }}
+                </span>
+            </div>
+
+            <!-- Content -->
+            <div class="blog-content text-leapp-black dark:text-white text-base leading-relaxed">
+                {{ blog.long_description or "" }}
+            </div>
+
+            <!-- Back Link -->
+            <div class="mt-12 pt-8 border-t border-slate-200 dark:border-slate-800">
+                <a href="/blogs/list"
+                   class="inline-flex items-center gap-2 px-6 py-3 bg-leapp-yellow text-leapp-black rounded-xl font-bold hover:bg-leapp-yellow/90 transition-all">
+                    <span class="material-symbols-outlined">arrow_back</span>
+                    Back to All Articles
+                </a>
+            </div>
+
+        </div>
+    </div>
+    {% endif %}
+
+</main>
+{% endblock %}

@@ -31,7 +31,7 @@
                         <div class="space-y-2 pb-2 max-h-[200px] overflow-y-auto">
                             {% for category in categories[:10] %}
                             <label class="flex items-center gap-2 text-slate-600 dark:text-slate-400 text-sm">
-                                <input class="form-checkbox rounded bg-slate-100 dark:bg-slate-800 border-slate-300 dark:border-slate-700 text-leapp-yellow focus:ring-leapp-yellow" type="checkbox" name="category" value="{{ category.category_name }}" {% if category.category_name in category_filter %}checked{% endif %}/>
+                                <input class="form-checkbox rounded bg-slate-100 dark:bg-slate-800 border-slate-300 dark:border-slate-700 text-leapp-yellow focus:ring-leapp-yellow" type="checkbox" name="category" value="{{ category.name }}" {% if category.name in category_filter %}checked{% endif %}/>
                                 {{ category.category_name }}
                             </label>
                             {% endfor %}
@@ -100,12 +100,36 @@
                         </div>
                         <div>
                             <p class="text-leapp-black dark:text-white text-lg font-bold leading-normal">{{ offering.title }}</p>
-                            <p class="text-slate-600 dark:text-slate-400 text-sm font-normal leading-normal mt-1 line-clamp-2">{{ offering.description }}</p>
-                            <div class="flex gap-2 mt-3 flex-wrap">
-                                {% for category in offering.categories[:3] %}
-                                <span class="text-xs text-leapp-yellow bg-leapp-yellow/20 px-2 py-1 rounded-full">{{ category }}</span>
+                            {% if offering.subtitle %}
+                            <p class="text-sm text-slate-600 dark:text-slate-400 mt-1 line-clamp-2">{{ offering.subtitle }}</p>
+                            {% endif %}
+                            <div class="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-slate-600 dark:text-slate-400">
+                                {% if offering.negotiable %}
+                                <span class="font-semibold text-leapp-yellow">Price on request</span>
+                                {% else %}
+                                <span class="font-semibold text-leapp-black dark:text-white">₹{{ "%.0f"|format(offering.price or 0) }}</span>
+                                {% endif %}
+                                {% if offering.duration_hours %}
+                                <span class="inline-flex items-center gap-1"><span class="material-symbols-outlined text-base">schedule</span>{{ offering.duration_hours }} hrs</span>
+                                {% endif %}
+                            </div>
+                            <div class="flex gap-2 mt-2 flex-wrap">
+                                {% for category in (offering.categories or [])[:5] %}
+                                <span class="text-xs font-medium text-leapp-black dark:text-white px-2 py-1 rounded-full bg-leapp-yellow/20 border border-leapp-yellow/30">{{ category }}</span>
                                 {% endfor %}
                             </div>
+                            {% if offering.locations and offering.locations|length > 0 %}
+                            <div class="flex gap-1.5 mt-2 flex-wrap items-center">
+                                {% for loc in (offering.locations or [])[:4] %}
+                                {% if loc.city %}
+                                <span class="text-xs text-slate-700 dark:text-slate-200 px-2 py-0.5 rounded-full bg-slate-200 dark:bg-slate-700">{{ loc.city }}</span>
+                                {% endif %}
+                                {% if loc.area %}
+                                <span class="text-xs text-slate-700 dark:text-slate-200 px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-600">{{ loc.area }}</span>
+                                {% endif %}
+                                {% endfor %}
+                            </div>
+                            {% endif %}
                             <a href="{{ offering.detail_url }}" class="w-full mt-4 flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-9 px-4 bg-leapp-yellow text-leapp-black text-sm font-bold leading-normal tracking-[0.015em]">
                                 View Details
                             </a>
@@ -133,20 +157,38 @@
                         <div class="flex-1 flex flex-col justify-between">
                             <div>
                                 <h3 class="text-leapp-black dark:text-white text-xl font-bold leading-tight">{{ offering.title }}</h3>
-                                <p class="text-slate-600 dark:text-slate-400 text-sm font-normal leading-normal mt-2 line-clamp-2">{{ offering.description }}</p>
-                                <div class="flex gap-2 mt-3 flex-wrap">
-                                    {% for category in offering.categories[:5] %}
-                                    <span class="text-xs text-leapp-yellow bg-leapp-yellow/20 px-2 py-1 rounded-full">{{ category }}</span>
+                                {% if offering.subtitle %}
+                                <p class="text-slate-600 dark:text-slate-400 text-sm mt-1 line-clamp-2">{{ offering.subtitle }}</p>
+                                {% endif %}
+                                <div class="flex flex-wrap items-center gap-x-3 gap-y-1 mt-2 text-sm text-slate-600 dark:text-slate-400">
+                                    {% if offering.negotiable %}
+                                    <span class="font-semibold text-leapp-yellow">Price on request</span>
+                                    {% else %}
+                                    <span class="font-semibold text-leapp-black dark:text-white">₹{{ "%.0f"|format(offering.price or 0) }}</span>
+                                    {% endif %}
+                                    {% if offering.duration_hours %}
+                                    <span class="inline-flex items-center gap-1"><span class="material-symbols-outlined text-base">schedule</span>{{ offering.duration_hours }} hrs</span>
+                                    {% endif %}
+                                </div>
+                                <div class="flex gap-2 mt-2 flex-wrap">
+                                    {% for category in (offering.categories or [])[:6] %}
+                                    <span class="text-xs font-medium text-leapp-black dark:text-white px-2 py-1 rounded-full bg-leapp-yellow/20 border border-leapp-yellow/30">{{ category }}</span>
                                     {% endfor %}
                                 </div>
+                                {% if offering.locations and offering.locations|length > 0 %}
+                                <div class="flex gap-1.5 mt-2 flex-wrap items-center">
+                                    {% for loc in (offering.locations or [])[:5] %}
+                                    {% if loc.city %}
+                                    <span class="text-xs text-slate-700 dark:text-slate-200 px-2 py-0.5 rounded-full bg-slate-200 dark:bg-slate-700">{{ loc.city }}</span>
+                                    {% endif %}
+                                    {% if loc.area %}
+                                    <span class="text-xs text-slate-700 dark:text-slate-200 px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-600">{{ loc.area }}</span>
+                                    {% endif %}
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
                             </div>
                             <div class="mt-4 sm:mt-0 flex items-center gap-4">
-                                {% if offering.duration_hours %}
-                                <span class="text-slate-600 dark:text-slate-400 text-sm">
-                                    <span class="material-symbols-outlined text-base align-middle">schedule</span>
-                                    {{ offering.duration_hours }} hrs
-                                </span>
-                                {% endif %}
                                 <a href="{{ offering.detail_url }}" class="ml-auto flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-9 px-4 bg-leapp-yellow text-leapp-black text-sm font-bold leading-normal tracking-[0.015em]">
                                     View Details
                                 </a>

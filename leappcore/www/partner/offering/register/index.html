@@ -135,6 +135,13 @@
                                 class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark p-[15px] text-base font-normal leading-normal text-leapp-black dark:text-white placeholder:text-gray-400 focus:border-leapp-yellow focus:outline-0 focus:ring-2 focus:ring-leapp-yellow/50"
                                 placeholder="Detailed description of your offering">{{ offering.description or '' }}</textarea>
                         </label>
+
+                        <label class="flex flex-col">
+                            <p class="text-leapp-black dark:text-white text-base font-medium leading-normal pb-2">Address</p>
+                            <textarea name="address" rows="3"
+                                class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark p-[15px] text-base font-normal leading-normal text-leapp-black dark:text-white placeholder:text-gray-400 focus:border-leapp-yellow focus:outline-0 focus:ring-2 focus:ring-leapp-yellow/50"
+                                placeholder="e.g., 42, MG Road, Bengaluru, Karnataka 560001">{{ offering.address or '' }}</textarea>
+                        </label>
                         
                         <!-- Image Upload -->
                         <div class="flex flex-col">
@@ -184,16 +191,18 @@
                         </div>
                         
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <label class="flex flex-col">
-                                <p class="text-leapp-black dark:text-white text-base font-medium leading-normal pb-2">Skill Level</p>
-                                <select name="level"
-                                    class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark h-14 p-[15px] text-base font-normal leading-normal text-leapp-black dark:text-white focus:border-leapp-yellow focus:outline-0 focus:ring-2 focus:ring-leapp-yellow/50">
-                                    <option value="Beginner" {% if offering.level == 'Beginner' %}selected{% endif %}>Beginner</option>
-                                    <option value="Intermediate" {% if offering.level == 'Intermediate' %}selected{% endif %}>Intermediate</option>
-                                    <option value="Advanced" {% if offering.level == 'Advanced' %}selected{% endif %}>Advanced</option>
+                            <div class="flex flex-col">
+                                <p class="text-leapp-black dark:text-white text-base font-medium leading-normal pb-2">Skill Level(s)</p>
+                                <select id="levels-select" multiple
+                                    class="form-input w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark p-3 text-base text-leapp-black dark:text-white focus:border-leapp-yellow focus:outline-0 focus:ring-2 focus:ring-leapp-yellow/50 min-h-[120px]">
+                                    {% for sl in skill_levels %}
+                                    <option value="{{ sl.name }}" {% if sl.name in (offering.levels or []) %}selected{% endif %}>{{ sl.skill or sl.name }}</option>
+                                    {% endfor %}
                                 </select>
-                            </label>
-                            
+                                <input type="hidden" name="levels" id="levels-input" value='{{ (offering.levels or []) | tojson }}'>
+                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Hold Ctrl/Cmd to select multiple</p>
+                            </div>
+
                             <label class="flex flex-col">
                                 <p class="text-leapp-black dark:text-white text-base font-medium leading-normal pb-2">Total Sessions</p>
                                 <input name="total_sessions" value="{{ offering.total_sessions or 0 }}" type="number" min="0"
@@ -201,35 +210,17 @@
                                     placeholder="0" />
                             </label>
                         </div>
-                        
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <label class="flex flex-col">
-                                <p class="text-leapp-black dark:text-white text-base font-medium leading-normal pb-2">Language</p>
-                                <select name="language"
-                                    class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark h-14 p-[15px] text-base font-normal leading-normal text-leapp-black dark:text-white focus:border-leapp-yellow focus:outline-0 focus:ring-2 focus:ring-leapp-yellow/50">
-                                    <option value="">Select Language</option>
-                                    <option value="Arabic" {% if offering.language == 'Arabic' %}selected{% endif %}>Arabic</option>
-                                    <option value="Bengali" {% if offering.language == 'Bengali' %}selected{% endif %}>Bengali</option>
-                                    <option value="English" {% if offering.language == 'English' %}selected{% endif %}>English</option>
-                                    <option value="French" {% if offering.language == 'French' %}selected{% endif %}>French</option>
-                                    <option value="German" {% if offering.language == 'German' %}selected{% endif %}>German</option>
-                                    <option value="Gujarati" {% if offering.language == 'Gujarati' %}selected{% endif %}>Gujarati</option>
-                                    <option value="Hindi" {% if offering.language == 'Hindi' %}selected{% endif %}>Hindi</option>
-                                    <option value="Italian" {% if offering.language == 'Italian' %}selected{% endif %}>Italian</option>
-                                    <option value="Japanese" {% if offering.language == 'Japanese' %}selected{% endif %}>Japanese</option>
-                                    <option value="Mandarin Chinese" {% if offering.language == 'Mandarin Chinese' %}selected{% endif %}>Mandarin Chinese</option>
-                                    <option value="Malayalam" {% if offering.language == 'Malayalam' %}selected{% endif %}>Malayalam</option>
-                                    <option value="Marathi" {% if offering.language == 'Marathi' %}selected{% endif %}>Marathi</option>
-                                    <option value="Odia" {% if offering.language == 'Odia' %}selected{% endif %}>Odia</option>
-                                    <option value="Portuguese" {% if offering.language == 'Portuguese' %}selected{% endif %}>Portuguese</option>
-                                    <option value="Punjabi" {% if offering.language == 'Punjabi' %}selected{% endif %}>Punjabi</option>
-                                    <option value="Russian" {% if offering.language == 'Russian' %}selected{% endif %}>Russian</option>
-                                    <option value="Spanish" {% if offering.language == 'Spanish' %}selected{% endif %}>Spanish</option>
-                                    <option value="Tamil" {% if offering.language == 'Tamil' %}selected{% endif %}>Tamil</option>
-                                    <option value="Telugu" {% if offering.language == 'Telugu' %}selected{% endif %}>Telugu</option>
-                                    <option value="Urdu" {% if offering.language == 'Urdu' %}selected{% endif %}>Urdu</option>
-                                </select>
-                            </label>
+
+                        <div class="flex flex-col">
+                            <p class="text-leapp-black dark:text-white text-base font-medium leading-normal pb-2">Language(s)</p>
+                            <select id="languages-select" multiple
+                                class="form-input w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark p-3 text-base text-leapp-black dark:text-white focus:border-leapp-yellow focus:outline-0 focus:ring-2 focus:ring-leapp-yellow/50 min-h-[120px]">
+                                {% for lang in languages %}
+                                <option value="{{ lang.name }}" {% if lang.name in (offering.languages or []) %}selected{% endif %}>{{ lang.language_name or lang.name }}</option>
+                                {% endfor %}
+                            </select>
+                            <input type="hidden" name="languages" id="languages-input" value='{{ (offering.languages or []) | tojson }}'>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Hold Ctrl/Cmd to select multiple</p>
                         </div>
                     </div>
 
@@ -415,15 +406,6 @@
                                     <p class="text-sm text-gray-500 dark:text-gray-400">Active offerings will be visible to all users</p>
                                 </label>
                             </div>
-                            
-                            <div class="flex items-center gap-3">
-                                <input type="checkbox" id="featured" name="featured" {% if offering.featured %}checked{% endif %}
-                                    class="h-5 w-5 rounded border-gray-300 dark:border-gray-600 text-leapp-yellow focus:ring-leapp-yellow focus:ring-2" />
-                                <label for="featured" class="text-base text-gray-700 dark:text-gray-300">
-                                    <span class="font-medium">Mark as Featured</span>
-                                    <p class="text-sm text-gray-500 dark:text-gray-400">Featured offerings get highlighted on the homepage</p>
-                                </label>
-                            </div>
                         </div>
                     </div>
 
@@ -487,6 +469,16 @@
             const instSelect = document.getElementById('instructors-select');
             const selectedInst = Array.from(instSelect.selectedOptions).map(o => o.value);
             document.getElementById('instructors-input').value = JSON.stringify(selectedInst);
+            
+            // Collect levels
+            const levelsSelect = document.getElementById('levels-select');
+            const selectedLevels = Array.from(levelsSelect.selectedOptions).map(o => o.value);
+            document.getElementById('levels-input').value = JSON.stringify(selectedLevels);
+
+            // Collect languages
+            const langSelect = document.getElementById('languages-select');
+            const selectedLangs = Array.from(langSelect.selectedOptions).map(o => o.value);
+            document.getElementById('languages-input').value = JSON.stringify(selectedLangs);
             
             // Collect highlights
             const highlights = [];

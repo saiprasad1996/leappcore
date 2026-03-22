@@ -127,7 +127,11 @@
                         <h3 class="font-bold text-leapp-black dark:text-white mb-1 group-hover:text-leapp-yellow transition-colors">{{ offering.title }}</h3>
                         <p class="text-sm text-gray-600 dark:text-gray-400 mb-3 line-clamp-2">{{ offering.subtitle or '' }}</p>
                         <div class="flex items-center justify-between">
+                            {% if offering.negotiable %}
+                            <span class="text-leapp-yellow font-bold">Price on Request</span>
+                            {% else %}
                             <span class="text-leapp-yellow font-bold">₹{{ "%.0f"|format(offering.price) }}</span>
+                            {% endif %}
                             <div class="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400">
                                 {% if offering.duration_hours %}
                                 <span class="flex items-center gap-1">

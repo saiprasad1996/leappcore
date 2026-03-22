@@ -1,49 +1,43 @@
 {
  "actions": [],
- "allow_import": 1,
  "allow_rename": 1,
- "autoname": "field:area_name",
- "creation": "2024-11-26 16:45:00",
+ "autoname": "field:language",
+ "creation": "2026-03-22 13:13:19.858551",
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
-  "location",
-  "area_pin",
-  "column_break_anik",
-  "area_name"
+  "language",
+  "column_break_xlzl",
+  "symbol"
  ],
  "fields": [
   {
-   "fieldname": "location",
-   "fieldtype": "Link",
-   "in_list_view": 1,
-   "label": "Location",
-   "options": "Location"
-  },
-  {
-   "fieldname": "area_name",
+   "fieldname": "language",
    "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "Area Name",
+   "label": "Language",
    "reqd": 1,
+   "search_index": 1,
    "unique": 1
   },
   {
-   "fieldname": "area_pin",
-   "fieldtype": "Int",
-   "label": "Area PIN"
+   "fieldname": "column_break_xlzl",
+   "fieldtype": "Column Break"
   },
   {
-   "fieldname": "column_break_anik",
-   "fieldtype": "Column Break"
+   "fieldname": "symbol",
+   "fieldtype": "Data",
+   "label": "Symbol"
   }
  ],
+ "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-03-22 14:12:42.701759",
+ "modified": "2026-03-22 13:14:29.739073",
  "modified_by": "Administrator",
  "module": "Leapp",
- "name": "Area",
+ "name": "Leapp Languages",
+ "naming_rule": "By fieldname",
  "owner": "Administrator",
  "permissions": [
   {
@@ -60,7 +54,8 @@
   }
  ],
  "row_format": "Dynamic",
- "sort_field": "modified",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "creation",
  "sort_order": "DESC",
  "states": []
 }

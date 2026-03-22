@@ -10,8 +10,8 @@
   "subtitle",
   "provider",
   "price",
-  "total_sessions",
-  "description",
+  "negotiable",
+  "address",
   "column_break_vozl",
   "featured",
   "active",
@@ -19,6 +19,8 @@
   "duration_hours",
   "level",
   "language",
+  "offering_description_section",
+  "description",
   "section_break_iimd",
   "prices",
   "categories",
@@ -54,7 +56,7 @@
   },
   {
    "fieldname": "description",
-   "fieldtype": "Text",
+   "fieldtype": "Text Editor",
    "label": "Full Description"
   },
   {
@@ -65,23 +67,21 @@
   {
    "fieldname": "price",
    "fieldtype": "Currency",
-   "label": "Price"
+   "label": "Price per session",
+   "precision": "2"
   },
   {
+   "description": "Indicative offering duration to complete the course. Actuals may vary.",
    "fieldname": "duration_hours",
    "fieldtype": "Float",
-   "label": "Total Duration (hrs)"
+   "label": "Offering Duration (hrs)",
+   "precision": "1"
   },
   {
    "fieldname": "level",
-   "fieldtype": "Select",
-   "label": "Skill Level",
-   "options": "Beginner\nIntermediate\nAdvanced"
-  },
-  {
-   "fieldname": "total_sessions",
-   "fieldtype": "Int",
-   "label": "Total Sessions"
+   "fieldtype": "Table MultiSelect",
+   "label": "Skill Levels",
+   "options": "Offering skill selected"
   },
   {
    "default": "0",
@@ -104,7 +104,7 @@
   {
    "fieldname": "areas",
    "fieldtype": "Table",
-   "label": "Areas",
+   "label": "Location",
    "options": "Offering Area Table"
   },
   {
@@ -116,19 +116,19 @@
   {
    "fieldname": "program_outline",
    "fieldtype": "Table",
-   "label": "Program Outline",
+   "label": "Course Curriculum",
    "options": "Offering Program Outline"
   },
   {
    "fieldname": "prices",
    "fieldtype": "Table",
-   "label": "Prices",
+   "label": "Course packages",
    "options": "Offering Price"
   },
   {
    "fieldname": "schedules",
    "fieldtype": "Table",
-   "label": "Schedules",
+   "label": "Class Schedule",
    "options": "Offering Schedule"
   },
   {
@@ -151,14 +151,30 @@
   },
   {
    "fieldname": "language",
-   "fieldtype": "Select",
-   "label": "Language",
-   "options": "Arabic\nBengali\nEnglish\nFrench\nGerman\nGujarati\nHindi\nItalian\nJapanese\nMandarin Chinese\nMalayalam\nMarathi\nOdia\nPortuguese\nPunjabi\nRussian\nSpanish\nTamil\nTelugu\nUrdu"
+   "fieldtype": "Table MultiSelect",
+   "label": "Languages",
+   "options": "Offering languages"
+  },
+  {
+   "fieldname": "address",
+   "fieldtype": "Text",
+   "label": "Address"
+  },
+  {
+   "fieldname": "offering_description_section",
+   "fieldtype": "Section Break",
+   "label": "Offering description"
+  },
+  {
+   "default": "0",
+   "fieldname": "negotiable",
+   "fieldtype": "Check",
+   "label": "Negotiable"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-01-09 21:22:59.903247",
+ "modified": "2026-03-22 13:40:18.152842",
  "modified_by": "Administrator",
  "module": "Leapp",
  "name": "Offering",

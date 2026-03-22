@@ -1,6 +1,7 @@
 import frappe
 from urllib.parse import quote
 from leappcore.backend.common.context import PageContext
+from leappcore.backend.common.offering_cards import enrich_offerings_for_cards
 
 
 def get_context(context):
@@ -15,7 +16,7 @@ def get_context(context):
     start = (page - 1) * per_page
 
     offerings = _fetch_offerings(where_clause, params, start, per_page)
-    _attach_categories(offerings)
+    enrich_offerings_for_cards(offerings)
     _attach_detail_urls(offerings)
 
     context.offerings = offerings
@@ -111,7 +112,8 @@ def _build_conditions(search_query, category_filter, location_filter, group_filt
 def _fetch_offerings(where_clause, params, start, per_page):
     return frappe.db.sql(f"""
         SELECT DISTINCT
-            o.name, o.title, o.description, o.image, o.duration_hours, o.level
+            o.name, o.title, o.subtitle, o.description, o.image, o.duration_hours, o.level,
+            o.price, o.negotiable
         FROM `tabOffering` o
         WHERE {where_clause}
         ORDER BY o.modified DESC
@@ -119,19 +121,9 @@ def _fetch_offerings(where_clause, params, start, per_page):
     """, {**params, "start": start, "per_page": per_page}, as_dict=True)
 
 
-def _attach_categories(offerings):
-    for offering in offerings:
-        offering["categories"] = frappe.get_all(
-            "Offering Category Table",
-            filters={"parent": offering.name},
-            fields=["offering_category"],
-            pluck="offering_category",
-        )
-
-
 def _attach_detail_urls(offerings):
     for offering in offerings:
-        offering["detail_url"] = f"/courses/detail?offering={str(offering.name)}"
+        offering["detail_url"] = f"/courses/detail?offering={str(offering['name'])}"
 
 
 def _count_offerings(where_clause, params):
@@ -150,7 +142,7 @@ def _list_categories(group_filter=None):
     return frappe.get_all(
         "Offering Category",
         filters=filters,
-        fields=["category_name", "parent_group"],
+        fields=["name", "category_name", "parent_group"],
         order_by="parent_group, category_name",
     )
 

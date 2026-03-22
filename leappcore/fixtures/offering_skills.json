@@ -1,0 +1,23 @@
+[
+ {
+  "docstatus": 0,
+  "doctype": "Offering skills",
+  "modified": "2026-03-22 13:06:16.817385",
+  "name": "Beginner",
+  "skill": "Beginner"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Offering skills",
+  "modified": "2026-03-22 13:06:56.702507",
+  "name": "Advanced",
+  "skill": "Advanced"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Offering skills",
+  "modified": "2026-03-22 13:06:45.918013",
+  "name": "Intermediate",
+  "skill": "Intermediate"
+ }
+]

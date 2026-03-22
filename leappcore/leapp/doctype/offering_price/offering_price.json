@@ -5,6 +5,7 @@
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
+  "package_name",
   "amount",
   "currency",
   "billing_type"
@@ -27,13 +28,21 @@
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Billing Type",
-   "options": "per_session\nper_month\npackage"
+   "options": "per_month\npackage"
+  },
+  {
+   "fieldname": "package_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Package name",
+   "search_index": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-12-25 16:29:27.113296",
+ "modified": "2026-03-22 12:28:01.349042",
  "modified_by": "Administrator",
  "module": "Leapp",
  "name": "Offering Price",

@@ -69,25 +69,69 @@
 <div class="px-4 py-8">
     <h2 class="text-leapp-black dark:text-white text-[22px] font-bold leading-tight tracking-[-0.015em] pb-4">
         Explore Cities</h2>
-    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-        {% for city in cities %}
-        <a href="/courses?location={{ city.city }}" class="flex flex-col items-center gap-2 group cursor-pointer">
-            <div class="w-full aspect-square rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 shadow-md group-hover:shadow-xl transition-shadow duration-300 group-hover:scale-105 transform transition-transform">
-                {% if city.image %}
-                <img src="{{ city.image }}" 
-                     alt="{{ city.city }}" 
-                     class="w-full h-full object-cover">
-                {% else %}
-                <div class="w-full h-full flex items-center justify-center text-slate-400">
-                    <span class="text-4xl">🏙️</span>
+    <div class="relative">
+        <!-- Left Button -->
+        <button id="cities-prev"
+            onclick="scrollCities(-1)"
+            class="absolute left-0 top-1/2 -translate-y-1/2 z-10 -translate-x-2 w-9 h-9 rounded-full bg-white dark:bg-leapp-black border border-slate-200 dark:border-slate-700 shadow-md flex items-center justify-center text-leapp-black dark:text-white hover:bg-leapp-yellow hover:text-leapp-black transition-all duration-200 opacity-0 pointer-events-none"
+            aria-label="Scroll left">
+            <span class="material-symbols-outlined text-xl">chevron_left</span>
+        </button>
+
+        <!-- Scroll container -->
+        <div id="cities-scroll"
+            class="flex gap-4 overflow-x-auto scroll-smooth pb-2"
+            style="scrollbar-width: none; -ms-overflow-style: none;"
+            onscroll="updateCitiesButtons()">
+            {% for city in cities %}
+            <a href="/courses?location={{ city.city }}"
+               class="flex-none flex flex-col items-center gap-2 group cursor-pointer w-[200px]">
+                <div class="w-[200px] h-[200px] rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 shadow-md group-hover:shadow-xl group-hover:scale-105 transition-all duration-300">
+                    {% if city.image %}
+                    <img src="{{ city.image }}" alt="{{ city.city }}" class="w-full h-full object-cover">
+                    {% else %}
+                    <div class="w-full h-full flex items-center justify-center text-slate-400">
+                        <span class="text-4xl">🏙️</span>
+                    </div>
+                    {% endif %}
                 </div>
-                {% endif %}
-            </div>
-            <p class="text-leapp-black dark:text-white text-sm font-medium text-center group-hover:text-leapp-yellow transition-colors">{{ city.city }}</p>
-        </a>
-        {% endfor %}
+                <p class="text-leapp-black dark:text-white text-sm font-medium text-center group-hover:text-leapp-yellow transition-colors">{{ city.city }}</p>
+            </a>
+            {% endfor %}
+        </div>
+
+        <!-- Right Button -->
+        <button id="cities-next"
+            onclick="scrollCities(1)"
+            class="absolute right-0 top-1/2 -translate-y-1/2 z-10 translate-x-2 w-9 h-9 rounded-full bg-white dark:bg-leapp-black border border-slate-200 dark:border-slate-700 shadow-md flex items-center justify-center text-leapp-black dark:text-white hover:bg-leapp-yellow hover:text-leapp-black transition-all duration-200"
+            aria-label="Scroll right">
+            <span class="material-symbols-outlined text-xl">chevron_right</span>
+        </button>
     </div>
 </div>
+
+<style>
+    #cities-scroll::-webkit-scrollbar { display: none; }
+</style>
+
+<script>
+    function scrollCities(dir) {
+        const el = document.getElementById('cities-scroll');
+        el.scrollBy({ left: dir * 320, behavior: 'smooth' });
+    }
+    function updateCitiesButtons() {
+        const el = document.getElementById('cities-scroll');
+        const prev = document.getElementById('cities-prev');
+        const next = document.getElementById('cities-next');
+        const atStart = el.scrollLeft <= 4;
+        const atEnd = el.scrollLeft + el.clientWidth >= el.scrollWidth - 4;
+        prev.classList.toggle('opacity-0', atStart);
+        prev.classList.toggle('pointer-events-none', atStart);
+        next.classList.toggle('opacity-0', atEnd);
+        next.classList.toggle('pointer-events-none', atEnd);
+    }
+    document.addEventListener('DOMContentLoaded', () => updateCitiesButtons());
+</script>
 {% endif %}
 
 <!-- Special Offers -->
@@ -125,38 +169,6 @@
 </div>
 {% endif %}
 
-<!-- Testimonials Section -->
-<div class="px-4 py-8">
-    <h2 class="text-leapp-black dark:text-white text-[22px] font-bold leading-tight tracking-[-0.015em] pb-4 text-center">
-        What Parents Say About Us</h2>
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
-        {% for testimonial in testimonials %}
-        <div class="flex flex-col gap-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-background-dark p-6 shadow-md hover:shadow-xl transition-shadow duration-300">
-            <div class="flex items-center gap-4">
-                {% if testimonial.image %}
-                <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-12"
-                    style="background-image: url('{{ testimonial.image }}');"></div>
-                {% else %}
-                <div class="bg-leapp-yellow rounded-full size-12 flex items-center justify-center">
-                    <span class="text-leapp-black font-bold text-xl">{{ testimonial.customer_name[0] if testimonial.customer_name else "?" }}</span>
-                </div>
-                {% endif %}
-                <div>
-                    <h3 class="text-leapp-black dark:text-white font-bold">{{ testimonial.customer_name }}</h3>
-                    {% if testimonial.customer_designation %}
-                    <p class="text-slate-600 dark:text-slate-400 text-sm">{{ testimonial.customer_designation }}</p>
-                    {% endif %}
-                </div>
-            </div>
-            <p class="text-slate-600 dark:text-slate-400 text-base font-normal leading-normal italic">
-                "{{ testimonial.description }}"
-            </p>
-        </div>
-        {% else %}
-        <div class="col-span-full text-center text-slate-500">No testimonials available yet.</div>
-        {% endfor %}
-    </div>
-</div>
 
 <!-- Top Courses -->
 <div class="px-4 py-8">
@@ -166,13 +178,42 @@
         {% for course in top_courses %}
         <div
             class="bg-white dark:bg-leapp-black rounded-xl overflow-hidden shadow-lg transform hover:-translate-y-1 transition-transform duration-300">
-            <div class="w-full h-32 bg-cover bg-center" style="
-            background-image: url('{{ course.image or " https://placehold.co/600x400?text=No+Image" }}')">
+            <div class="w-full h-32 bg-cover bg-center" style="background-image: url('{{ course.image or "https://placehold.co/600x400?text=No+Image" }}')">
             </div>
             <div class="p-4">
                 <h3 class="font-bold text-leapp-black dark:text-white truncate">{{ course.title }}</h3>
-                <p class="text-sm text-leapp-black/70 dark:text-slate-400 mt-1 line-clamp-2">{{ course.description }}
-                </p>
+                {% if course.subtitle %}
+                <p class="text-sm text-slate-600 dark:text-slate-400 mt-1 line-clamp-2">{{ course.subtitle }}</p>
+                {% endif %}
+                <div class="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-slate-600 dark:text-slate-400">
+                    {% if course.negotiable %}
+                    <span class="font-semibold text-leapp-yellow">Price on request</span>
+                    {% else %}
+                    <span class="font-semibold text-leapp-black dark:text-white">₹{{ "%.0f"|format(course.price or 0) }}</span>
+                    {% endif %}
+                    {% if course.duration_hours %}
+                    <span class="inline-flex items-center gap-1"><span class="material-symbols-outlined text-base">schedule</span>{{ course.duration_hours }} hrs</span>
+                    {% endif %}
+                </div>
+                {% if course.categories and course.categories|length > 0 %}
+                <div class="flex flex-wrap gap-1.5 mt-2">
+                    {% for cat in course.categories[:4] %}
+                    <span class="text-xs font-medium text-leapp-black dark:text-white px-2 py-0.5 rounded-full bg-leapp-yellow/20 border border-leapp-yellow/30">{{ cat }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                {% if course.locations and course.locations|length > 0 %}
+                <div class="flex flex-wrap gap-1.5 mt-1.5 items-center">
+                    {% for loc in course.locations[:3] %}
+                    {% if loc.city %}
+                    <span class="text-xs text-slate-700 dark:text-slate-200 px-2 py-0.5 rounded-full bg-slate-200 dark:bg-slate-700">{{ loc.city }}</span>
+                    {% endif %}
+                    {% if loc.area %}
+                    <span class="text-xs text-slate-700 dark:text-slate-200 px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-600">{{ loc.area }}</span>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+                {% endif %}
                 <a href="/courses/detail?offering={{ course.name }}"
                     class="w-full mt-4 h-9 px-3 bg-leapp-yellow text-leapp-black text-sm font-bold rounded-lg hover:bg-yellow-400 transition-colors flex items-center justify-center">
                     View Details
@@ -218,6 +259,84 @@
         {% else %}
         <div class="col-span-full text-center text-slate-500">No upcoming events at the moment.</div>
         {% endfor %}
+    </div>
+</div>
+
+
+<!-- Testimonials Section -->
+<div class="px-4 py-8">
+    <h2 class="text-leapp-black dark:text-white text-[22px] font-bold leading-tight tracking-[-0.015em] pb-4 text-center">
+        What Users Say About Us</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+        {% for testimonial in testimonials %}
+        <div class="flex flex-col gap-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-background-dark p-6 shadow-md hover:shadow-xl transition-shadow duration-300">
+            <div class="flex items-center gap-4">
+                {% if testimonial.image %}
+                <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-12"
+                    style="background-image: url('{{ testimonial.image }}');"></div>
+                {% else %}
+                <div class="bg-leapp-yellow rounded-full size-12 flex items-center justify-center">
+                    <span class="text-leapp-black font-bold text-xl">{{ testimonial.customer_name[0] if testimonial.customer_name else "?" }}</span>
+                </div>
+                {% endif %}
+                <div>
+                    <h3 class="text-leapp-black dark:text-white font-bold">{{ testimonial.customer_name }}</h3>
+                    {% if testimonial.customer_designation %}
+                    <p class="text-slate-600 dark:text-slate-400 text-sm">{{ testimonial.customer_designation }}</p>
+                    {% endif %}
+                </div>
+            </div>
+            <p class="text-slate-600 dark:text-slate-400 text-base font-normal leading-normal italic">
+                "{{ testimonial.description }}"
+            </p>
+        </div>
+        {% else %}
+        <div class="col-span-full text-center text-slate-500">No testimonials available yet.</div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- News and Blogs-->
+<div class="px-4 py-8">
+    <h2 class="text-center text-leapp-black dark:text-white text-[22px] font-bold leading-tight tracking-[-0.015em] pb-4">
+        News and Blogs
+    </h2>
+
+    <!-- Centered Horizontal Scroll Container -->
+    <div class="flex justify-center">
+        <div class="flex gap-6 overflow-x-auto pb-2 max-w-full">
+            {% for news in news_and_blogs %}
+            
+            <!-- Clickable Card -->
+            <a href="/blogs?id={{ news.name }}"
+               class="min-w-[220px] max-w-[220px] flex-shrink-0 bg-white dark:bg-leapp-black rounded-xl overflow-hidden shadow-lg transform hover:-translate-y-1 transition-transform duration-300 cursor-pointer">
+                
+                <!-- Image -->
+                <div class="w-full h-32 bg-cover bg-center"
+                     style="background-image: url('{{ news.image if news.image else "https://placehold.co/600x400?text=No+Image" }}')">
+                </div>
+
+                <!-- Content -->
+                <div class="p-3">
+                    <h3 class="text-sm font-semibold text-gray-900 dark:text-white line-clamp-2">
+                        {{ news.title }}
+                    </h3>
+
+                    <div class="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                        <span>{{ news.author or "Unknown Author" }}</span>
+                        <span class="mx-1">•</span>
+                        <span>{{ frappe.utils.formatdate(news.creation, "medium") }}</span>
+                    </div>
+                </div>
+
+            </a>
+
+            {% else %}
+            <div class="w-full text-center text-slate-500">
+                No news and blogs available at the moment.
+            </div>
+            {% endfor %}
+        </div>
     </div>
 </div>
 

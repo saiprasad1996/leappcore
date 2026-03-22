@@ -1,6 +1,7 @@
 import frappe
 from urllib.parse import quote
 from leappcore.backend.common.context import PageContext
+from leappcore.backend.common.event_cards import enrich_events_for_cards
 
 
 def get_context(context):
@@ -9,12 +10,17 @@ def get_context(context):
 
     page = max(int(frappe.form_dict.get("page", 1)), 1)
     per_page = 12
-    search_query, area_filter, view_mode = _parse_filters()
+    search_query, location_filter, area_filter_raw, view_mode = _parse_filters()
 
-    where_clause, params = _build_conditions(search_query, area_filter)
+    areas = _list_areas(location_filter)
+    valid_area_names = {a["name"] for a in areas}
+    area_filter = [a for a in area_filter_raw if a in valid_area_names]
+
+    where_clause, params = _build_conditions(search_query, location_filter, area_filter)
     start = (page - 1) * per_page
 
     events = _fetch_events(where_clause, params, start, per_page)
+    enrich_events_for_cards(events)
     _attach_detail_urls(events)
 
     context.events = events
@@ -24,11 +30,13 @@ def get_context(context):
     context.total_pages = (context.total_count + per_page - 1) // per_page
     context.view_mode = view_mode
 
-    context.areas = _list_areas()
+    context.locations = _list_locations()
+    context.areas = areas
 
     context.search_query = search_query
+    context.location_filter = location_filter
     context.area_filter = area_filter
-    context.filter_query = _build_filter_query(search_query, area_filter)
+    context.filter_query = _build_filter_query(search_query, location_filter, area_filter)
     return context
 
 
@@ -43,9 +51,10 @@ def _init_page_context(context):
 
 def _parse_filters():
     search_query = (frappe.form_dict.get("search") or "").strip()
+    location_filter = (frappe.form_dict.get("location") or "").strip()
     area_filter = _as_list("area")
     view_mode = frappe.form_dict.get("view", "gallery")
-    return search_query, area_filter, view_mode
+    return search_query, location_filter, area_filter, view_mode
 
 
 def _as_list(key):
@@ -59,13 +68,19 @@ def _as_list(key):
     return [raw] if raw else []
 
 
-def _build_conditions(search_query, area_filter):
+def _build_conditions(search_query, location_filter, area_filter):
     conditions = ["e.active = 1"]
     params = {}
 
     if search_query:
-        conditions.append("(e.event_name LIKE %(search_query)s OR e.short_description LIKE %(search_query)s OR e.long_description LIKE %(search_query)s)")
+        conditions.append(
+            "(e.event_name LIKE %(search_query)s OR e.short_description LIKE %(search_query)s OR e.long_description LIKE %(search_query)s)"
+        )
         params["search_query"] = f"%{search_query}%"
+
+    if location_filter:
+        conditions.append("e.location = %(location_filter)s")
+        params["location_filter"] = location_filter
 
     if area_filter:
         conditions.append("e.area IN %(area_filter)s")
@@ -83,14 +98,20 @@ def _fetch_events(where_clause, params, start, per_page):
             e.heading,
             e.organizer,
             e.area,
+            e.location,
             e.start_datetime,
             e.end_datetime,
             e.short_description,
             e.long_description,
             e.venue_address,
             e.featured_image,
-            e.active
+            e.active,
+            COALESCE(loc.city, loc_from_area.city) AS city,
+            a.area_name AS area_name
         FROM `tabLeapp Event` e
+        LEFT JOIN `tabLocation` loc ON loc.name = e.location
+        LEFT JOIN `tabArea` a ON a.name = e.area
+        LEFT JOIN `tabLocation` loc_from_area ON loc_from_area.name = a.location
         WHERE {where_clause}
         ORDER BY e.start_datetime DESC
         LIMIT %(start)s, %(limit)s
@@ -110,14 +131,28 @@ def _attach_detail_urls(events):
         event["detail_url"] = f"/events/detail?event={str(event.name)}"
 
 
-def _list_areas():
-    return frappe.get_all("Area", fields=["name", "area_name"], order_by="area_name")
+def _list_locations():
+    return frappe.get_all("Location", fields=["name", "city"], order_by="city asc")
 
 
-def _build_filter_query(search_query, area_filter):
+def _list_areas(location_name=None):
+    filters = {}
+    if location_name:
+        filters["location"] = location_name
+    return frappe.get_all(
+        "Area",
+        filters=filters,
+        fields=["name", "area_name"],
+        order_by="area_name",
+    )
+
+
+def _build_filter_query(search_query, location_filter, area_filter):
     parts = []
     if search_query:
         parts.append(f"search={quote(search_query)}")
+    if location_filter:
+        parts.append(f"location={quote(location_filter)}")
     for area in area_filter:
         parts.append(f"area={quote(area)}")
     return "&".join(parts) if parts else ""

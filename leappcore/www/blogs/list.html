@@ -1,0 +1,200 @@
+{% extends 'templates/htmlbase/base.html' %}
+
+{% block head %}
+<style type="text/css">
+    .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="flex-1 w-full bg-background-light dark:bg-background-dark text-leapp-black dark:text-white">
+    <div class="w-full px-4 sm:px-6 lg:px-8 py-8">
+
+        <!-- Header -->
+        <div class="mb-8">
+            <h1 class="text-4xl sm:text-5xl font-black text-leapp-black dark:text-white mb-4">News &amp; Blogs</h1>
+            <p class="text-lg text-gray-600 dark:text-gray-400">Stay up to date with the latest stories and insights.</p>
+        </div>
+
+        <!-- Search + View Toggle -->
+        <div class="mb-8">
+            <form method="get" action="/blogs/list" class="flex flex-col md:flex-row gap-4">
+                <input type="hidden" name="view" value="{{ view_mode }}" />
+
+                <!-- Search Input -->
+                <div class="flex-1">
+                    <div class="relative">
+                        <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">search</span>
+                        <input
+                            type="text"
+                            name="search"
+                            value="{{ search_query }}"
+                            placeholder="Search articles..."
+                            class="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark text-leapp-black dark:text-white placeholder:text-gray-400 focus:border-leapp-yellow focus:outline-0 focus:ring-2 focus:ring-leapp-yellow/50" />
+                    </div>
+                </div>
+
+                <!-- View Toggle -->
+                <div class="flex gap-2 bg-gray-100 dark:bg-gray-800 p-1 rounded-lg">
+                    <a href="/blogs/list?view=gallery{% if filter_query %}&{{ filter_query }}{% endif %}"
+                       class="px-4 py-2 rounded-md flex items-center gap-2 transition-all {% if view_mode == 'gallery' %}bg-white dark:bg-gray-700 text-leapp-yellow shadow-sm{% else %}text-gray-600 dark:text-gray-400 hover:text-leapp-black dark:hover:text-white{% endif %}">
+                        <span class="material-symbols-outlined text-xl">grid_view</span>
+                        <span class="hidden sm:inline text-sm font-medium">Gallery</span>
+                    </a>
+                    <a href="/blogs/list?view=list{% if filter_query %}&{{ filter_query }}{% endif %}"
+                       class="px-4 py-2 rounded-md flex items-center gap-2 transition-all {% if view_mode == 'list' %}bg-white dark:bg-gray-700 text-leapp-yellow shadow-sm{% else %}text-gray-600 dark:text-gray-400 hover:text-leapp-black dark:hover:text-white{% endif %}">
+                        <span class="material-symbols-outlined text-xl">view_list</span>
+                        <span class="hidden sm:inline text-sm font-medium">List</span>
+                    </a>
+                </div>
+
+                <!-- Search Button -->
+                <button type="submit" class="px-6 py-3 bg-leapp-yellow text-leapp-black rounded-xl font-bold hover:bg-leapp-yellow/90 transition-all">
+                    Search
+                </button>
+            </form>
+        </div>
+
+        <!-- Results Count -->
+        <div class="mb-6">
+            <p class="text-gray-600 dark:text-gray-400">
+                Showing <span class="font-bold text-leapp-black dark:text-white">{{ blogs|length }}</span>
+                of <span class="font-bold text-leapp-black dark:text-white">{{ total_count }}</span> articles
+            </p>
+        </div>
+
+        {% if blogs and blogs|length > 0 %}
+
+        {% if view_mode == 'gallery' %}
+        <!-- Gallery View -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            {% for blog in blogs %}
+            <a href="/blogs?id={{ blog.name }}"
+               class="group flex flex-col rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-background-dark shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
+                <!-- Image -->
+                {% if blog.image %}
+                <div class="w-full h-48 bg-center bg-cover" style="background-image: url('{{ blog.image }}');"></div>
+                {% else %}
+                <div class="w-full h-48 bg-gradient-to-br from-leapp-yellow/20 to-leapp-yellow/5 flex items-center justify-center">
+                    <span class="material-symbols-outlined text-leapp-yellow text-6xl">article</span>
+                </div>
+                {% endif %}
+
+                <div class="p-6 flex flex-col flex-1">
+                    <h2 class="text-lg font-bold text-leapp-black dark:text-white mb-2 line-clamp-2 group-hover:text-leapp-yellow transition-colors">
+                        {{ blog.title }}
+                    </h2>
+                    <div class="mt-auto pt-3 flex flex-wrap items-center gap-3 text-sm text-gray-600 dark:text-gray-400">
+                        <span class="flex items-center gap-1.5">
+                            <span class="material-symbols-outlined text-base text-leapp-yellow">person</span>
+                            {{ blog.author or "Unknown" }}
+                        </span>
+                        <span class="flex items-center gap-1.5">
+                            <span class="material-symbols-outlined text-base text-leapp-yellow">calendar_today</span>
+                            {{ frappe.utils.formatdate(blog.creation, "medium") }}
+                        </span>
+                    </div>
+                    <div class="mt-4 flex items-center justify-center gap-2 w-full px-4 py-3 bg-leapp-yellow text-leapp-black rounded-xl font-bold hover:bg-leapp-yellow/90 transition-all">
+                        <span>Read Article</span>
+                        <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                    </div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+
+        {% else %}
+        <!-- List View -->
+        <div class="space-y-4 mb-8">
+            {% for blog in blogs %}
+            <a href="/blogs?id={{ blog.name }}"
+               class="group flex flex-col md:flex-row rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-background-dark shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
+                <!-- Image -->
+                {% if blog.image %}
+                <div class="w-full md:w-64 h-48 md:h-auto bg-center bg-cover flex-shrink-0" style="background-image: url('{{ blog.image }}');"></div>
+                {% else %}
+                <div class="w-full md:w-64 h-48 md:h-auto bg-gradient-to-br from-leapp-yellow/20 to-leapp-yellow/5 flex items-center justify-center flex-shrink-0">
+                    <span class="material-symbols-outlined text-leapp-yellow text-6xl">article</span>
+                </div>
+                {% endif %}
+
+                <!-- Content -->
+                <div class="flex-1 p-6 flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+                    <div class="flex-1">
+                        <h2 class="text-xl font-bold text-leapp-black dark:text-white mb-2 group-hover:text-leapp-yellow transition-colors">
+                            {{ blog.title }}
+                        </h2>
+                        <div class="flex flex-wrap gap-4 text-sm text-gray-600 dark:text-gray-400">
+                            <span class="flex items-center gap-1.5">
+                                <span class="material-symbols-outlined text-base text-leapp-yellow">person</span>
+                                {{ blog.author or "Unknown" }}
+                            </span>
+                            <span class="flex items-center gap-1.5">
+                                <span class="material-symbols-outlined text-base text-leapp-yellow">calendar_today</span>
+                                {{ frappe.utils.formatdate(blog.creation, "medium") }}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="flex-shrink-0">
+                        <span class="flex items-center gap-2 px-6 py-3 bg-leapp-yellow text-leapp-black rounded-xl font-bold hover:bg-leapp-yellow/90 transition-all whitespace-nowrap">
+                            Read Article
+                            <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                        </span>
+                    </div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Pagination -->
+        {% if total_pages > 1 %}
+        <div class="flex justify-center items-center gap-2">
+            {% if page > 1 %}
+            <a href="/blogs/list?page={{ page - 1 }}&view={{ view_mode }}{% if filter_query %}&{{ filter_query }}{% endif %}"
+               class="px-4 py-2 rounded-lg bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-700 transition-colors">
+                <span class="material-symbols-outlined">chevron_left</span>
+            </a>
+            {% endif %}
+            <span class="px-4 py-2 text-gray-600 dark:text-gray-400">
+                Page {{ page }} of {{ total_pages }}
+            </span>
+            {% if page < total_pages %}
+            <a href="/blogs/list?page={{ page + 1 }}&view={{ view_mode }}{% if filter_query %}&{{ filter_query }}{% endif %}"
+               class="px-4 py-2 rounded-lg bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-700 transition-colors">
+                <span class="material-symbols-outlined">chevron_right</span>
+            </a>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        {% else %}
+        <!-- Empty State -->
+        <div class="text-center py-16">
+            <div class="flex justify-center mb-6">
+                <div class="w-24 h-24 rounded-full bg-leapp-yellow/10 dark:bg-leapp-yellow/20 flex items-center justify-center">
+                    <span class="material-symbols-outlined text-leapp-yellow text-6xl">article</span>
+                </div>
+            </div>
+            <h2 class="text-2xl font-bold text-leapp-black dark:text-white mb-3">No Articles Found</h2>
+            <p class="text-gray-600 dark:text-gray-400 mb-6">
+                {% if search_query %}
+                Try adjusting your search query.
+                {% else %}
+                Check back soon for new content.
+                {% endif %}
+            </p>
+            {% if search_query %}
+            <a href="/blogs/list" class="inline-flex items-center gap-2 px-6 py-3 bg-leapp-yellow text-leapp-black rounded-xl font-bold hover:bg-leapp-yellow/90 transition-all">
+                <span class="material-symbols-outlined">refresh</span>
+                Clear Search
+            </a>
+            {% endif %}
+        </div>
+        {% endif %}
+
+    </div>
+</main>
+{% endblock %}

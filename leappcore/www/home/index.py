@@ -1,6 +1,7 @@
 import frappe
 from frappe.utils import now_datetime
 from leappcore.backend.common.context import PageContext
+from leappcore.backend.common.offering_cards import enrich_offerings_for_cards
 
 def get_context(context):
     # Initialize shared context
@@ -15,11 +16,15 @@ def get_context(context):
     context.locations_count = frappe.db.count("Location")
     context.events_count = frappe.db.count("Leapp Event", {"active": 1})
     
-    # Get cities from Location doctype
-    context.cities = frappe.get_all(
-        "Location",
-        fields=["name", "city", "image"],
-        order_by="city asc"
+    # Featured locations for "Explore Cities" (ordered by Location.order ascending)
+    context.cities = frappe.db.sql(
+        """
+        SELECT name, city, image
+        FROM `tabLocation`
+        WHERE COALESCE(featured, 0) = 1
+        ORDER BY IFNULL(`order`, 2147483647) ASC, city ASC
+        """,
+        as_dict=True,
     )
     
     # Testimonials for home page
@@ -35,10 +40,11 @@ def get_context(context):
     context.top_courses = frappe.get_all(
         "Offering",
         filters={"active": 1, "featured": 1},
-        fields=["name", "title", "image", "description", "duration_hours"],
+        fields=["name", "title", "subtitle", "image", "duration_hours", "price", "negotiable"],
         limit=5,
-        order_by="creation desc"
+        order_by="creation desc",
     )
+    enrich_offerings_for_cards(context.top_courses)
 
     # Upcoming Events
     context.upcoming_events = frappe.get_all(
@@ -47,6 +53,14 @@ def get_context(context):
         fields=["name", "event_name", "start_datetime", "venue_address", "featured_image"],
         limit=5,
         order_by="start_datetime asc"
+    )
+
+    context.news_and_blogs = frappe.get_all(
+        "NewsBlogs",
+        filters={"published": 1},
+        fields=["name", "title", "image", "author", "creation"],
+        limit=5,
+        order_by="creation desc"
     )
 
     return context
