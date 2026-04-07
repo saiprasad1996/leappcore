@@ -105,7 +105,7 @@
                             {% endif %}
                             <div class="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-slate-600 dark:text-slate-400">
                                 {% if offering.negotiable %}
-                                <span class="font-semibold text-leapp-yellow">Price on request</span>
+                                <span class="font-semibold text-leapp-black dark:text-white">Price on request</span>
                                 {% else %}
                                 <span class="font-semibold text-leapp-black dark:text-white">₹{{ "%.0f"|format(offering.price or 0) }}</span>
                                 {% endif %}
@@ -162,7 +162,7 @@
                                 {% endif %}
                                 <div class="flex flex-wrap items-center gap-x-3 gap-y-1 mt-2 text-sm text-slate-600 dark:text-slate-400">
                                     {% if offering.negotiable %}
-                                    <span class="font-semibold text-leapp-yellow">Price on request</span>
+                                    <span class="font-semibold text-leapp-black dark:text-white">Price on request</span>
                                     {% else %}
                                     <span class="font-semibold text-leapp-black dark:text-white">₹{{ "%.0f"|format(offering.price or 0) }}</span>
                                     {% endif %}

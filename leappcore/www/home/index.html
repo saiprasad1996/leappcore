@@ -7,13 +7,13 @@
         style='background-image: linear-gradient(to right, rgba(255, 199, 0, 0.8), rgba(255, 219, 77, 0.6)), url("{{ main_page.index_image or "https://lh3.googleusercontent.com/aida-public/AB6AXuD58OMGHDu__yINwpS8v_jzwzt0SeLpKprIVL821Qn6GTQR3nNem8zzGBTg4z0MEx3TlSEM16JeKoLbEiQzJXe_eGw_Sp5wYJ4hmzHMouXkNC6E5kRCpW555D-oXId7re17cZgOgRkRwgAjZk5tTnTQtuuHCS671Q11uz_pTN6grSBpy9VBtr8SmehpVjicBKlM6aVG24ic7faerd3qo-ScHQYoiMWE219nFQ1y8vCKO0IoXLChcTmk81pvSKcTLz9BQG72QykGyh7N" }}");'>
         <div class="flex flex-col gap-2 text-center">
             <h1 class="text-leapp-black text-4xl font-black leading-tight tracking-[-0.033em] @[480px]:text-5xl">
-                Unlock Your Child's Potential with LEAPP</h1>
+                One Platform. Infinite Potential.</h1>
             <h2 class="text-leapp-black/80 text-base font-medium leading-normal @[480px]:text-lg">
-                Discover activities that nurture growth and inspire creativity.</h2>
+                Powering your journey through a diverse set of offerings for skills, sports, holistic growth, and performance opportunities.</h2>
         </div>
         <button
             class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-12 px-5 bg-leapp-black text-leapp-yellow text-base font-bold leading-normal tracking-[0.015em] hover:bg-leapp-black/90 transition-colors shadow-lg">
-            <span class="truncate"><a href="/courses" class="text-leapp-yellow">Explore All Activities</a></span>
+            <span class="truncate"><a href="/courses" class="text-leapp-yellow">Explore</a></span>
         </button>
     </div>
 </div>
@@ -174,170 +174,440 @@
 <div class="px-4 py-8">
     <h2 class="text-leapp-black dark:text-white text-[22px] font-bold leading-tight tracking-[-0.015em] pb-4">
         Top Courses</h2>
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
-        {% for course in top_courses %}
-        <div
-            class="bg-white dark:bg-leapp-black rounded-xl overflow-hidden shadow-lg transform hover:-translate-y-1 transition-transform duration-300">
-            <div class="w-full h-32 bg-cover bg-center" style="background-image: url('{{ course.image or "https://placehold.co/600x400?text=No+Image" }}')">
+    {% if top_courses %}
+    <div class="relative">
+        <button id="courses-prev"
+            onclick="scrollCourses(-1)"
+            class="absolute left-0 top-1/2 -translate-y-1/2 z-10 -translate-x-2 w-9 h-9 rounded-full bg-white dark:bg-leapp-black border border-slate-200 dark:border-slate-700 shadow-md flex items-center justify-center text-leapp-black dark:text-white hover:bg-leapp-yellow hover:text-leapp-black transition-all duration-200 opacity-0 pointer-events-none"
+            aria-label="Scroll left">
+            <span class="material-symbols-outlined text-xl">chevron_left</span>
+        </button>
+
+        <div id="courses-scroll"
+            class="flex items-stretch gap-4 overflow-x-auto scroll-smooth pb-2"
+            style="scrollbar-width: none; -ms-overflow-style: none;"
+            onscroll="updateCoursesButtons()">
+            {% for course in top_courses %}
+            <div
+                class="flex-none self-stretch w-[260px] flex flex-col bg-white dark:bg-leapp-black rounded-xl overflow-hidden shadow-lg transform hover:-translate-y-1 transition-transform duration-300">
+                <div class="w-full h-32 flex-shrink-0 bg-cover bg-center" style="background-image: url('{{ course.image or "https://placehold.co/600x400?text=No+Image" }}')">
+                </div>
+                <div class="p-4 flex flex-col flex-1 min-h-0 gap-4">
+                    <div class="flex flex-1 min-h-0 flex-col">
+                        <h3 class="font-bold text-leapp-black dark:text-white truncate">{{ course.title }}</h3>
+                        {% if course.subtitle %}
+                        <p class="text-sm text-slate-600 dark:text-slate-400 mt-1 line-clamp-2">{{ course.subtitle }}</p>
+                        {% endif %}
+                        <div class="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-slate-600 dark:text-slate-400">
+                            {% if course.negotiable %}
+                            <span class="font-semibold text-leapp-black dark:text-white">Price on request</span>
+                            {% else %}
+                            <span class="font-semibold text-leapp-black dark:text-white">₹{{ "%.0f"|format(course.price or 0) }}</span>
+                            {% endif %}
+                            {% if course.duration_hours %}
+                            <span class="inline-flex items-center gap-1"><span class="material-symbols-outlined text-base">schedule</span>{{ course.duration_hours }} hrs</span>
+                            {% endif %}
+                        </div>
+                        {% if course.categories and course.categories|length > 0 %}
+                        <div class="flex flex-wrap gap-1.5 mt-2">
+                            {% for cat in course.categories[:4] %}
+                            <span class="text-xs font-medium text-leapp-black dark:text-white px-2 py-0.5 rounded-full bg-leapp-yellow/20 border border-leapp-yellow/30">{{ cat }}</span>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                        {% if course.locations and course.locations|length > 0 %}
+                        <div class="flex flex-wrap gap-1.5 mt-1.5 items-center">
+                            {% for loc in course.locations[:3] %}
+                            {% if loc.city %}
+                            <span class="text-xs text-slate-700 dark:text-slate-200 px-2 py-0.5 rounded-full bg-slate-200 dark:bg-slate-700">{{ loc.city }}</span>
+                            {% endif %}
+                            {% if loc.area %}
+                            <span class="text-xs text-slate-700 dark:text-slate-200 px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-600">{{ loc.area }}</span>
+                            {% endif %}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                    <a href="/courses/detail?offering={{ course.name }}"
+                        class="w-full h-9 px-3 bg-leapp-yellow text-leapp-black text-sm font-bold rounded-lg hover:bg-yellow-400 transition-colors flex items-center justify-center flex-shrink-0">
+                        View Details
+                    </a>
+                </div>
             </div>
-            <div class="p-4">
-                <h3 class="font-bold text-leapp-black dark:text-white truncate">{{ course.title }}</h3>
-                {% if course.subtitle %}
-                <p class="text-sm text-slate-600 dark:text-slate-400 mt-1 line-clamp-2">{{ course.subtitle }}</p>
-                {% endif %}
-                <div class="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-slate-600 dark:text-slate-400">
-                    {% if course.negotiable %}
-                    <span class="font-semibold text-leapp-yellow">Price on request</span>
-                    {% else %}
-                    <span class="font-semibold text-leapp-black dark:text-white">₹{{ "%.0f"|format(course.price or 0) }}</span>
-                    {% endif %}
-                    {% if course.duration_hours %}
-                    <span class="inline-flex items-center gap-1"><span class="material-symbols-outlined text-base">schedule</span>{{ course.duration_hours }} hrs</span>
-                    {% endif %}
-                </div>
-                {% if course.categories and course.categories|length > 0 %}
-                <div class="flex flex-wrap gap-1.5 mt-2">
-                    {% for cat in course.categories[:4] %}
-                    <span class="text-xs font-medium text-leapp-black dark:text-white px-2 py-0.5 rounded-full bg-leapp-yellow/20 border border-leapp-yellow/30">{{ cat }}</span>
-                    {% endfor %}
-                </div>
-                {% endif %}
-                {% if course.locations and course.locations|length > 0 %}
-                <div class="flex flex-wrap gap-1.5 mt-1.5 items-center">
-                    {% for loc in course.locations[:3] %}
-                    {% if loc.city %}
-                    <span class="text-xs text-slate-700 dark:text-slate-200 px-2 py-0.5 rounded-full bg-slate-200 dark:bg-slate-700">{{ loc.city }}</span>
-                    {% endif %}
-                    {% if loc.area %}
-                    <span class="text-xs text-slate-700 dark:text-slate-200 px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-600">{{ loc.area }}</span>
-                    {% endif %}
-                    {% endfor %}
-                </div>
-                {% endif %}
-                <a href="/courses/detail?offering={{ course.name }}"
-                    class="w-full mt-4 h-9 px-3 bg-leapp-yellow text-leapp-black text-sm font-bold rounded-lg hover:bg-yellow-400 transition-colors flex items-center justify-center">
-                    View Details
-                </a>
-            </div>
+            {% endfor %}
         </div>
-        {% else %}
-        <div class="col-span-full text-center text-slate-500">No courses available at the moment.</div>
-        {% endfor %}
+
+        <button id="courses-next"
+            onclick="scrollCourses(1)"
+            class="absolute right-0 top-1/2 -translate-y-1/2 z-10 translate-x-2 w-9 h-9 rounded-full bg-white dark:bg-leapp-black border border-slate-200 dark:border-slate-700 shadow-md flex items-center justify-center text-leapp-black dark:text-white hover:bg-leapp-yellow hover:text-leapp-black transition-all duration-200"
+            aria-label="Scroll right">
+            <span class="material-symbols-outlined text-xl">chevron_right</span>
+        </button>
     </div>
+
+    <style>
+        #courses-scroll::-webkit-scrollbar { display: none; }
+    </style>
+
+    <script>
+        function scrollCourses(dir) {
+            const el = document.getElementById('courses-scroll');
+            el.scrollBy({ left: dir * 400, behavior: 'smooth' });
+        }
+        function updateCoursesButtons() {
+            const el = document.getElementById('courses-scroll');
+            const prev = document.getElementById('courses-prev');
+            const next = document.getElementById('courses-next');
+            if (!el || !prev || !next) return;
+            const atStart = el.scrollLeft <= 4;
+            const atEnd = el.scrollLeft + el.clientWidth >= el.scrollWidth - 4;
+            prev.classList.toggle('opacity-0', atStart);
+            prev.classList.toggle('pointer-events-none', atStart);
+            next.classList.toggle('opacity-0', atEnd);
+            next.classList.toggle('pointer-events-none', atEnd);
+        }
+        document.addEventListener('DOMContentLoaded', () => updateCoursesButtons());
+    </script>
+    {% else %}
+    <div class="text-center text-slate-500">No courses available at the moment.</div>
+    {% endif %}
 </div>
 
 <!-- Upcoming Events -->
 <div class="px-4 py-8">
     <h2 class="text-leapp-black dark:text-white text-[22px] font-bold leading-tight tracking-[-0.015em] pb-4">
         Upcoming Events</h2>
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
-        {% for event in upcoming_events %}
-        <div
-            class="gradient-bg text-leapp-black rounded-xl overflow-hidden shadow-lg p-1 transform hover:-translate-y-1 transition-transform duration-300">
+    {% if upcoming_events %}
+    <div class="relative">
+        <button type="button" id="events-prev"
+            onclick="scrollEvents(-1)"
+            class="absolute left-0 top-1/2 -translate-y-1/2 z-10 -translate-x-2 w-9 h-9 rounded-full bg-white dark:bg-leapp-black border border-slate-200 dark:border-slate-700 shadow-md flex items-center justify-center text-leapp-black dark:text-white hover:bg-leapp-yellow hover:text-leapp-black transition-all duration-200 opacity-0 pointer-events-none"
+            aria-label="Scroll left">
+            <span class="material-symbols-outlined text-xl">chevron_left</span>
+        </button>
+
+        <div id="events-scroll"
+            class="flex items-stretch gap-6 overflow-x-auto scroll-smooth pb-2"
+            style="scrollbar-width: none; -ms-overflow-style: none;"
+            onscroll="updateEventsButtons()">
+            {% for event in upcoming_events %}
             <div
-                class="bg-background-light dark:bg-leapp-black h-full rounded-lg flex flex-col justify-between overflow-hidden">
-                <div class="w-full h-32 bg-cover bg-center" style="background-image: url('{{ event.featured_image or "https://placehold.co/600x400?text=No+Image" }}')">
-                </div>
-                <div class="p-4 flex flex-col justify-between flex-grow">
-                    <div>
-                        <p class="text-leapp-black dark:text-white text-sm font-bold">{{
-                            event.start_datetime.strftime('%b
-                            %d') }}</p>
-                        <h3 class="font-bold text-lg text-leapp-black dark:text-leapp-yellow mt-1 truncate">
-                            {{ event.event_name }}</h3>
-                        <p class="text-sm text-leapp-black/70 dark:text-slate-400 mt-1 truncate">{{ event.venue_address
-                            }}
-                        </p>
+                class="flex-none self-stretch w-[320px] flex flex-col gradient-bg text-leapp-black rounded-xl overflow-hidden shadow-lg p-1 transform hover:-translate-y-1 transition-transform duration-300">
+                <div
+                    class="bg-background-light dark:bg-leapp-black flex-1 min-h-0 rounded-lg flex flex-col overflow-hidden">
+                    <div class="w-full h-32 flex-shrink-0 bg-cover bg-center" style="background-image: url('{{ event.featured_image or "https://placehold.co/600x400?text=No+Image" }}')">
                     </div>
-                    <a href="/events/detail?event={{ event.name }}"
-                        class="w-full mt-4 h-9 px-3 bg-leapp-black text-leapp-yellow text-sm font-bold rounded-lg hover:bg-black/80 transition-colors flex items-center justify-center">
-                        View Details
-                    </a>
+                    <div class="p-4 flex flex-col flex-1 min-h-0 gap-4">
+                        <div class="flex flex-1 min-h-0 flex-col">
+                            <p class="text-leapp-black dark:text-white text-sm font-bold">{{
+                                event.start_datetime.strftime('%b
+                                %d') }}</p>
+                            <h3 class="font-bold text-lg text-leapp-black dark:text-leapp-yellow mt-1 truncate">
+                                {{ event.event_name }}</h3>
+                            <p class="text-sm text-leapp-black/70 dark:text-slate-400 mt-1 truncate">{{ event.venue_address
+                                }}
+                            </p>
+                        </div>
+                        <a href="/events/detail?event={{ event.name }}"
+                            class="w-full h-9 px-3 bg-leapp-black text-leapp-yellow text-sm font-bold rounded-lg hover:bg-black/80 transition-colors flex items-center justify-center flex-shrink-0">
+                            View Details
+                        </a>
+                    </div>
                 </div>
             </div>
+            {% endfor %}
         </div>
-        {% else %}
-        <div class="col-span-full text-center text-slate-500">No upcoming events at the moment.</div>
-        {% endfor %}
+
+        <button type="button" id="events-next"
+            onclick="scrollEvents(1)"
+            class="absolute right-0 top-1/2 -translate-y-1/2 z-10 translate-x-2 w-9 h-9 rounded-full bg-white dark:bg-leapp-black border border-slate-200 dark:border-slate-700 shadow-md flex items-center justify-center text-leapp-black dark:text-white hover:bg-leapp-yellow hover:text-leapp-black transition-all duration-200"
+            aria-label="Scroll right">
+            <span class="material-symbols-outlined text-xl">chevron_right</span>
+        </button>
     </div>
+
+    <style>
+        #events-scroll::-webkit-scrollbar { display: none; }
+    </style>
+
+    <script>
+        function scrollEvents(dir) {
+            const el = document.getElementById('events-scroll');
+            if (el) el.scrollBy({ left: dir * 360, behavior: 'smooth' });
+        }
+        function updateEventsButtons() {
+            const el = document.getElementById('events-scroll');
+            const prev = document.getElementById('events-prev');
+            const next = document.getElementById('events-next');
+            if (!el || !prev || !next) return;
+            const atStart = el.scrollLeft <= 4;
+            const atEnd = el.scrollLeft + el.clientWidth >= el.scrollWidth - 4;
+            prev.classList.toggle('opacity-0', atStart);
+            prev.classList.toggle('pointer-events-none', atStart);
+            next.classList.toggle('opacity-0', atEnd);
+            next.classList.toggle('pointer-events-none', atEnd);
+        }
+        document.addEventListener('DOMContentLoaded', () => updateEventsButtons());
+    </script>
+    {% else %}
+    <div class="text-center text-slate-500">No upcoming events at the moment.</div>
+    {% endif %}
 </div>
 
 
 <!-- Testimonials Section -->
 <div class="px-4 py-8">
-    <h2 class="text-leapp-black dark:text-white text-[22px] font-bold leading-tight tracking-[-0.015em] pb-4 text-center">
+    <h2 class="text-leapp-black dark:text-white text-[22px] font-bold leading-tight tracking-[-0.015em] pb-4">
         What Users Say About Us</h2>
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
-        {% for testimonial in testimonials %}
-        <div class="flex flex-col gap-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-background-dark p-6 shadow-md hover:shadow-xl transition-shadow duration-300">
-            <div class="flex items-center gap-4">
-                {% if testimonial.image %}
-                <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-12"
-                    style="background-image: url('{{ testimonial.image }}');"></div>
-                {% else %}
-                <div class="bg-leapp-yellow rounded-full size-12 flex items-center justify-center">
-                    <span class="text-leapp-black font-bold text-xl">{{ testimonial.customer_name[0] if testimonial.customer_name else "?" }}</span>
-                </div>
-                {% endif %}
-                <div>
-                    <h3 class="text-leapp-black dark:text-white font-bold">{{ testimonial.customer_name }}</h3>
-                    {% if testimonial.customer_designation %}
-                    <p class="text-slate-600 dark:text-slate-400 text-sm">{{ testimonial.customer_designation }}</p>
+    {% if testimonials %}
+    <script type="application/json" id="testimonials-data">{{ testimonials_json|safe }}</script>
+    <div class="relative">
+        <button type="button" id="testimonials-prev"
+            onclick="scrollTestimonials(-1)"
+            class="absolute left-0 top-1/2 -translate-y-1/2 z-10 -translate-x-2 w-9 h-9 rounded-full bg-white dark:bg-leapp-black border border-slate-200 dark:border-slate-700 shadow-md flex items-center justify-center text-leapp-black dark:text-white hover:bg-leapp-yellow hover:text-leapp-black transition-all duration-200 opacity-0 pointer-events-none"
+            aria-label="Scroll testimonials left">
+            <span class="material-symbols-outlined text-xl">chevron_left</span>
+        </button>
+
+        <div id="testimonials-scroll"
+            class="flex gap-4 overflow-x-auto scroll-smooth pb-2"
+            style="scrollbar-width: none; -ms-overflow-style: none;"
+            onscroll="updateTestimonialsButtons()">
+            {% for testimonial in testimonials %}
+            {% set full = testimonial.description or '' %}
+            {% set preview = full[:200] if full|length > 200 else full %}
+            {% set show_ellipsis = full|length > 200 %}
+            <button type="button"
+                onclick="openTestimonialModal({{ loop.index0 }})"
+                class="flex-none w-[350px] text-left flex flex-col gap-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-background-dark p-6 shadow-md hover:shadow-xl hover:border-leapp-yellow/40 transition-all duration-300 cursor-pointer group">
+                <div class="flex items-center gap-4">
+                    {% if testimonial.image %}
+                    <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-12 flex-shrink-0 ring-2 ring-leapp-yellow/30"
+                        style="background-image: url('{{ testimonial.image }}');"></div>
+                    {% else %}
+                    <div class="bg-leapp-yellow rounded-full size-12 flex items-center justify-center flex-shrink-0 ring-2 ring-leapp-yellow/50">
+                        <span class="text-leapp-black font-bold text-xl">{{ testimonial.customer_name[0] if testimonial.customer_name else "?" }}</span>
+                    </div>
                     {% endif %}
+                    <div class="min-w-0">
+                        <h3 class="text-leapp-black dark:text-white font-bold truncate group-hover:text-leapp-yellow transition-colors">{{ testimonial.customer_name }}</h3>
+                        {% if testimonial.customer_designation %}
+                        <p class="text-slate-600 dark:text-slate-400 text-sm truncate">{{ testimonial.customer_designation }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+                <p class="text-slate-600 dark:text-slate-400 text-sm font-normal leading-relaxed">
+                    <span class="italic">"{{ preview }}{% if show_ellipsis %}…{% endif %}"</span>
+                </p>
+                {% if show_ellipsis %}
+                <p class="text-xs text-leapp-black/60 dark:text-slate-500 font-medium">Tap to read full story</p>
+                {% endif %}
+            </button>
+            {% endfor %}
+        </div>
+
+        <button type="button" id="testimonials-next"
+            onclick="scrollTestimonials(1)"
+            class="absolute right-0 top-1/2 -translate-y-1/2 z-10 translate-x-2 w-9 h-9 rounded-full bg-white dark:bg-leapp-black border border-slate-200 dark:border-slate-700 shadow-md flex items-center justify-center text-leapp-black dark:text-white hover:bg-leapp-yellow hover:text-leapp-black transition-all duration-200"
+            aria-label="Scroll testimonials right">
+            <span class="material-symbols-outlined text-xl">chevron_right</span>
+        </button>
+    </div>
+
+    <style>
+        #testimonials-scroll::-webkit-scrollbar { display: none; }
+    </style>
+
+    <!-- Testimonial detail modal -->
+    <div id="testimonial-modal"
+        class="fixed inset-0 z-[200] hidden items-center justify-center p-4 sm:p-6"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="testimonial-modal-title">
+        <div class="absolute inset-0 bg-leapp-black/60 dark:bg-black/70 backdrop-blur-sm transition-opacity"
+            onclick="closeTestimonialModal()"></div>
+        <div class="relative z-10 w-full max-w-4xl h-[82vh] max-h-[900px] overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-2xl shadow-leapp-yellow/10 flex flex-col">
+            <div class="h-1.5 w-full bg-gradient-to-r from-leapp-yellow via-amber-300 to-leapp-yellow flex-shrink-0"></div>
+            <button type="button"
+                onclick="closeTestimonialModal()"
+                class="absolute top-4 right-4 z-10 flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 dark:border-slate-600 bg-white/90 dark:bg-slate-800 text-leapp-black dark:text-white hover:bg-leapp-yellow hover:border-leapp-yellow transition-colors"
+                aria-label="Close">
+                <span class="material-symbols-outlined text-xl">close</span>
+            </button>
+            <div class="flex-1 min-h-0 p-6 sm:p-10 pt-12 sm:pt-14 flex flex-col">
+                <div class="flex items-start gap-5 sm:gap-6 mb-8">
+                    <div id="tm-avatar" class="size-16 sm:size-20 rounded-full bg-leapp-yellow/20 flex-shrink-0 overflow-hidden ring-2 ring-leapp-yellow/40"></div>
+                    <div class="min-w-0 flex-1">
+                        <h3 id="testimonial-modal-title" class="text-2xl sm:text-3xl font-bold text-leapp-black dark:text-white"></h3>
+                        <p id="tm-designation" class="text-base text-slate-600 dark:text-slate-400 mt-1"></p>
+                        <p id="tm-posted" class="text-sm text-slate-500 dark:text-slate-500 mt-3"></p>
+                    </div>
+                </div>
+                <div class="flex-1 min-h-0 overflow-y-auto pr-1">
+                    <p id="tm-title-line" class="text-base font-semibold text-leapp-yellow mb-4 hidden"></p>
+                    <div class="relative pl-5 sm:pl-6 border-l-4 border-leapp-yellow/80">
+                        <span class="material-symbols-outlined absolute -left-1 -top-1 text-leapp-yellow/40 text-5xl select-none" aria-hidden="true">format_quote</span>
+                        <p id="tm-body" class="text-slate-700 dark:text-slate-200 text-base sm:text-lg leading-relaxed sm:leading-relaxed whitespace-pre-wrap pl-7 sm:pl-8"></p>
+                    </div>
                 </div>
             </div>
-            <p class="text-slate-600 dark:text-slate-400 text-base font-normal leading-normal italic">
-                "{{ testimonial.description }}"
-            </p>
         </div>
-        {% else %}
-        <div class="col-span-full text-center text-slate-500">No testimonials available yet.</div>
-        {% endfor %}
     </div>
+
+    <script>
+        function scrollTestimonials(dir) {
+            const el = document.getElementById('testimonials-scroll');
+            if (el) el.scrollBy({ left: dir * 400, behavior: 'smooth' });
+        }
+        function updateTestimonialsButtons() {
+            const el = document.getElementById('testimonials-scroll');
+            const prev = document.getElementById('testimonials-prev');
+            const next = document.getElementById('testimonials-next');
+            if (!el || !prev || !next) return;
+            const atStart = el.scrollLeft <= 4;
+            const atEnd = el.scrollLeft + el.clientWidth >= el.scrollWidth - 4;
+            prev.classList.toggle('opacity-0', atStart);
+            prev.classList.toggle('pointer-events-none', atStart);
+            next.classList.toggle('opacity-0', atEnd);
+            next.classList.toggle('pointer-events-none', atEnd);
+        }
+        function openTestimonialModal(index) {
+            const raw = document.getElementById('testimonials-data');
+            if (!raw) return;
+            let data;
+            try { data = JSON.parse(raw.textContent); } catch (e) { return; }
+            const t = data[index];
+            if (!t) return;
+            const modal = document.getElementById('testimonial-modal');
+            const nameEl = document.getElementById('testimonial-modal-title');
+            const desigEl = document.getElementById('tm-designation');
+            const postedEl = document.getElementById('tm-posted');
+            const titleLine = document.getElementById('tm-title-line');
+            const bodyEl = document.getElementById('tm-body');
+            const avatar = document.getElementById('tm-avatar');
+            nameEl.textContent = t.customer_name || '';
+            desigEl.textContent = t.customer_designation || '';
+            desigEl.classList.toggle('hidden', !t.customer_designation);
+            postedEl.textContent = t.posted_date ? ('Posted ' + t.posted_date) : '';
+            postedEl.classList.toggle('hidden', !t.posted_date);
+            if (t.testimonial_title) {
+                titleLine.textContent = t.testimonial_title;
+                titleLine.classList.remove('hidden');
+            } else {
+                titleLine.classList.add('hidden');
+            }
+            bodyEl.textContent = t.description || '';
+            avatar.innerHTML = '';
+            avatar.style.backgroundImage = '';
+            avatar.style.backgroundSize = '';
+            avatar.style.backgroundPosition = '';
+            avatar.className = 'size-16 sm:size-20 rounded-full flex-shrink-0 overflow-hidden ring-2 ring-leapp-yellow/40';
+            if (t.image) {
+                avatar.style.backgroundImage = 'url(' + JSON.stringify(t.image) + ')';
+                avatar.style.backgroundSize = 'cover';
+                avatar.style.backgroundPosition = 'center';
+                avatar.classList.add('bg-slate-100', 'dark:bg-slate-800');
+            } else {
+                avatar.classList.add('bg-leapp-yellow', 'flex', 'items-center', 'justify-center');
+                const initial = (t.customer_name && t.customer_name[0]) ? t.customer_name[0] : '?';
+                avatar.innerHTML = '<span class="text-leapp-black font-bold text-2xl">' + initial + '</span>';
+            }
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            document.body.style.overflow = 'hidden';
+            document.addEventListener('keydown', testimonialModalEsc);
+        }
+        function closeTestimonialModal() {
+            const modal = document.getElementById('testimonial-modal');
+            if (!modal) return;
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            document.body.style.overflow = '';
+            document.removeEventListener('keydown', testimonialModalEsc);
+        }
+        function testimonialModalEsc(e) {
+            if (e.key === 'Escape') closeTestimonialModal();
+        }
+        document.addEventListener('DOMContentLoaded', () => updateTestimonialsButtons());
+    </script>
+    {% else %}
+    <div class="text-center text-slate-500">No testimonials available yet.</div>
+    {% endif %}
 </div>
 
 <!-- News and Blogs-->
 <div class="px-4 py-8">
-    <h2 class="text-center text-leapp-black dark:text-white text-[22px] font-bold leading-tight tracking-[-0.015em] pb-4">
+    <h2 class="text-leapp-black dark:text-white text-[22px] font-bold leading-tight tracking-[-0.015em] pb-4">
         News and Blogs
     </h2>
 
-    <!-- Centered Horizontal Scroll Container -->
-    <div class="flex justify-center">
-        <div class="flex gap-6 overflow-x-auto pb-2 max-w-full">
+    {% if news_and_blogs %}
+    <div class="relative">
+        <button type="button" id="news-prev"
+            onclick="scrollNews(-1)"
+            class="absolute left-0 top-1/2 -translate-y-1/2 z-10 -translate-x-2 w-9 h-9 rounded-full bg-white dark:bg-leapp-black border border-slate-200 dark:border-slate-700 shadow-md flex items-center justify-center text-leapp-black dark:text-white hover:bg-leapp-yellow hover:text-leapp-black transition-all duration-200 opacity-0 pointer-events-none"
+            aria-label="Scroll left">
+            <span class="material-symbols-outlined text-xl">chevron_left</span>
+        </button>
+
+        <div id="news-scroll"
+            class="flex gap-4 overflow-x-auto scroll-smooth pb-2"
+            style="scrollbar-width: none; -ms-overflow-style: none;"
+            onscroll="updateNewsButtons()">
             {% for news in news_and_blogs %}
-            
-            <!-- Clickable Card -->
             <a href="/blogs?id={{ news.name }}"
-               class="min-w-[220px] max-w-[220px] flex-shrink-0 bg-white dark:bg-leapp-black rounded-xl overflow-hidden shadow-lg transform hover:-translate-y-1 transition-transform duration-300 cursor-pointer">
-                
-                <!-- Image -->
-                <div class="w-full h-32 bg-cover bg-center"
+               class="flex-none w-[300px] bg-white dark:bg-leapp-black rounded-xl overflow-hidden shadow-lg transform hover:-translate-y-1 transition-transform duration-300 cursor-pointer flex flex-col">
+                <div class="w-full h-48 bg-cover bg-center flex-shrink-0"
                      style="background-image: url('{{ news.image if news.image else "https://placehold.co/600x400?text=No+Image" }}')">
                 </div>
-
-                <!-- Content -->
-                <div class="p-3">
-                    <h3 class="text-sm font-semibold text-gray-900 dark:text-white line-clamp-2">
+                <div class="p-4 flex flex-col flex-1 min-h-[120px]">
+                    <h3 class="text-base font-semibold text-gray-900 dark:text-white line-clamp-3 leading-snug">
                         {{ news.title }}
                     </h3>
-
-                    <div class="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                    <div class="mt-auto pt-3 text-sm text-gray-500 dark:text-gray-400">
                         <span>{{ news.author or "Unknown Author" }}</span>
                         <span class="mx-1">•</span>
                         <span>{{ frappe.utils.formatdate(news.creation, "medium") }}</span>
                     </div>
                 </div>
-
             </a>
-
-            {% else %}
-            <div class="w-full text-center text-slate-500">
-                No news and blogs available at the moment.
-            </div>
             {% endfor %}
         </div>
+
+        <button type="button" id="news-next"
+            onclick="scrollNews(1)"
+            class="absolute right-0 top-1/2 -translate-y-1/2 z-10 translate-x-2 w-9 h-9 rounded-full bg-white dark:bg-leapp-black border border-slate-200 dark:border-slate-700 shadow-md flex items-center justify-center text-leapp-black dark:text-white hover:bg-leapp-yellow hover:text-leapp-black transition-all duration-200"
+            aria-label="Scroll right">
+            <span class="material-symbols-outlined text-xl">chevron_right</span>
+        </button>
     </div>
+
+    <style>
+        #news-scroll::-webkit-scrollbar { display: none; }
+    </style>
+
+    <script>
+        function scrollNews(dir) {
+            const el = document.getElementById('news-scroll');
+            if (el) el.scrollBy({ left: dir * 400, behavior: 'smooth' });
+        }
+        function updateNewsButtons() {
+            const el = document.getElementById('news-scroll');
+            const prev = document.getElementById('news-prev');
+            const next = document.getElementById('news-next');
+            if (!el || !prev || !next) return;
+            const atStart = el.scrollLeft <= 4;
+            const atEnd = el.scrollLeft + el.clientWidth >= el.scrollWidth - 4;
+            prev.classList.toggle('opacity-0', atStart);
+            prev.classList.toggle('pointer-events-none', atStart);
+            next.classList.toggle('opacity-0', atEnd);
+            next.classList.toggle('pointer-events-none', atEnd);
+        }
+        document.addEventListener('DOMContentLoaded', () => updateNewsButtons());
+    </script>
+    {% else %}
+    <div class="text-center text-slate-500">No news and blogs available at the moment.</div>
+    {% endif %}
 </div>
 
 {% endblock %}

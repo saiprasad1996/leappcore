@@ -1,5 +1,7 @@
+import json
+
 import frappe
-from frappe.utils import now_datetime
+from frappe.utils import formatdate, now_datetime
 from leappcore.backend.common.context import PageContext
 from leappcore.backend.common.offering_cards import enrich_offerings_for_cards
 
@@ -31,17 +33,26 @@ def get_context(context):
     context.testimonials = frappe.get_all(
         "Testimonials",
         filters={"active": 1},
-        fields=["customer_name", "customer_designation", "description", "image"],
+        fields=[
+            "customer_name",
+            "customer_designation",
+            "testimonial_title",
+            "description",
+            "image",
+            "creation",
+        ],
         limit=6,
-        order_by="creation desc"
+        order_by="creation desc",
     )
+    for t in context.testimonials:
+        t["posted_date"] = formatdate(t["creation"], "medium") if t.get("creation") else ""
+    context.testimonials_json = json.dumps(context.testimonials, default=str)
 
     # Top Courses (Featured)
     context.top_courses = frappe.get_all(
         "Offering",
         filters={"active": 1, "featured": 1},
         fields=["name", "title", "subtitle", "image", "duration_hours", "price", "negotiable"],
-        limit=5,
         order_by="creation desc",
     )
     enrich_offerings_for_cards(context.top_courses)
@@ -51,7 +62,6 @@ def get_context(context):
         "Leapp Event",
         filters={"active": 1, "end_datetime": [">=", now_datetime()]},
         fields=["name", "event_name", "start_datetime", "venue_address", "featured_image"],
-        limit=5,
         order_by="start_datetime asc"
     )
 
