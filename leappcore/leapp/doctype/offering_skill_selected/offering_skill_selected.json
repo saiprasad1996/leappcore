@@ -16,15 +16,14 @@
    "in_standard_filter": 1,
    "label": "Skill",
    "options": "Offering skills",
-   "reqd": 1,
-   "unique": 1
+   "reqd": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2026-03-22 12:55:13.082070",
+ "modified": "2026-04-12 11:15:52.276419",
  "modified_by": "Administrator",
  "module": "Leapp",
  "name": "Offering skill selected",

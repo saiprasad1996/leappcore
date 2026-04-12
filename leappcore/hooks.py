@@ -132,13 +132,12 @@ app_license = "gpl-3.0"
 # ---------------
 # Hook on document methods and events
 
-# doc_events = {
-# 	"*": {
-# 		"on_update": "method",
-# 		"on_cancel": "method",
-# 		"on_trash": "method"
-# 	}
-# }
+doc_events = {
+	"User": {
+		"before_insert": "leappcore.signup_notifications.user_before_insert",
+		"after_insert": "leappcore.signup_notifications.user_after_insert",
+	}
+}
 
 # Scheduled Tasks
 # ---------------
@@ -248,6 +247,10 @@ app_license = "gpl-3.0"
 
 favicon = "/assets/leappcore/images/leapp_favicon.png"
 
+
+from leappcore.oauth_utils import patch_login_oauth_user_for_signup_context
+
+patch_login_oauth_user_for_signup_context()
 
 fixtures = [
     {"dt": "Role", "filters": [["name", "in", ["Leapp Customer", "Leapp Partner"]]]},

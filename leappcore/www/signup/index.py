@@ -1,6 +1,8 @@
 import frappe
 from frappe import _
-from frappe.utils.oauth import get_oauth2_authorize_url, get_oauth_keys
+from frappe.utils.oauth import get_oauth_keys
+
+from leappcore.oauth_utils import get_leapp_oauth2_authorize_url
 from frappe.utils.password import get_decrypted_password
 
 
@@ -8,7 +10,7 @@ def get_context(context):
     # Redirect if already logged in
     if frappe.session.user != "Guest":
         if frappe.session.data.user_type == "Website User":
-            frappe.local.flags.redirect_location = "/"
+            frappe.local.flags.redirect_location = "/user/profile"
             raise frappe.Redirect
         else:
             frappe.local.flags.redirect_location = "/app"
@@ -20,8 +22,8 @@ def get_context(context):
     context.csrf_token = frappe.sessions.get_csrf_token()
     context.no_cache = 1
     
-    # Setup Google login - redirect to home page after signup
-    context.google_login = get_google_login_info(redirect_to="/")
+    # After Google signup, send customers to their profile (OAuth state redirect_to)
+    context.google_login = get_google_login_info(redirect_to="/user/profile")
     
     # Handle signup form submission
     if frappe.request.method == "POST":
@@ -81,7 +83,9 @@ def get_google_login_info(redirect_to=None):
         # Check if OAuth keys are properly configured
         if google_provider.client_id and google_provider.base_url and client_secret and get_oauth_keys(google_provider.name):
             google_login["enabled"] = True
-            google_login["auth_url"] = get_oauth2_authorize_url(google_provider.name, redirect_to)
+            google_login["auth_url"] = get_leapp_oauth2_authorize_url(
+                google_provider.name, redirect_to, signup_kind="customer"
+            )
     
     return google_login
 
@@ -149,14 +153,7 @@ def signup_user():
         user.insert(ignore_permissions=True)
         
         frappe.db.commit()
-        
-        # Send verification email
-        from frappe.utils.verified_command import get_signed_params
-        verify_url = get_verification_url(user.name)
-        
-        # Send welcome email
-        send_welcome_email(user.name, full_name, verify_url)
-        
+
         # Redirect to home page
         frappe.local.flags.redirect_location = "/"
         raise frappe.Redirect
@@ -170,64 +167,3 @@ def signup_user():
         raise
 
 
-def get_verification_url(user):
-    """Generate verification URL for the user"""
-    from frappe.utils import get_url
-    from frappe.utils.verified_command import get_signed_params
-    
-    verify_url = get_url("/api/method/frappe.core.doctype.user.user.verify_request?" + 
-                        get_signed_params({"email": user}))
-    return verify_url
-
-
-def send_welcome_email(user_email, full_name, verify_url):
-    """Send welcome email to new user"""
-    try:
-        from frappe.utils import get_url
-        
-        subject = _("Welcome to LEAPP!")
-        
-        message = f"""
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-            <h2 style="color: #ffc700;">Welcome to LEAPP, {full_name}!</h2>
-            <p>Thank you for joining LEAPP - your platform for learning, exploration, and personal growth.</p>
-            
-            <p>We're excited to have you as part of our community!</p>
-            
-            <p><strong>Next Steps:</strong></p>
-            <ol>
-                <li>Verify your email address by clicking the button below</li>
-                <li>Complete your profile</li>
-                <li>Start exploring courses and events</li>
-            </ol>
-            
-            <div style="margin: 30px 0;">
-                <a href="{verify_url}" 
-                   style="background-color: #ffc700; color: #000; padding: 12px 30px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">
-                    Verify Email Address
-                </a>
-            </div>
-            
-            <p>If you have any questions or need assistance, please don't hesitate to contact us.</p>
-            
-            <p style="margin-top: 30px;">
-                Best regards,<br>
-                <strong>The LEAPP Team</strong>
-            </p>
-            
-            <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 30px 0;">
-            <p style="font-size: 12px; color: #666;">
-                If you didn't create this account, please ignore this email or contact us at support@leapp.com
-            </p>
-        </div>
-        """
-        
-        frappe.sendmail(
-            recipients=user_email,
-            subject=subject,
-            message=message,
-            delayed=False
-        )
-    except Exception as e:
-        frappe.log_error(frappe.get_traceback(), "Welcome Email Error")
-        # Don't raise exception as signup is already successful
