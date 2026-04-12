@@ -216,7 +216,7 @@
                             <select id="languages-select" multiple
                                 class="form-input w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark p-3 text-base text-leapp-black dark:text-white focus:border-leapp-yellow focus:outline-0 focus:ring-2 focus:ring-leapp-yellow/50 min-h-[120px]">
                                 {% for lang in languages %}
-                                <option value="{{ lang.name }}" {% if lang.name in (offering.languages or []) %}selected{% endif %}>{{ lang.language_name or lang.name }}</option>
+                                <option value="{{ lang.name }}" {% if lang.name in (offering.languages or []) %}selected{% endif %}>{{ lang.language or lang.name }}{% if lang.symbol %} ({{ lang.symbol }}){% endif %}</option>
                                 {% endfor %}
                             </select>
                             <input type="hidden" name="languages" id="languages-input" value='{{ (offering.languages or []) | tojson }}'>

@@ -74,7 +74,7 @@ def _load_offering(offering_id: str):
     # Fetch languages from Table MultiSelect child rows
     languages = []
     for row in doc.get("language") or []:
-        lang_name = frappe.db.get_value("Language", row.language, "language_name") or row.language
+        lang_name = frappe.db.get_value("Leapp Languages", row.language, "language") or row.language
         if lang_name:
             languages.append(lang_name)
 
@@ -128,7 +128,7 @@ def _default_highlights(doc):
         parts.append({"icon": "bar_chart", "label": "Level", "value": ", ".join(level_names)})
     lang_names = []
     for row in (doc.get("language") or []):
-        lang_name = frappe.db.get_value("Language", row.language, "language_name") or row.language
+        lang_name = frappe.db.get_value("Leapp Languages", row.language, "language") or row.language
         if lang_name:
             lang_names.append(lang_name)
     if lang_names:

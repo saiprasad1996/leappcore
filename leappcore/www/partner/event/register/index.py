@@ -166,26 +166,28 @@ def save_event(event_id=None):
             "area": area if area else None,
             "active": active
         })
-    
-    # Handle image upload
-    if frappe.request.files.get("featured_image"):
-        file = frappe.request.files.get("featured_image")
-        if file.filename:
-            from frappe.utils.file_manager import save_file
-            saved_file = save_file(
-                file.filename,
-                file.read(),
-                "Leapp Event",
-                event.name if event_id else None,
-                folder="Home/Attachments",
-                is_private=0
-            )
-            event.featured_image = saved_file.file_url
-    
+
+    # Persist first so `event.name` exists — File requires attached_to_name as str/int
     if event_id:
         event.save(ignore_permissions=True)
     else:
         event.insert(ignore_permissions=True)
-    
+
+    if frappe.request.files.get("featured_image"):
+        file = frappe.request.files.get("featured_image")
+        if file.filename:
+            from frappe.utils.file_manager import save_file
+
+            saved_file = save_file(
+                file.filename,
+                file.read(),
+                "Leapp Event",
+                event.name,
+                folder="Home/Attachments",
+                is_private=0,
+            )
+            event.featured_image = saved_file.file_url
+            event.save(ignore_permissions=True)
+
     frappe.db.commit()
     return event.name

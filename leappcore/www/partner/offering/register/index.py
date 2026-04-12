@@ -72,7 +72,6 @@ def get_empty_offering():
         "image": "",
         "price": 0,
         "duration_hours": 0,
-        "level": "Beginner",
         "levels": [],
         "languages": [],
         "total_sessions": 0,
@@ -172,13 +171,12 @@ def get_areas():
 
 
 def get_languages():
-    """Get all languages from the Language doctype"""
-    languages = frappe.get_all(
-        "Language",
-        fields=["name", "language_name"],
-        order_by="language_name"
+    """Languages selectable on offerings (must match Link target on Offering languages)."""
+    return frappe.get_all(
+        "Leapp Languages",
+        fields=["name", "language", "symbol"],
+        order_by="language",
     )
-    return languages
 
 def get_skill_levels():
     """Get all skill levels from the Offering skills doctype"""
@@ -211,23 +209,37 @@ def save_offering(offering_id=None):
     description = frappe.form_dict.get("description")
     price = frappe.form_dict.get("price", 0)
     duration_hours = frappe.form_dict.get("duration_hours", 0)
-    level = frappe.form_dict.get("level", "Beginner")
-    levels = json.loads(frappe.form_dict.get("levels", "[]"))
-    languages = json.loads(frappe.form_dict.get("languages", "[]"))
+    levels = json.loads(frappe.form_dict.get("levels") or "[]")
+    if not isinstance(levels, list):
+        levels = []
+    languages = json.loads(frappe.form_dict.get("languages") or "[]")
+    if not isinstance(languages, list):
+        languages = []
     address = frappe.form_dict.get("address", "")
     total_sessions = frappe.form_dict.get("total_sessions", 0)
     active = 1 if frappe.form_dict.get("active") else 0
     featured = 1 if frappe.form_dict.get("featured") else 0
     
     # Get child table data (JSON strings)
-    categories = json.loads(frappe.form_dict.get("categories", "[]"))
-    areas = json.loads(frappe.form_dict.get("areas", "[]"))
-    instructors = json.loads(frappe.form_dict.get("instructors", "[]"))
-    highlights = json.loads(frappe.form_dict.get("highlights", "[]"))
-    program_outline = json.loads(frappe.form_dict.get("program_outline", "[]"))
-    prices = json.loads(frappe.form_dict.get("prices", "[]"))
-    schedules = json.loads(frappe.form_dict.get("schedules", "[]"))
-    
+    categories = json.loads(frappe.form_dict.get("categories") or "[]")
+    areas = json.loads(frappe.form_dict.get("areas") or "[]")
+    instructors = json.loads(frappe.form_dict.get("instructors") or "[]")
+    highlights = json.loads(frappe.form_dict.get("highlights") or "[]")
+    program_outline = json.loads(frappe.form_dict.get("program_outline") or "[]")
+    prices = json.loads(frappe.form_dict.get("prices") or "[]")
+    schedules = json.loads(frappe.form_dict.get("schedules") or "[]")
+    for name, seq in (
+        ("categories", categories),
+        ("areas", areas),
+        ("instructors", instructors),
+        ("highlights", highlights),
+        ("program_outline", program_outline),
+        ("prices", prices),
+        ("schedules", schedules),
+    ):
+        if not isinstance(seq, list):
+            frappe.throw(_("Invalid {0} data").format(name))
+
     # Validate required fields
     if not title:
         frappe.throw(_("Title is required"))
@@ -245,7 +257,6 @@ def save_offering(offering_id=None):
         offering.description = description
         offering.price = price
         offering.duration_hours = duration_hours
-        offering.level = level
         offering.total_sessions = total_sessions
         offering.active = active
         offering.featured = featured
@@ -272,7 +283,6 @@ def save_offering(offering_id=None):
             "description": description,
             "price": price,
             "duration_hours": duration_hours,
-            "level": level,
             "address": address,
             "total_sessions": total_sessions,
             "active": active,
@@ -301,6 +311,8 @@ def save_offering(offering_id=None):
             offering.append("level", {"skill": lvl})
     
     for h in highlights:
+        if not isinstance(h, dict):
+            continue
         if h.get("label") or h.get("value"):
             offering.append("highlights", {
                 "order_no": h.get("order_no", 0),
@@ -310,6 +322,8 @@ def save_offering(offering_id=None):
             })
     
     for p in program_outline:
+        if not isinstance(p, dict):
+            continue
         if p.get("title"):
             offering.append("program_outline", {
                 "title": p.get("title", ""),
@@ -319,6 +333,8 @@ def save_offering(offering_id=None):
             })
     
     for pr in prices:
+        if not isinstance(pr, dict):
+            continue
         if pr.get("amount"):
             offering.append("prices", {
                 "amount": pr.get("amount", 0),
@@ -327,6 +343,8 @@ def save_offering(offering_id=None):
             })
     
     for s in schedules:
+        if not isinstance(s, dict):
+            continue
         if s.get("recurrence"):
             offering.append("schedules", {
                 "recurrence": s.get("recurrence", "Once"),
@@ -335,25 +353,26 @@ def save_offering(offering_id=None):
                 "days_of_week": s.get("days_of_week", "")
             })
     
-    # Handle image upload
-    if frappe.request.files.get("image"):
-        file = frappe.request.files.get("image")
-        if file.filename:
-            from frappe.utils.file_manager import save_file
-            saved_file = save_file(
-                file.filename,
-                file.read(),
-                "Offering",
-                offering.name if offering_id else None,
-                folder="Home/Attachments",
-                is_private=0
-            )
-            offering.image = saved_file.file_url
-    
     if offering_id:
         offering.save(ignore_permissions=True)
     else:
         offering.insert(ignore_permissions=True)
-    
+
+    if frappe.request.files.get("image"):
+        file = frappe.request.files.get("image")
+        if file.filename:
+            from frappe.utils.file_manager import save_file
+
+            saved_file = save_file(
+                file.filename,
+                file.read(),
+                "Offering",
+                offering.name,
+                folder="Home/Attachments",
+                is_private=0,
+            )
+            offering.image = saved_file.file_url
+            offering.save(ignore_permissions=True)
+
     frappe.db.commit()
     return offering.name
