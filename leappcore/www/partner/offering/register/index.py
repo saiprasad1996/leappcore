@@ -50,8 +50,9 @@ def get_context(context):
     # Load dropdown/select options
     context.my_offerings = get_my_offerings()
     context.categories = get_categories()
+    context.category_parent_groups = get_category_parent_groups()
+    context.locations = get_locations()
     context.areas = get_areas()
-    context.instructors = get_instructors()
     context.languages = get_languages()
     context.skill_levels = get_skill_levels()
     
@@ -79,12 +80,16 @@ def get_empty_offering():
         "featured": 0,
         "address": "",
         "categories": [],
+        "category_parent": "",
+        "location": "",
+        "location_display": "",
         "areas": [],
         "highlights": [],
         "program_outline": [],
         "prices": [],
         "schedules": [],
-        "instructors": []
+        "instructors": [],
+        "instructor_details": [],
     }
 
 
@@ -104,7 +109,26 @@ def load_offering(offering_id):
     # Convert child tables to proper format (only include needed fields, convert time to string)
     data["categories"] = [row.offering_category for row in offering.categories]
     data["areas"] = [row.area for row in offering.areas]
+    data["location"] = ""
+    data["location_display"] = ""
+    for row in offering.areas or []:
+        loc = frappe.db.get_value("Area", row.area, "location")
+        if loc:
+            data["location"] = loc
+            data["location_display"] = frappe.db.get_value("Location", loc, "city") or loc
+            break
     data["instructors"] = [row.instructor for row in offering.instructors]
+    data["instructor_details"] = []
+    for uid in data["instructors"]:
+        if not uid:
+            continue
+        data["instructor_details"].append(
+            {
+                "name": uid,
+                "full_name": frappe.db.get_value("User", uid, "full_name") or uid,
+                "email": frappe.db.get_value("User", uid, "email") or "",
+            }
+        )
     data["languages"] = [row.language for row in (offering.language or [])]
     data["address"] = offering.address or ""
     data["levels"] = [row.skill for row in (offering.level or [])]
@@ -135,6 +159,8 @@ def load_offering(offering_id):
         "end_time": str(row.end_time) if row.end_time else "",
         "days_of_week": row.days_of_week or ""
     } for row in offering.schedules]
+
+    data["category_parent"] = infer_category_parent_group(data["categories"])
     
     return data
 
@@ -160,14 +186,54 @@ def get_categories():
     return categories
 
 
-def get_areas():
-    """Get all areas"""
-    areas = frappe.get_all(
-        "Area",
-        fields=["name", "area_name"],
-        order_by="area_name"
+def get_category_parent_groups():
+    """Distinct parent_group values for the Category (parent) dropdown."""
+    rows = frappe.get_all(
+        "Offering Category",
+        fields=["parent_group"],
+        filters={"parent_group": ("!=", "")},
+        distinct=True,
+        order_by="parent_group asc",
     )
-    return areas
+    groups = [r.parent_group for r in rows if r.get("parent_group")]
+    preferred = ["Learn", "Leisure", "Play"]
+    ordered = [g for g in preferred if g in groups]
+    for g in groups:
+        if g not in ordered:
+            ordered.append(g)
+    return ordered
+
+
+def infer_category_parent_group(category_names):
+    """Pick parent group for edit form when subcategories may span groups (use majority)."""
+    if not category_names:
+        return ""
+    counts = {}
+    for cn in category_names:
+        pg = frappe.db.get_value("Offering Category", cn, "parent_group")
+        if pg:
+            counts[pg] = counts.get(pg, 0) + 1
+    if not counts:
+        return ""
+    return max(counts.items(), key=lambda x: (x[1], x[0]))[0]
+
+
+def get_locations():
+    """Cities / locations for filtering areas."""
+    return frappe.get_all(
+        "Location",
+        fields=["name", "city"],
+        order_by="city asc",
+    )
+
+
+def get_areas():
+    """All areas with parent Location (for client-side filtering)."""
+    return frappe.get_all(
+        "Area",
+        fields=["name", "area_name", "location"],
+        order_by="area_name asc",
+    )
 
 
 def get_languages():
@@ -188,15 +254,13 @@ def get_skill_levels():
 
 
 
-def get_instructors():
-    """Get users who can be instructors (Leapp Partners)"""
-    instructors = frappe.get_all(
-        "User",
-        filters={"enabled": 1},
-        fields=["name", "full_name", "email"],
-        order_by="full_name"
-    )
-    return instructors
+def _validate_instructor_user(user_id: str) -> None:
+    if not user_id or not frappe.db.exists("User", user_id):
+        frappe.throw(_("Invalid instructor."))
+    if not frappe.db.get_value("User", user_id, "enabled"):
+        frappe.throw(_("Instructor account is disabled."))
+    if "Leapp Partner" not in frappe.get_roles(user_id):
+        frappe.throw(_("Instructor must be a Leapp Partner."))
 
 
 def save_offering(offering_id=None):
@@ -300,6 +364,7 @@ def save_offering(offering_id=None):
     
     for inst in instructors:
         if inst:
+            _validate_instructor_user(inst)
             offering.append("instructors", {"instructor": inst})
 
     for lang in languages:

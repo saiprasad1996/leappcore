@@ -49,7 +49,9 @@ def get_context(context):
     
     # Load my events
     context.my_events = get_my_events()
-    
+    context.locations = get_locations()
+    context.areas = get_areas()
+
     return context
 
 
@@ -71,7 +73,9 @@ def get_empty_event():
         "featured_image": "",
         "area": "",
         "area_name": "",
-        "active": 0
+        "location": "",
+        "location_display": "",
+        "active": 0,
     }
 
 
@@ -94,14 +98,45 @@ def load_event(event_id):
     if data.get("end_datetime"):
         data["end_datetime"] = str(data["end_datetime"]).replace(" ", "T")[:16]
     
-    # Get area name for display
+    # Area display + city (location) for form
+    data["location"] = data.get("location") or ""
+    data["location_display"] = ""
+    if data.get("location"):
+        data["location_display"] = (
+            frappe.db.get_value("Location", data["location"], "city") or data["location"]
+        )
+    elif data.get("area") and frappe.db.exists("Area", data["area"]):
+        loc = frappe.db.get_value("Area", data["area"], "location")
+        if loc:
+            data["location"] = loc
+            data["location_display"] = (
+                frappe.db.get_value("Location", loc, "city") or loc
+            )
+
     if data.get("area") and frappe.db.exists("Area", data["area"]):
-        area_doc = frappe.get_doc("Area", data["area"])
-        data["area_name"] = area_doc.area_name
+        data["area_name"] = frappe.db.get_value("Area", data["area"], "area_name") or ""
     else:
         data["area_name"] = ""
-    
+
     return data
+
+
+def get_locations():
+    """Cities / locations for filtering areas (same as offering register)."""
+    return frappe.get_all(
+        "Location",
+        fields=["name", "city"],
+        order_by="city asc",
+    )
+
+
+def get_areas():
+    """All areas with parent Location name for client-side filtering."""
+    return frappe.get_all(
+        "Area",
+        fields=["name", "area_name", "location"],
+        order_by="area_name asc",
+    )
 
 
 def get_my_events():
@@ -127,8 +162,16 @@ def save_event(event_id=None):
     venue_address = frappe.form_dict.get("venue_address")
     long_description = frappe.form_dict.get("long_description")
     short_description = frappe.form_dict.get("short_description")
-    area = frappe.form_dict.get("area")
+    location = (frappe.form_dict.get("location") or "").strip()
+    area = (frappe.form_dict.get("area") or "").strip()
     active = 1 if frappe.form_dict.get("active") else 0
+
+    if area and not location:
+        location = frappe.db.get_value("Area", area, "location") or ""
+    if area and location:
+        area_loc = frappe.db.get_value("Area", area, "location")
+        if area_loc != location:
+            frappe.throw(_("Selected area does not belong to the selected city."))
     
     # Validate required fields
     if not event_name:
@@ -149,7 +192,8 @@ def save_event(event_id=None):
         event.venue_address = venue_address
         event.long_description = long_description
         event.short_description = short_description
-        event.area = area if area else None
+        event.location = location or None
+        event.area = area or None
         event.active = active
     else:
         # Create new event
@@ -163,8 +207,9 @@ def save_event(event_id=None):
             "venue_address": venue_address,
             "long_description": long_description,
             "short_description": short_description,
-            "area": area if area else None,
-            "active": active
+            "location": location or None,
+            "area": area or None,
+            "active": active,
         })
 
     # Persist first so `event.name` exists — File requires attached_to_name as str/int

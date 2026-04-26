@@ -33,6 +33,18 @@ def get_context(context):
     return context
 
 
+def _area_chip_label(area_row_id: str) -> str:
+    """Chip text: city + area from Area → Location (e.g. 'Bengaluru, Koramangala')."""
+    if not area_row_id:
+        return ""
+    area_name = frappe.db.get_value("Area", area_row_id, "area_name") or area_row_id
+    location = frappe.db.get_value("Area", area_row_id, "location")
+    city = frappe.db.get_value("Location", location, "city") if location else None
+    if city:
+        return f"{city}, {area_name}"
+    return area_name
+
+
 def _load_offering(offering_id: str):
     doc = frappe.get_doc("Offering", offering_id)
 
@@ -78,11 +90,12 @@ def _load_offering(offering_id: str):
         if lang_name:
             languages.append(lang_name)
 
-    # Fetch areas
+    # Fetch areas (chip = city + area when Location is set on Area)
     areas = []
     for row in doc.get("areas") or []:
-        area_name = frappe.db.get_value("Area", row.area, "area_name") or row.area
-        areas.append(area_name)
+        label = _area_chip_label(row.area)
+        if label:
+            areas.append(label)
 
     # Fetch categories
     categories = []

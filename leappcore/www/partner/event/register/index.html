@@ -10,14 +10,6 @@
         font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
     }
     
-    .area-dropdown {
-        max-height: 200px;
-        overflow-y: auto;
-    }
-    
-    .area-option:hover {
-        background-color: rgba(255, 199, 0, 0.1);
-    }
 </style>
 {% endblock %}
 
@@ -208,30 +200,39 @@
                             </label>
                         </div>
                         
-                        <!-- Searchable Area Select -->
-                        <div class="flex flex-col">
-                            <p class="text-leapp-black dark:text-white text-base font-medium leading-normal pb-2">Area</p>
-                            <div class="relative">
-                                <input type="hidden" name="area" id="area-value" value="{{ event.area or '' }}" />
-                                <input
-                                    type="text"
-                                    id="area-search"
-                                    value="{{ event.area_name or '' }}"
-                                    autocomplete="off"
-                                    class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark h-14 p-[15px] text-base font-normal leading-normal text-leapp-black dark:text-white placeholder:text-gray-400 focus:border-leapp-yellow focus:outline-0 focus:ring-2 focus:ring-leapp-yellow/50"
-                                    placeholder="Search and select an area..." />
-                                <span class="absolute right-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-gray-500 dark:text-gray-400 pointer-events-none">search</span>
-                                <div id="area-dropdown" class="hidden absolute top-full left-0 right-0 mt-1 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark shadow-lg z-50 area-dropdown">
-                                    <div id="area-results" class="divide-y divide-gray-200 dark:divide-gray-700"></div>
-                                    <div id="area-loading" class="hidden p-3 text-center text-gray-500 dark:text-gray-400 text-sm">
-                                        Searching...
-                                    </div>
-                                    <div id="area-empty" class="hidden p-3 text-center text-gray-500 dark:text-gray-400 text-sm">
-                                        No areas found
+                        <!-- Location (city) → Area (same pattern as offering register) -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+                            <div class="rounded-xl bg-gray-50 dark:bg-gray-900/40 p-4 sm:p-5 flex flex-col gap-2 shadow-sm dark:shadow-none ring-1 ring-gray-200/70 dark:ring-white/[0.06]">
+                                <label for="event-location-search-input" class="text-leapp-black dark:text-white text-base font-medium leading-normal">Location</label>
+                                <p class="text-xs text-gray-500 dark:text-gray-400 -mt-0.5">Search and pick a city. The area list only shows neighbourhoods in that city.</p>
+                                <div class="relative">
+                                    <input type="text" id="event-location-search-input" autocomplete="off" readonly
+                                        placeholder="Click to search city…"
+                                        value="{{ event.location_display or '' }}"
+                                        class="form-input w-full rounded-xl border-0 ring-1 ring-gray-200/80 dark:ring-white/[0.08] bg-white dark:bg-background-dark h-14 px-[15px] text-base text-leapp-black dark:text-white placeholder:text-gray-400 focus:ring-2 focus:ring-leapp-yellow/50 focus:outline-0 cursor-pointer" />
+                                    <input type="hidden" name="location" id="event-location-selected" value="{{ event.location or '' }}" />
+                                    <div id="event-location-dropdown" class="hidden absolute z-30 mt-1 w-full max-h-60 overflow-y-auto rounded-xl bg-white dark:bg-background-dark shadow-lg ring-1 ring-gray-200/60 dark:ring-white/[0.08]">
+                                        <div class="p-2">
+                                            <input type="text" id="event-location-filter-input" autocomplete="off" placeholder="Type to filter…"
+                                                class="w-full px-3 py-2 rounded-lg border-0 ring-1 ring-gray-200/70 dark:ring-white/[0.08] bg-white dark:bg-background-dark text-sm text-leapp-black dark:text-white focus:ring-2 focus:ring-leapp-yellow/40 focus:outline-0" />
+                                        </div>
+                                        <div id="event-location-list" class="py-1"></div>
                                     </div>
                                 </div>
                             </div>
+                            <div class="rounded-xl bg-gray-50 dark:bg-gray-900/40 p-4 sm:p-5 flex flex-col gap-2 shadow-sm dark:shadow-none ring-1 ring-gray-200/70 dark:ring-white/[0.06]">
+                                <label for="event-area-select" class="text-leapp-black dark:text-white text-base font-medium leading-normal">Area</label>
+                                <p class="text-xs text-gray-500 dark:text-gray-400 -mt-0.5">Choose a neighbourhood in the city you selected.</p>
+                                <input type="hidden" name="area" id="event-area-hidden" value="{{ event.area or '' }}" />
+                                <select id="event-area-select" disabled
+                                    class="form-input w-full rounded-xl border-0 ring-1 ring-gray-200/80 dark:ring-white/[0.08] bg-white dark:bg-background-dark h-14 px-[15px] text-base text-leapp-black dark:text-white focus:ring-2 focus:ring-leapp-yellow/50 focus:outline-0 disabled:opacity-60 disabled:cursor-not-allowed">
+                                </select>
+                            </div>
                         </div>
+                        <script type="application/json" id="event-locations-json">{{ locations | tojson }}</script>
+                        <script type="application/json" id="event-areas-json">{{ areas | tojson }}</script>
+                        <script type="application/json" id="event-initial-area-json">{{ event.area | tojson }}</script>
+
                         
                         <label class="flex flex-col">
                             <p class="text-leapp-black dark:text-white text-base font-medium leading-normal pb-2">Venue Address</p>
@@ -311,81 +312,125 @@
             }
         });
         
-        // Searchable Area Select
-        const areaSearch = document.getElementById('area-search');
-        const areaValue = document.getElementById('area-value');
-        const areaDropdown = document.getElementById('area-dropdown');
-        const areaResults = document.getElementById('area-results');
-        const areaLoading = document.getElementById('area-loading');
-        const areaEmpty = document.getElementById('area-empty');
-        
-        let searchTimeout;
-        
-        async function searchAreas(query) {
-            areaLoading.classList.remove('hidden');
-            areaEmpty.classList.add('hidden');
-            areaResults.innerHTML = '';
-            
+        // Location (city) → single Area select
+        const eventLocationsJson = document.getElementById('event-locations-json');
+        const eventAreasJson = document.getElementById('event-areas-json');
+        const eventInitialAreaJson = document.getElementById('event-initial-area-json');
+        if (eventLocationsJson && eventAreasJson) {
+            const locations = JSON.parse(eventLocationsJson.textContent || '[]');
+            const allAreas = JSON.parse(eventAreasJson.textContent || '[]');
+            let initialAreaName = null;
             try {
-                const response = await fetch(`/api/method/leappcore.api.area.search_areas?query=${encodeURIComponent(query)}&limit=20`, {
-                    headers: {
-                        'X-Frappe-CSRF-Token': '{{ csrf_token }}'
-                    }
-                });
-                const data = await response.json();
-                
-                areaLoading.classList.add('hidden');
-                
-                if (data.message && data.message.length > 0) {
-                    areaResults.innerHTML = data.message.map(area => `
-                        <div class="area-option px-4 py-3 cursor-pointer transition-colors text-leapp-black dark:text-white" data-name="${area.name}" data-area-name="${area.area_name}">
-                            ${area.area_name}
-                        </div>
-                    `).join('');
-                    
-                    document.querySelectorAll('.area-option').forEach(opt => {
-                        opt.addEventListener('click', () => {
-                            areaValue.value = opt.dataset.name;
-                            areaSearch.value = opt.dataset.areaName;
-                            areaDropdown.classList.add('hidden');
-                        });
-                    });
-                } else {
-                    areaEmpty.classList.remove('hidden');
+                initialAreaName = JSON.parse((eventInitialAreaJson && eventInitialAreaJson.textContent) || 'null');
+            } catch (err) {
+                initialAreaName = null;
+            }
+            if (initialAreaName === '') initialAreaName = null;
+
+            const locationSearch = document.getElementById('event-location-search-input');
+            const locationHidden = document.getElementById('event-location-selected');
+            const locationDropdown = document.getElementById('event-location-dropdown');
+            const locationFilterInput = document.getElementById('event-location-filter-input');
+            const locationList = document.getElementById('event-location-list');
+            const areaSelect = document.getElementById('event-area-select');
+            const areaHidden = document.getElementById('event-area-hidden');
+
+            function syncAreaHidden() {
+                if (areaHidden) areaHidden.value = areaSelect.value || '';
+            }
+
+            function buildAreaOptions(locationDocName, selectedAreaName) {
+                areaSelect.innerHTML = '';
+                const ph = document.createElement('option');
+                ph.value = '';
+                ph.textContent = 'Select area…';
+                areaSelect.appendChild(ph);
+                if (!locationDocName) {
+                    areaSelect.disabled = true;
+                    if (areaHidden) areaHidden.value = '';
+                    return;
                 }
-            } catch (error) {
-                console.error('Area search error:', error);
-                areaLoading.classList.add('hidden');
-                areaEmpty.classList.remove('hidden');
+                areaSelect.disabled = false;
+                allAreas
+                    .filter((a) => a.location === locationDocName)
+                    .sort((a, b) =>
+                        String(a.area_name || a.name || '').localeCompare(
+                            String(b.area_name || b.name || ''),
+                            undefined,
+                            { sensitivity: 'base' }
+                        )
+                    )
+                    .forEach((a) => {
+                        const opt = document.createElement('option');
+                        opt.value = a.name;
+                        opt.textContent = a.area_name || a.name;
+                        if (selectedAreaName && a.name === selectedAreaName) opt.selected = true;
+                        areaSelect.appendChild(opt);
+                    });
+                syncAreaHidden();
+            }
+
+            areaSelect.addEventListener('change', syncAreaHidden);
+
+            function renderLocationList(filter) {
+                const q = (filter || '').toLowerCase().trim();
+                const filtered = !q
+                    ? locations
+                    : locations.filter(
+                          (l) =>
+                              String(l.city || '')
+                                  .toLowerCase()
+                                  .includes(q) || String(l.name || '').toLowerCase().includes(q)
+                      );
+                locationList.innerHTML = '';
+                filtered.forEach((l) => {
+                    const row = document.createElement('div');
+                    row.className =
+                        'location-option px-4 py-2.5 hover:bg-leapp-yellow/10 cursor-pointer text-sm text-leapp-black dark:text-white rounded-lg mx-1';
+                    row.dataset.name = l.name;
+                    row.textContent = l.city || l.name;
+                    row.addEventListener('click', () => {
+                        locationHidden.value = l.name;
+                        locationSearch.value = l.city || l.name;
+                        locationDropdown.classList.add('hidden');
+                        locationFilterInput.value = '';
+                        renderLocationList('');
+                        buildAreaOptions(l.name, null);
+                    });
+                    locationList.appendChild(row);
+                });
+            }
+
+            function openLocationDropdown() {
+                locationDropdown.classList.remove('hidden');
+                renderLocationList(locationFilterInput.value);
+                locationFilterInput.focus();
+            }
+
+            locationSearch.addEventListener('click', (e) => {
+                e.stopPropagation();
+                openLocationDropdown();
+            });
+            locationFilterInput.addEventListener('input', () => renderLocationList(locationFilterInput.value));
+            document.addEventListener('click', (e) => {
+                const wrap = locationSearch && locationSearch.closest('.relative');
+                if (wrap && !wrap.contains(e.target)) {
+                    locationDropdown.classList.add('hidden');
+                }
+            });
+            locationDropdown.addEventListener('click', (e) => e.stopPropagation());
+            locationFilterInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    locationDropdown.classList.add('hidden');
+                    locationSearch.focus();
+                }
+            });
+
+            const initialLoc = locationHidden.value;
+            if (initialLoc) {
+                buildAreaOptions(initialLoc, initialAreaName);
             }
         }
-        
-        areaSearch.addEventListener('focus', () => {
-            areaDropdown.classList.remove('hidden');
-            if (areaSearch.value.length > 0) {
-                searchAreas(areaSearch.value);
-            } else {
-                searchAreas('');
-            }
-        });
-        
-        areaSearch.addEventListener('input', (e) => {
-            clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(() => {
-                searchAreas(e.target.value);
-            }, 300);
-        });
-        
-        // Clear selection when typing
-        areaSearch.addEventListener('keydown', () => {
-            areaValue.value = '';
-        });
-        
-        document.addEventListener('click', (e) => {
-            if (!areaSearch.contains(e.target) && !areaDropdown.contains(e.target)) {
-                areaDropdown.classList.add('hidden');
-            }
-        });
     });
 </script>
 {% endblock %}

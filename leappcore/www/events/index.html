@@ -116,14 +116,8 @@
                         {{ event.event_name }}
                     </h3>
 
-                    <!-- Heading/Subtitle -->
-                    {% if event.heading %}
-                    <p class="text-sm text-gray-600 dark:text-gray-400 mb-3">{{ event.heading }}</p>
-                    {% endif %}
-
-                    <!-- Short Description -->
                     {% if event.short_description %}
-                    <p class="text-sm text-gray-600 dark:text-gray-400 mb-4 line-clamp-2">{{ event.short_description }}</p>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mb-4 line-clamp-3">{{ event.short_description }}</p>
                     {% endif %}
 
                     {% if event.categories and event.categories|length > 0 %}
@@ -194,12 +188,8 @@
                                     {{ event.event_name }}
                                 </h3>
 
-                                {% if event.heading %}
-                                <p class="text-sm text-gray-600 dark:text-gray-400 mb-3">{{ event.heading }}</p>
-                                {% endif %}
-
                                 {% if event.short_description %}
-                                <p class="text-sm text-gray-600 dark:text-gray-400 mb-4 line-clamp-2">{{ event.short_description }}</p>
+                                <p class="text-sm text-gray-600 dark:text-gray-400 mb-4 line-clamp-3">{{ event.short_description }}</p>
                                 {% endif %}
 
                                 {% if event.categories and event.categories|length > 0 %}

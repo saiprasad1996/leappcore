@@ -33,7 +33,7 @@
                     </div>
                 </div>
                 <p class="text-leapp-black dark:text-white text-4xl font-black leading-tight tracking-[-0.033em]">Become a LEAPP Partner</p>
-                <p class="text-gray-600 dark:text-gray-300 text-base font-normal leading-normal">Join our network of educators and organizations making a difference in children's lives.</p>
+                <p class="text-gray-600 dark:text-gray-300 text-base font-normal leading-normal">Join our network of educators and organizations making a difference in lives.</p>
             </div>
             
             {% if error_message %}
@@ -107,10 +107,9 @@
                     </div>
                     
                     <label class="flex flex-col">
-                        <p class="text-leapp-black dark:text-white text-base font-medium leading-normal pb-2">Organization Name <span class="text-red-500">*</span></p>
+                        <p class="text-leapp-black dark:text-white text-base font-medium leading-normal pb-2">Organization Name <span class="text-gray-500 dark:text-gray-400 font-normal text-sm">(optional)</span></p>
                         <input
                             name="organization_name"
-                            required
                             value="{{ organization_name or '' }}"
                             class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark h-14 p-[15px] text-base font-normal leading-normal text-leapp-black dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-400 focus:border-leapp-yellow focus:outline-0 focus:ring-2 focus:ring-leapp-yellow/50"
                             placeholder="Enter your organization or business name" type="text" />

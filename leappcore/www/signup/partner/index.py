@@ -109,14 +109,14 @@ def signup_partner():
     email = frappe.form_dict.get("email")
     password = frappe.form_dict.get("password")
     confirm_password = frappe.form_dict.get("confirm_password")
-    organization_name = frappe.form_dict.get("organization_name")
+    organization_name = (frappe.form_dict.get("organization_name") or "").strip()
     phone = frappe.form_dict.get("phone")
     country_code = frappe.form_dict.get("country_code", "+91")
     address = frappe.form_dict.get("address")
     city = frappe.form_dict.get("city")
     
     # Validate inputs
-    if not full_name or not email or not password or not organization_name:
+    if not full_name or not email or not password:
         frappe.throw(_("Please fill in all required fields"), frappe.ValidationError)
     
     if password != confirm_password:
@@ -167,12 +167,14 @@ def signup_partner():
         # })
         # partner_profile.insert(ignore_permissions=True)
         
-        # Store additional partner information in User document custom fields
-        # Or you can create a separate Partner Profile doctype
-        frappe.db.set_value("User", user.name, {
-            "bio": f"Organization: {organization_name}",
-            # Add more custom fields as needed
-        }, update_modified=False)
+        # Store optional organization on User bio for profile context
+        if organization_name:
+            frappe.db.set_value(
+                "User",
+                user.name,
+                {"bio": f"Organization: {organization_name}"},
+                update_modified=False,
+            )
         
         frappe.db.commit()
 
