@@ -99,8 +99,14 @@
 
             <!-- Hero -->
             <div class="flex flex-wrap justify-between gap-3 p-6 rounded-xl bg-gradient-to-r from-leapp-yellow/10 to-leapp-yellow/5 border border-slate-200 dark:border-slate-800">
-                <div class="flex min-w-72 flex-col gap-3">
-                    <p class="text-3xl sm:text-4xl font-black leading-tight tracking-[-0.033em]">{{ offering.title }}</p>
+                <div class="flex min-w-72 flex-col gap-3 flex-1">
+                    <div class="flex items-start justify-between gap-3">
+                        <p class="text-3xl sm:text-4xl font-black leading-tight tracking-[-0.033em]">{{ offering.title }}</p>
+                        {% set share_url = offering.share_url %}
+                        {% set share_title = offering.title %}
+                        {% set share_button_size = 'detail' %}
+                        {% include "templates/includes/share_button.html" %}
+                    </div>
                     <p class="text-slate-600 dark:text-slate-400 text-base leading-normal">{{ offering.subtitle }}</p>
                     
                     <!-- Categories and Areas -->
@@ -141,11 +147,22 @@
                 <!-- Sidebar Card -->
                 <div class="lg:col-span-1 space-y-8">
                     <div class="flex flex-col rounded-xl border border-slate-200 dark:border-slate-800 bg-background-light dark:bg-background-dark shadow-lg overflow-hidden">
-                        <div class="w-full aspect-video sm:aspect-[16/7] overflow-hidden bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
-                            <img src="{{ offering.image or 'https://placehold.co/600x400?text=No+Image' }}" 
-                                 alt="{{ offering.title }}" 
-                                 class="w-full h-full object-contain">
-                        </div>
+                        {% set poster_image = offering.image or 'https://placehold.co/600x400?text=No+Image' %}
+                        {% set poster_is_placeholder = not offering.image or 'placehold.co' in poster_image %}
+                        <button type="button"
+                            id="course-poster-thumb"
+                            class="group relative w-full aspect-video sm:aspect-[16/7] overflow-hidden bg-slate-100 dark:bg-slate-800 flex items-center justify-center {% if not poster_is_placeholder %}cursor-pointer{% else %}cursor-default{% endif %}"
+                            aria-label="{% if not poster_is_placeholder %}View poster full screen{% else %}{{ offering.title }} poster{% endif %}"
+                            {% if not poster_is_placeholder %}data-poster-src="{{ poster_image }}" data-poster-alt="{{ offering.title }}"{% endif %}>
+                            <img src="{{ poster_image }}"
+                                 alt="{{ offering.title }}"
+                                 class="w-full h-full object-contain pointer-events-none">
+                            {% if not poster_is_placeholder %}
+                            <span class="absolute inset-0 flex items-center justify-center bg-black/0 group-hover:bg-black/20 transition-colors duration-200">
+                                <span class="material-symbols-outlined text-white text-4xl opacity-0 group-hover:opacity-100 transition-opacity duration-200 drop-shadow-lg">zoom_in</span>
+                            </span>
+                            {% endif %}
+                        </button>
                          <div class="p-6 space-y-4">
                             {% if has_leapp_customer_role %}
                             <button id="interest-btn" 
@@ -311,6 +328,27 @@
         </div>
     </div>
     {% endif %}
+
+    <!-- Poster lightbox -->
+    <div id="poster-lightbox"
+        class="fixed inset-0 z-[200] hidden items-center justify-center p-4 sm:p-6"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Course poster full screen view">
+        <div class="absolute inset-0 bg-black/70 backdrop-blur-sm transition-opacity"
+            onclick="closePosterLightbox()"></div>
+        <button type="button"
+            id="poster-lightbox-close"
+            onclick="closePosterLightbox()"
+            class="absolute top-4 right-4 z-20 flex h-11 w-11 items-center justify-center rounded-full border border-white/30 bg-black/50 text-white hover:bg-leapp-yellow hover:text-leapp-black hover:border-leapp-yellow transition-colors"
+            aria-label="Close">
+            <span class="material-symbols-outlined text-2xl">close</span>
+        </button>
+        <img id="poster-lightbox-image"
+            src=""
+            alt=""
+            class="relative z-10 max-w-[95vw] max-h-[90vh] object-contain rounded-lg shadow-2xl">
+    </div>
 </main>
 {% endblock %}
 
@@ -346,6 +384,49 @@ document.addEventListener('DOMContentLoaded', () => {
                 targetContent.classList.remove('hidden');
             }
         });
+    });
+
+    // Poster lightbox
+    const posterThumb = document.getElementById('course-poster-thumb');
+    const posterLightbox = document.getElementById('poster-lightbox');
+    const posterLightboxImage = document.getElementById('poster-lightbox-image');
+    const posterLightboxClose = document.getElementById('poster-lightbox-close');
+
+    function openPosterLightbox(src, alt) {
+        if (!posterLightbox || !posterLightboxImage || !src) return;
+        posterLightboxImage.src = src;
+        posterLightboxImage.alt = alt || 'Course poster';
+        posterLightbox.classList.remove('hidden');
+        posterLightbox.classList.add('flex');
+        document.body.style.overflow = 'hidden';
+        posterLightboxClose?.focus();
+    }
+
+    function closePosterLightbox() {
+        if (!posterLightbox) return;
+        posterLightbox.classList.add('hidden');
+        posterLightbox.classList.remove('flex');
+        document.body.style.overflow = '';
+        posterLightboxImage?.removeAttribute('src');
+    }
+
+    window.closePosterLightbox = closePosterLightbox;
+
+    if (posterThumb && posterThumb.dataset.posterSrc) {
+        const openFromThumb = () => openPosterLightbox(posterThumb.dataset.posterSrc, posterThumb.dataset.posterAlt);
+        posterThumb.addEventListener('click', openFromThumb);
+        posterThumb.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                openFromThumb();
+            }
+        });
+    }
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && posterLightbox && !posterLightbox.classList.contains('hidden')) {
+            closePosterLightbox();
+        }
     });
     
     // Interest Button Functionality

@@ -124,6 +124,7 @@ def _fetch_offerings(where_clause, params, start, per_page):
 def _attach_detail_urls(offerings):
     for offering in offerings:
         offering["detail_url"] = f"/courses/detail?offering={str(offering['name'])}"
+        offering["share_url"] = frappe.utils.get_url(offering["detail_url"])
 
 
 def _count_offerings(where_clause, params):

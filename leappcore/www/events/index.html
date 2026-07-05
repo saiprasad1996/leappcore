@@ -112,9 +112,14 @@
 
                 <div class="p-6">
                     <!-- Event Name -->
-                    <h3 class="text-lg font-bold text-leapp-black dark:text-white mb-2 line-clamp-2 group-hover:text-leapp-yellow transition-colors">
-                        {{ event.event_name }}
-                    </h3>
+                    <div class="flex items-start justify-between gap-2 mb-2">
+                        <h3 class="text-lg font-bold text-leapp-black dark:text-white line-clamp-2 group-hover:text-leapp-yellow transition-colors flex-1 min-w-0">
+                            {{ event.event_name }}
+                        </h3>
+                        {% set share_url = event.share_url %}
+                        {% set share_title = event.event_name %}
+                        {% include "templates/includes/share_button.html" %}
+                    </div>
 
                     {% if event.short_description %}
                     <p class="text-sm text-gray-600 dark:text-gray-400 mb-4 line-clamp-3">{{ event.short_description }}</p>
@@ -184,9 +189,14 @@
                     <div class="flex-1 p-6">
                         <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
                             <div class="flex-1">
-                                <h3 class="text-xl font-bold text-leapp-black dark:text-white mb-2 hover:text-leapp-yellow transition-colors">
-                                    {{ event.event_name }}
-                                </h3>
+                                <div class="flex items-start justify-between gap-2 mb-2">
+                                    <h3 class="text-xl font-bold text-leapp-black dark:text-white hover:text-leapp-yellow transition-colors flex-1 min-w-0">
+                                        {{ event.event_name }}
+                                    </h3>
+                                    {% set share_url = event.share_url %}
+                                    {% set share_title = event.event_name %}
+                                    {% include "templates/includes/share_button.html" %}
+                                </div>
 
                                 {% if event.short_description %}
                                 <p class="text-sm text-gray-600 dark:text-gray-400 mb-4 line-clamp-3">{{ event.short_description }}</p>

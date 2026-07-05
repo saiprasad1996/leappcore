@@ -51,5 +51,6 @@ def _load_event(event_id):
         "organizer_image": organizer.user_image if organizer else None,
         "area": event.area,
         "area_name": area.area_name if area else None,
-        "active": event.active
+        "active": event.active,
+        "share_url": frappe.utils.get_url(f"/events/detail?event={event.name}"),
     }

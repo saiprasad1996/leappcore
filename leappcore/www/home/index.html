@@ -1,22 +1,189 @@
 {% extends 'templates/htmlbase/base.html' %}
 {% block content %}
 
+{% set hero_fallback_image = "https://lh3.googleusercontent.com/aida-public/AB6AXuD58OMGHDu__yINwpS8v_jzwzt0SeLpKprIVL821Qn6GTQR3nNem8zzGBTg4z0MEx3TlSEM16JeKoLbEiQzJXe_eGw_Sp5wYJ4hmzHMouXkNC6E5kRCpW555D-oXId7re17cZgOgRkRwgAjZk5tTnTQtuuHCS671Q11uz_pTN6grSBpy9VBtr8SmehpVjicBKlM6aVG24ic7faerd3qo-ScHQYoiMWE219nFQ1y8vCKO0IoXLChcTmk81pvSKcTLz9BQG72QykGyh7N" %}
+{% set hero_slide_ns = namespace(count=0) %}
+{% for slide in main_page.hero_slides | sort(attribute='sort_order') %}
+    {% if slide.image %}
+        {% set hero_slide_ns.count = hero_slide_ns.count + 1 %}
+    {% endif %}
+{% endfor %}
+
 <div class="@container p-4">
-    <div class="flex min-h-[480px] flex-col gap-6 bg-cover bg-center bg-no-repeat @[480px]:gap-8 rounded-xl items-center justify-center text-center p-4"
-        data-alt="Children playing and learning in a colorful environment"
-        style='background-image: linear-gradient(to right, rgba(255, 199, 0, 0.8), rgba(255, 219, 77, 0.6)), url("{{ main_page.index_image or "https://lh3.googleusercontent.com/aida-public/AB6AXuD58OMGHDu__yINwpS8v_jzwzt0SeLpKprIVL821Qn6GTQR3nNem8zzGBTg4z0MEx3TlSEM16JeKoLbEiQzJXe_eGw_Sp5wYJ4hmzHMouXkNC6E5kRCpW555D-oXId7re17cZgOgRkRwgAjZk5tTnTQtuuHCS671Q11uz_pTN6grSBpy9VBtr8SmehpVjicBKlM6aVG24ic7faerd3qo-ScHQYoiMWE219nFQ1y8vCKO0IoXLChcTmk81pvSKcTLz9BQG72QykGyh7N" }}");'>
-        <div class="flex flex-col gap-2 text-center">
+    <div id="hero-carousel"
+        role="region"
+        aria-label="Hero carousel"
+        tabindex="0"
+        data-slide-count="{{ hero_slide_ns.count if hero_slide_ns.count > 0 else 1 }}"
+        class="relative flex min-h-[480px] flex-col gap-6 @[480px]:gap-8 rounded-xl items-center justify-center text-center p-4 overflow-hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-leapp-yellow focus-visible:ring-offset-2">
+        <div class="absolute inset-0 rounded-xl" aria-hidden="true">
+            {% set hero_slide_ns.idx = 0 %}
+            {% for slide in main_page.hero_slides | sort(attribute='sort_order') %}
+                {% if slide.image %}
+                <div class="hero-slide absolute inset-0 bg-cover bg-center bg-no-repeat transition-opacity duration-700 ease-in-out rounded-xl {% if hero_slide_ns.idx == 0 %}opacity-100 z-[1]{% else %}opacity-0 z-0{% endif %}"
+                    data-slide-index="{{ hero_slide_ns.idx }}"
+                    data-alt="{{ slide.alt_text or 'Hero carousel slide' }}"
+                    style='background-image: url("{{ slide.image }}");'
+                    aria-hidden="{% if hero_slide_ns.idx == 0 %}false{% else %}true{% endif %}"></div>
+                {% set hero_slide_ns.idx = hero_slide_ns.idx + 1 %}
+                {% endif %}
+            {% endfor %}
+            {% if hero_slide_ns.idx == 0 %}
+            <div class="hero-slide absolute inset-0 bg-cover bg-center bg-no-repeat opacity-100 z-[1] rounded-xl"
+                data-slide-index="0"
+                data-alt="Children playing and learning in a colorful environment"
+                style='background-image: url("{{ hero_fallback_image }}");'
+                aria-hidden="false"></div>
+            {% endif %}
+            <div class="absolute inset-0 z-[2] rounded-xl"
+                style="background: linear-gradient(to right, rgba(255, 199, 0, 0.8), rgba(255, 219, 77, 0.6));"></div>
+        </div>
+
+        <div class="relative z-10 flex flex-col gap-2 text-center">
             <h1 class="text-leapp-black text-4xl font-black leading-tight tracking-[-0.033em] @[480px]:text-5xl">
                 One Platform. Infinite Potential.</h1>
             <h2 class="text-leapp-black/80 text-base font-medium leading-normal @[480px]:text-lg">
                 Powering your journey through a diverse set of offerings for skills, sports, holistic growth, and performance opportunities.</h2>
         </div>
         <button
-            class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-12 px-5 bg-leapp-black text-leapp-yellow text-base font-bold leading-normal tracking-[0.015em] hover:bg-leapp-black/90 transition-colors shadow-lg">
+            class="relative z-10 flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-12 px-5 bg-leapp-black text-leapp-yellow text-base font-bold leading-normal tracking-[0.015em] hover:bg-leapp-black/90 transition-colors shadow-lg">
             <span class="truncate"><a href="/courses" class="text-leapp-yellow">Explore</a></span>
         </button>
+
+        {% if hero_slide_ns.count > 1 %}
+        <button type="button"
+            id="hero-prev"
+            class="absolute left-3 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-white/90 dark:bg-leapp-black/90 border border-slate-200 dark:border-slate-700 shadow-md flex items-center justify-center text-leapp-black dark:text-white hover:bg-leapp-yellow hover:text-leapp-black transition-all duration-200"
+            aria-label="Previous slide">
+            <span class="material-symbols-outlined text-xl">chevron_left</span>
+        </button>
+        <button type="button"
+            id="hero-next"
+            class="absolute right-3 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-white/90 dark:bg-leapp-black/90 border border-slate-200 dark:border-slate-700 shadow-md flex items-center justify-center text-leapp-black dark:text-white hover:bg-leapp-yellow hover:text-leapp-black transition-all duration-200"
+            aria-label="Next slide">
+            <span class="material-symbols-outlined text-xl">chevron_right</span>
+        </button>
+        <div id="hero-dots" class="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2" role="tablist" aria-label="Hero slide indicators">
+            {% set hero_slide_ns.dot = 0 %}
+            {% for slide in main_page.hero_slides | sort(attribute='sort_order') %}
+                {% if slide.image %}
+                <button type="button"
+                    class="hero-dot h-2.5 w-2.5 rounded-full transition-all duration-200 {% if hero_slide_ns.dot == 0 %}bg-leapp-black w-6{% else %}bg-leapp-black/40 hover:bg-leapp-black/70{% endif %}"
+                    data-slide-index="{{ hero_slide_ns.dot }}"
+                    role="tab"
+                    aria-label="Go to slide {{ hero_slide_ns.dot + 1 }}"
+                    aria-selected="{% if hero_slide_ns.dot == 0 %}true{% else %}false{% endif %}"></button>
+                {% set hero_slide_ns.dot = hero_slide_ns.dot + 1 %}
+                {% endif %}
+            {% endfor %}
+        </div>
+        {% endif %}
     </div>
 </div>
+
+<script>
+    (function () {
+        const carousel = document.getElementById('hero-carousel');
+        if (!carousel) return;
+
+        const slides = Array.from(carousel.querySelectorAll('.hero-slide'));
+        const prevBtn = document.getElementById('hero-prev');
+        const nextBtn = document.getElementById('hero-next');
+        const dots = Array.from(carousel.querySelectorAll('.hero-dot'));
+        const slideCount = slides.length;
+        if (slideCount <= 1) return;
+
+        let currentIndex = 0;
+        let autoTimer = null;
+        const intervalMs = 5000;
+        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        slides.forEach((slide) => {
+            const bg = slide.style.backgroundImage;
+            const match = bg && bg.match(/url\(["']?(.+?)["']?\)/);
+            if (match && match[1]) {
+                const img = new Image();
+                img.src = match[1];
+            }
+        });
+
+        function setActiveSlide(index) {
+            currentIndex = (index + slideCount) % slideCount;
+            slides.forEach((slide, i) => {
+                const isActive = i === currentIndex;
+                slide.classList.toggle('opacity-100', isActive);
+                slide.classList.toggle('z-[1]', isActive);
+                slide.classList.toggle('opacity-0', !isActive);
+                slide.classList.toggle('z-0', !isActive);
+                slide.setAttribute('aria-hidden', isActive ? 'false' : 'true');
+            });
+            dots.forEach((dot, i) => {
+                const isActive = i === currentIndex;
+                dot.classList.toggle('bg-leapp-black', isActive);
+                dot.classList.toggle('w-6', isActive);
+                dot.classList.toggle('bg-leapp-black/40', !isActive);
+                dot.classList.toggle('w-2.5', !isActive);
+                dot.setAttribute('aria-selected', isActive ? 'true' : 'false');
+            });
+        }
+
+        function stopAutoAdvance() {
+            if (autoTimer) {
+                clearInterval(autoTimer);
+                autoTimer = null;
+            }
+        }
+
+        function startAutoAdvance() {
+            stopAutoAdvance();
+            if (prefersReducedMotion || document.hidden) return;
+            autoTimer = setInterval(() => setActiveSlide(currentIndex + 1), intervalMs);
+        }
+
+        function goToSlide(index) {
+            setActiveSlide(index);
+            startAutoAdvance();
+        }
+
+        prevBtn?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            goToSlide(currentIndex - 1);
+        });
+        nextBtn?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            goToSlide(currentIndex + 1);
+        });
+        dots.forEach((dot) => {
+            dot.addEventListener('click', (e) => {
+                e.stopPropagation();
+                goToSlide(parseInt(dot.dataset.slideIndex, 10));
+            });
+        });
+
+        carousel.addEventListener('mouseenter', stopAutoAdvance);
+        carousel.addEventListener('mouseleave', startAutoAdvance);
+        carousel.addEventListener('focusin', stopAutoAdvance);
+        carousel.addEventListener('focusout', (e) => {
+            if (!carousel.contains(e.relatedTarget)) startAutoAdvance();
+        });
+        carousel.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                goToSlide(currentIndex - 1);
+            } else if (e.key === 'ArrowRight') {
+                e.preventDefault();
+                goToSlide(currentIndex + 1);
+            }
+        });
+
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) stopAutoAdvance();
+            else startAutoAdvance();
+        });
+
+        startAutoAdvance();
+    })();
+</script>
 
 <!-- Categories Section -->
 <div class="grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] gap-6 p-4">

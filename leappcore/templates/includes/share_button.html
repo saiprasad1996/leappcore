@@ -1,0 +1,16 @@
+{# Share trigger button. Expects: share_url, share_title. Optional: share_button_variant ('default'|'on-dark'), share_button_size ('compact'|'detail') #}
+{% set _variant = share_button_variant | default('default') %}
+{% set _size = share_button_size | default('compact') %}
+{% set _size_classes = 'h-10 w-10' if _size == 'detail' else 'h-9 w-9' %}
+{% if _variant == 'on-dark' %}
+    {% set _btn_classes = 'border-white/30 bg-black/40 text-white hover:bg-white/20 hover:border-white/50' %}
+{% else %}
+    {% set _btn_classes = 'border-slate-200 dark:border-slate-600 bg-white/90 dark:bg-slate-800 text-leapp-black dark:text-white hover:bg-leapp-yellow hover:border-leapp-yellow hover:text-leapp-black' %}
+{% endif %}
+<button type="button"
+    class="share-trigger flex flex-shrink-0 items-center justify-center rounded-full border transition-colors {{ _size_classes }} {{ _btn_classes }}"
+    data-share-url="{{ share_url }}"
+    data-share-title="{{ share_title | e }}"
+    aria-label="Share {{ share_title | e }}">
+    <span class="material-symbols-outlined text-lg">share</span>
+</button>

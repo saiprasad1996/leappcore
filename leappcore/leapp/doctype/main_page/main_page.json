@@ -6,6 +6,7 @@
  "engine": "InnoDB",
  "field_order": [
   "home_page_section",
+  "hero_slides",
   "index_image",
   "category_columns_section",
   "category1_image",
@@ -57,9 +58,17 @@
    "label": "Home Page"
   },
   {
+   "fieldname": "hero_slides",
+   "fieldtype": "Table",
+   "label": "Hero Carousel Slides",
+   "options": "Main Page Hero Slide"
+  },
+  {
    "fieldname": "index_image",
    "fieldtype": "Attach Image",
-   "label": "Hero Background Image"
+   "hidden": 1,
+   "label": "Hero Background Image (Deprecated)",
+   "read_only": 1
   },
   {
    "fieldname": "category_columns_section",

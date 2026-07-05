@@ -129,6 +129,7 @@ def _load_offering(offering_id: str):
         "categories": categories,
         "address": doc.address or "",
         "packages": packages,
+        "share_url": frappe.utils.get_url(f"/courses/detail?offering={doc.name}"),
     }
 
 

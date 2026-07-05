@@ -135,29 +135,11 @@
                                 </div>
                                 {% else %}
                                 <!-- Guest user section (hidden on mobile) -->
-                                <div class="hidden md:block relative" id="signup-menu-container">
-                                    <button id="signup-menu-button"
-                                        class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-lg h-10 px-4 bg-leapp-yellow text-leapp-black text-sm font-bold leading-normal tracking-[0.015em] hover:bg-leapp-yellow/90 transition-colors">
+                                <div class="hidden md:block" id="signup-menu-container">
+                                    <button type="button" id="signup-menu-button"
+                                        class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-leapp-yellow text-leapp-black text-sm font-bold leading-normal tracking-[0.015em] hover:bg-leapp-yellow/90 transition-colors">
                                         <span class="truncate">Sign Up</span>
-                                        <span class="material-symbols-outlined text-lg">expand_more</span>
                                     </button>
-                                    
-                                    <!-- Signup Dropdown Menu -->
-                                    <div id="signup-dropdown"
-                                        class="hidden absolute right-0 mt-2 w-48 rounded-lg shadow-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 overflow-hidden z-50">
-                                        <div class="py-1">
-                                            <a href="/signup"
-                                                class="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-                                                <span class="material-symbols-outlined text-lg">school</span>
-                                                <span>For Learners</span>
-                                            </a>
-                                            <a href="/signup/partner"
-                                                class="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-                                                <span class="material-symbols-outlined text-lg">handshake</span>
-                                                <span>For Partners</span>
-                                            </a>
-                                        </div>
-                                    </div>
                                 </div>
                                 <a href="/login"
                                     class="hidden md:flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-leapp-black/10 dark:bg-leapp-yellow/20 text-leapp-black dark:text-white text-sm font-bold leading-normal tracking-[0.015em] hover:bg-leapp-black/20 dark:hover:bg-leapp-yellow/30 transition-colors">
@@ -231,14 +213,10 @@
                                         {% endif %}
                                         {% else %}
                                         <div class="border-t border-gray-200 dark:border-gray-700 my-2"></div>
-                                        <a href="/signup" class="flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-leapp-yellow text-leapp-black font-bold hover:bg-leapp-yellow/90 transition-colors">
-                                            <span class="material-symbols-outlined">school</span>
-                                            <span>Sign Up as Learner</span>
-                                        </a>
-                                        <a href="/signup/partner" class="flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-leapp-yellow/80 text-leapp-black font-bold hover:bg-leapp-yellow/70 transition-colors">
-                                            <span class="material-symbols-outlined">handshake</span>
-                                            <span>Sign Up as Partner</span>
-                                        </a>
+                                        <button type="button" id="mobile-signup-button" class="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-leapp-yellow text-leapp-black font-bold hover:bg-leapp-yellow/90 transition-colors">
+                                            <span class="material-symbols-outlined">person_add</span>
+                                            <span>Sign Up</span>
+                                        </button>
                                         <a href="/login" class="flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-leapp-black/10 dark:bg-leapp-yellow/20 text-leapp-black dark:text-white font-bold hover:bg-leapp-black/20 dark:hover:bg-leapp-yellow/30 transition-colors">
                                             <span>Login</span>
                                         </a>
@@ -328,6 +306,66 @@
         </footer>
     </div>
 
+    {% include "templates/includes/share_dialog.html" %}
+
+    <!-- Signup choice modal -->
+    <div id="signup-choice-modal"
+        class="fixed inset-0 z-[200] hidden items-center justify-center p-4 sm:p-6"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="signup-choice-title">
+        <div class="absolute inset-0 bg-black/70 backdrop-blur-sm transition-opacity"
+            onclick="closeSignupChoiceModal()"></div>
+        <div class="relative z-10 w-full max-w-2xl overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-2xl">
+            <div class="h-1.5 w-full bg-gradient-to-r from-leapp-yellow via-amber-300 to-leapp-yellow"></div>
+            <button type="button"
+                id="signup-choice-close"
+                onclick="closeSignupChoiceModal()"
+                class="absolute top-4 right-4 z-10 flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 dark:border-slate-600 bg-white/90 dark:bg-slate-800 text-leapp-black dark:text-white hover:bg-leapp-yellow hover:border-leapp-yellow transition-colors"
+                aria-label="Close">
+                <span class="material-symbols-outlined text-xl">close</span>
+            </button>
+            <div class="p-6 sm:p-8 pt-12">
+                <h2 id="signup-choice-title" class="text-2xl sm:text-3xl font-bold text-leapp-black dark:text-white text-center mb-2">
+                    Join LEAPP
+                </h2>
+                <p class="text-center text-slate-600 dark:text-slate-400 text-sm sm:text-base mb-8">
+                    Choose how you would like to get started.
+                </p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <a href="/signup"
+                        class="group flex flex-col gap-3 rounded-xl border-2 border-slate-200 dark:border-slate-700 p-5 sm:p-6 hover:border-leapp-yellow hover:bg-leapp-yellow/5 dark:hover:bg-leapp-yellow/10 transition-all duration-200">
+                        <div class="flex items-center gap-3">
+                            <span class="material-symbols-outlined text-3xl text-leapp-yellow">school</span>
+                            <span class="text-xl font-bold text-leapp-black dark:text-white">Learner</span>
+                        </div>
+                        <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed flex-1">
+                            For parents, students, and individuals who want to discover courses, events, and activities — and express interest or enroll.
+                        </p>
+                        <span class="inline-flex items-center gap-1 text-sm font-bold text-leapp-black dark:text-leapp-yellow group-hover:underline">
+                            Continue as Learner
+                            <span class="material-symbols-outlined text-lg">arrow_forward</span>
+                        </span>
+                    </a>
+                    <a href="/signup/partner"
+                        class="group flex flex-col gap-3 rounded-xl border-2 border-slate-200 dark:border-slate-700 p-5 sm:p-6 hover:border-leapp-yellow hover:bg-leapp-yellow/5 dark:hover:bg-leapp-yellow/10 transition-all duration-200">
+                        <div class="flex items-center gap-3">
+                            <span class="material-symbols-outlined text-3xl text-leapp-yellow">handshake</span>
+                            <span class="text-xl font-bold text-leapp-black dark:text-white">Partner</span>
+                        </div>
+                        <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed flex-1">
+                            For educators, coaches, and organizations who want to list and manage their offerings on LEAPP.
+                        </p>
+                        <span class="inline-flex items-center gap-1 text-sm font-bold text-leapp-black dark:text-leapp-yellow group-hover:underline">
+                            Continue as Partner
+                            <span class="material-symbols-outlined text-lg">arrow_forward</span>
+                        </span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Theme Toggle Script -->
     <script>
         const themeToggle = document.getElementById('theme-toggle');
@@ -376,31 +414,171 @@
             });
         }
 
-        // Signup dropdown menu
+        // Signup choice modal
         const signupMenuButton = document.getElementById('signup-menu-button');
-        const signupDropdown = document.getElementById('signup-dropdown');
-        const signupMenuContainer = document.getElementById('signup-menu-container');
+        const signupChoiceModal = document.getElementById('signup-choice-modal');
+        const signupChoiceClose = document.getElementById('signup-choice-close');
+        const mobileSignupButton = document.getElementById('mobile-signup-button');
+        let signupModalPreviouslyFocused = null;
 
-        if (signupMenuButton && signupDropdown) {
+        function openSignupChoiceModal() {
+            if (!signupChoiceModal) return;
+            signupModalPreviouslyFocused = document.activeElement;
+            signupChoiceModal.classList.remove('hidden');
+            signupChoiceModal.classList.add('flex');
+            document.body.style.overflow = 'hidden';
+            signupChoiceClose?.focus();
+        }
+
+        function closeSignupChoiceModal() {
+            if (!signupChoiceModal) return;
+            signupChoiceModal.classList.add('hidden');
+            signupChoiceModal.classList.remove('flex');
+            document.body.style.overflow = '';
+            if (signupModalPreviouslyFocused && typeof signupModalPreviouslyFocused.focus === 'function') {
+                signupModalPreviouslyFocused.focus();
+            }
+        }
+
+        window.openSignupChoiceModal = openSignupChoiceModal;
+        window.closeSignupChoiceModal = closeSignupChoiceModal;
+
+        if (signupMenuButton) {
             signupMenuButton.addEventListener('click', (e) => {
-                e.stopPropagation();
-                signupDropdown.classList.toggle('hidden');
+                e.preventDefault();
+                openSignupChoiceModal();
             });
+        }
 
-            // Close dropdown when clicking outside
-            document.addEventListener('click', (e) => {
-                if (signupMenuContainer && !signupMenuContainer.contains(e.target)) {
-                    signupDropdown.classList.add('hidden');
-                }
+        if (mobileSignupButton) {
+            mobileSignupButton.addEventListener('click', () => {
+                closeMobileMenu();
+                setTimeout(openSignupChoiceModal, 320);
             });
+        }
 
-            // Close dropdown when pressing Escape
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape') {
-                    signupDropdown.classList.add('hidden');
+        signupChoiceModal?.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                e.preventDefault();
+                closeSignupChoiceModal();
+            }
+        });
+
+        // Share dialog
+        const shareDialog = document.getElementById('share-dialog');
+        const shareDialogClose = document.getElementById('share-dialog-close');
+        const shareDialogSubtitle = document.getElementById('share-dialog-subtitle');
+        const shareCopyLinkBtn = document.getElementById('share-copy-link-btn');
+        const shareCopyLinkLabel = document.getElementById('share-copy-link-label');
+        const shareWhatsappLink = document.getElementById('share-whatsapp-link');
+        let sharePreviouslyFocused = null;
+        let activeShareUrl = '';
+        let activeShareTitle = '';
+        let shareCopyResetTimer = null;
+
+        function buildShareWhatsAppUrl(title, url) {
+            const text = (title ? title + '\n' : '') + url;
+            return 'https://wa.me/?text=' + encodeURIComponent(text);
+        }
+
+        function copyShareTextToClipboard(text) {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                return navigator.clipboard.writeText(text);
+            }
+            return new Promise((resolve, reject) => {
+                const textarea = document.createElement('textarea');
+                textarea.value = text;
+                textarea.setAttribute('readonly', '');
+                textarea.style.position = 'absolute';
+                textarea.style.left = '-9999px';
+                document.body.appendChild(textarea);
+                textarea.select();
+                try {
+                    document.execCommand('copy') ? resolve() : reject(new Error('copy failed'));
+                } catch (err) {
+                    reject(err);
+                } finally {
+                    document.body.removeChild(textarea);
                 }
             });
         }
+
+        function openShareDialog(url, title) {
+            if (!shareDialog || !url) return;
+            activeShareUrl = url;
+            activeShareTitle = title || '';
+            sharePreviouslyFocused = document.activeElement;
+            if (shareDialogSubtitle) {
+                shareDialogSubtitle.textContent = activeShareTitle || url;
+            }
+            if (shareWhatsappLink) {
+                shareWhatsappLink.href = buildShareWhatsAppUrl(activeShareTitle, activeShareUrl);
+            }
+            if (shareCopyLinkLabel) {
+                shareCopyLinkLabel.textContent = 'Copy link';
+            }
+            shareDialog.classList.remove('hidden');
+            shareDialog.classList.add('flex');
+            document.body.style.overflow = 'hidden';
+            shareDialogClose?.focus();
+        }
+
+        function closeShareDialog() {
+            if (!shareDialog) return;
+            shareDialog.classList.add('hidden');
+            shareDialog.classList.remove('flex');
+            document.body.style.overflow = '';
+            if (shareCopyResetTimer) {
+                clearTimeout(shareCopyResetTimer);
+                shareCopyResetTimer = null;
+            }
+            if (shareCopyLinkLabel) {
+                shareCopyLinkLabel.textContent = 'Copy link';
+            }
+            if (sharePreviouslyFocused && typeof sharePreviouslyFocused.focus === 'function') {
+                sharePreviouslyFocused.focus();
+            }
+        }
+
+        window.openShareDialog = openShareDialog;
+        window.closeShareDialog = closeShareDialog;
+
+        document.addEventListener('click', (e) => {
+            const trigger = e.target.closest('.share-trigger');
+            if (!trigger) return;
+            e.preventDefault();
+            e.stopPropagation();
+            const url = trigger.getAttribute('data-share-url');
+            const title = trigger.getAttribute('data-share-title') || '';
+            if (url) openShareDialog(url, title);
+        });
+
+        shareCopyLinkBtn?.addEventListener('click', async () => {
+            if (!activeShareUrl) return;
+            try {
+                await copyShareTextToClipboard(activeShareUrl);
+                if (shareCopyLinkLabel) {
+                    shareCopyLinkLabel.textContent = 'Copied!';
+                }
+                if (shareCopyResetTimer) clearTimeout(shareCopyResetTimer);
+                shareCopyResetTimer = setTimeout(() => {
+                    if (shareCopyLinkLabel) {
+                        shareCopyLinkLabel.textContent = 'Copy link';
+                    }
+                }, 2000);
+            } catch (err) {
+                if (shareCopyLinkLabel) {
+                    shareCopyLinkLabel.textContent = 'Copy failed';
+                }
+            }
+        });
+
+        shareDialog?.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                e.preventDefault();
+                closeShareDialog();
+            }
+        });
 
         // Mobile Menu
         const mobileMenuButton = document.getElementById('mobile-menu-button');
@@ -438,9 +616,18 @@
             mobileMenuOverlay.addEventListener('click', closeMobileMenu);
         }
         
-        // Close mobile menu on escape key
+        // Close modals and mobile menu on escape key
         document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && mobileMenu && !mobileMenu.classList.contains('hidden')) {
+            if (e.key !== 'Escape') return;
+            if (shareDialog && !shareDialog.classList.contains('hidden')) {
+                closeShareDialog();
+                return;
+            }
+            if (signupChoiceModal && !signupChoiceModal.classList.contains('hidden')) {
+                closeSignupChoiceModal();
+                return;
+            }
+            if (mobileMenu && !mobileMenu.classList.contains('hidden')) {
                 closeMobileMenu();
             }
         });

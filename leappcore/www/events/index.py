@@ -127,6 +127,7 @@ def _count_events(where_clause, params):
 def _attach_detail_urls(events):
     for event in events:
         event["detail_url"] = f"/events/detail?event={str(event.name)}"
+        event["share_url"] = frappe.utils.get_url(event["detail_url"])
 
 
 def _list_locations():
