@@ -8,6 +8,10 @@
  "field_order": [
   "image",
   "alt_text",
+  "headline",
+  "subtext",
+  "button_text",
+  "button_link",
   "sort_order"
  ],
  "fields": [
@@ -21,8 +25,32 @@
   {
    "fieldname": "alt_text",
    "fieldtype": "Data",
-   "in_list_view": 1,
    "label": "Alt Text"
+  },
+  {
+   "fieldname": "headline",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Headline",
+   "reqd": 1
+  },
+  {
+   "fieldname": "subtext",
+   "fieldtype": "Small Text",
+   "label": "Subtext",
+   "reqd": 1
+  },
+  {
+   "fieldname": "button_text",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Button Text"
+  },
+  {
+   "fieldname": "button_link",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Button Link"
   },
   {
    "default": "1",
@@ -35,7 +63,7 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2026-07-05 18:00:00.000000",
+ "modified": "2026-07-14 16:30:00.000000",
  "modified_by": "Administrator",
  "module": "Leapp",
  "name": "Main Page Hero Slide",

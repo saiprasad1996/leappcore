@@ -2,6 +2,10 @@
 {% block content %}
 
 {% set hero_fallback_image = "https://lh3.googleusercontent.com/aida-public/AB6AXuD58OMGHDu__yINwpS8v_jzwzt0SeLpKprIVL821Qn6GTQR3nNem8zzGBTg4z0MEx3TlSEM16JeKoLbEiQzJXe_eGw_Sp5wYJ4hmzHMouXkNC6E5kRCpW555D-oXId7re17cZgOgRkRwgAjZk5tTnTQtuuHCS671Q11uz_pTN6grSBpy9VBtr8SmehpVjicBKlM6aVG24ic7faerd3qo-ScHQYoiMWE219nFQ1y8vCKO0IoXLChcTmk81pvSKcTLz9BQG72QykGyh7N" %}
+{% set hero_fallback_headline = "One Platform. Infinite Potential." %}
+{% set hero_fallback_subtext = "Powering your journey through a diverse set of offerings for skills, sports, holistic growth, and performance opportunities." %}
+{% set hero_fallback_button_text = "Explore" %}
+{% set hero_fallback_button_link = "/courses" %}
 {% set hero_slide_ns = namespace(count=0) %}
 {% for slide in main_page.hero_slides | sort(attribute='sort_order') %}
     {% if slide.image %}
@@ -15,40 +19,65 @@
         aria-label="Hero carousel"
         tabindex="0"
         data-slide-count="{{ hero_slide_ns.count if hero_slide_ns.count > 0 else 1 }}"
-        class="relative flex min-h-[480px] flex-col gap-6 @[480px]:gap-8 rounded-xl items-center justify-center text-center p-4 overflow-hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-leapp-yellow focus-visible:ring-offset-2">
-        <div class="absolute inset-0 rounded-xl" aria-hidden="true">
-            {% set hero_slide_ns.idx = 0 %}
-            {% for slide in main_page.hero_slides | sort(attribute='sort_order') %}
-                {% if slide.image %}
-                <div class="hero-slide absolute inset-0 bg-cover bg-center bg-no-repeat transition-opacity duration-700 ease-in-out rounded-xl {% if hero_slide_ns.idx == 0 %}opacity-100 z-[1]{% else %}opacity-0 z-0{% endif %}"
-                    data-slide-index="{{ hero_slide_ns.idx }}"
-                    data-alt="{{ slide.alt_text or 'Hero carousel slide' }}"
-                    style='background-image: url("{{ slide.image }}");'
-                    aria-hidden="{% if hero_slide_ns.idx == 0 %}false{% else %}true{% endif %}"></div>
-                {% set hero_slide_ns.idx = hero_slide_ns.idx + 1 %}
+        class="relative min-h-[480px] rounded-xl overflow-hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-leapp-yellow focus-visible:ring-offset-2">
+        {% set hero_slide_ns.idx = 0 %}
+        {% for slide in main_page.hero_slides | sort(attribute='sort_order') %}
+            {% if slide.image %}
+            <div class="hero-slide absolute inset-0 flex flex-col gap-6 @[480px]:gap-8 items-center justify-center text-center p-4 transition-opacity duration-700 ease-in-out {% if hero_slide_ns.idx == 0 %}opacity-100 z-[1]{% else %}opacity-0 z-0 pointer-events-none{% endif %}"
+                data-slide-index="{{ hero_slide_ns.idx }}"
+                aria-hidden="{% if hero_slide_ns.idx == 0 %}false{% else %}true{% endif %}">
+                <div class="absolute inset-0 bg-cover bg-center bg-no-repeat rounded-xl"
+                    data-alt="{{ (slide.alt_text or 'Hero carousel slide') | e }}"
+                    style='background-image: url("{{ slide.image | e }}");'
+                    aria-hidden="true"></div>
+                <div class="absolute inset-0 rounded-xl"
+                    style="background: linear-gradient(to right, rgba(255, 199, 0, 0.8), rgba(255, 219, 77, 0.6));"
+                    aria-hidden="true"></div>
+                {% if slide.headline or slide.subtext %}
+                <div class="relative z-10 flex flex-col gap-2 text-center max-w-3xl">
+                    {% if slide.headline %}
+                    <h1 class="text-leapp-black text-4xl font-black leading-tight tracking-[-0.033em] @[480px]:text-5xl">
+                        {{ slide.headline }}</h1>
+                    {% endif %}
+                    {% if slide.subtext %}
+                    <h2 class="text-leapp-black/80 text-base font-medium leading-normal @[480px]:text-lg whitespace-pre-line">
+                        {{ slide.subtext }}</h2>
+                    {% endif %}
+                </div>
                 {% endif %}
-            {% endfor %}
-            {% if hero_slide_ns.idx == 0 %}
-            <div class="hero-slide absolute inset-0 bg-cover bg-center bg-no-repeat opacity-100 z-[1] rounded-xl"
-                data-slide-index="0"
+                {% if slide.button_text and slide.button_link %}
+                <a href="{{ slide.button_link | e }}"
+                    class="relative z-10 inline-flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-12 px-5 bg-leapp-black text-leapp-yellow text-base font-bold leading-normal tracking-[0.015em] hover:bg-leapp-black/90 transition-colors shadow-lg">
+                    <span class="truncate">{{ slide.button_text }}</span>
+                </a>
+                {% endif %}
+            </div>
+            {% set hero_slide_ns.idx = hero_slide_ns.idx + 1 %}
+            {% endif %}
+        {% endfor %}
+        {% if hero_slide_ns.idx == 0 %}
+        <div class="hero-slide absolute inset-0 flex flex-col gap-6 @[480px]:gap-8 items-center justify-center text-center p-4 opacity-100 z-[1]"
+            data-slide-index="0"
+            aria-hidden="false">
+            <div class="absolute inset-0 bg-cover bg-center bg-no-repeat rounded-xl"
                 data-alt="Children playing and learning in a colorful environment"
                 style='background-image: url("{{ hero_fallback_image }}");'
-                aria-hidden="false"></div>
-            {% endif %}
-            <div class="absolute inset-0 z-[2] rounded-xl"
-                style="background: linear-gradient(to right, rgba(255, 199, 0, 0.8), rgba(255, 219, 77, 0.6));"></div>
+                aria-hidden="true"></div>
+            <div class="absolute inset-0 rounded-xl"
+                style="background: linear-gradient(to right, rgba(255, 199, 0, 0.8), rgba(255, 219, 77, 0.6));"
+                aria-hidden="true"></div>
+            <div class="relative z-10 flex flex-col gap-2 text-center max-w-3xl">
+                <h1 class="text-leapp-black text-4xl font-black leading-tight tracking-[-0.033em] @[480px]:text-5xl">
+                    {{ hero_fallback_headline }}</h1>
+                <h2 class="text-leapp-black/80 text-base font-medium leading-normal @[480px]:text-lg">
+                    {{ hero_fallback_subtext }}</h2>
+            </div>
+            <a href="{{ hero_fallback_button_link }}"
+                class="relative z-10 inline-flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-12 px-5 bg-leapp-black text-leapp-yellow text-base font-bold leading-normal tracking-[0.015em] hover:bg-leapp-black/90 transition-colors shadow-lg">
+                <span class="truncate">{{ hero_fallback_button_text }}</span>
+            </a>
         </div>
-
-        <div class="relative z-10 flex flex-col gap-2 text-center">
-            <h1 class="text-leapp-black text-4xl font-black leading-tight tracking-[-0.033em] @[480px]:text-5xl">
-                One Platform. Infinite Potential.</h1>
-            <h2 class="text-leapp-black/80 text-base font-medium leading-normal @[480px]:text-lg">
-                Powering your journey through a diverse set of offerings for skills, sports, holistic growth, and performance opportunities.</h2>
-        </div>
-        <button
-            class="relative z-10 flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-12 px-5 bg-leapp-black text-leapp-yellow text-base font-bold leading-normal tracking-[0.015em] hover:bg-leapp-black/90 transition-colors shadow-lg">
-            <span class="truncate"><a href="/courses" class="text-leapp-yellow">Explore</a></span>
-        </button>
+        {% endif %}
 
         {% if hero_slide_ns.count > 1 %}
         <button type="button"
@@ -99,7 +128,8 @@
         const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
         slides.forEach((slide) => {
-            const bg = slide.style.backgroundImage;
+            const bgEl = slide.querySelector('[style*="background-image"]');
+            const bg = bgEl && bgEl.style.backgroundImage;
             const match = bg && bg.match(/url\(["']?(.+?)["']?\)/);
             if (match && match[1]) {
                 const img = new Image();
@@ -115,6 +145,7 @@
                 slide.classList.toggle('z-[1]', isActive);
                 slide.classList.toggle('opacity-0', !isActive);
                 slide.classList.toggle('z-0', !isActive);
+                slide.classList.toggle('pointer-events-none', !isActive);
                 slide.setAttribute('aria-hidden', isActive ? 'false' : 'true');
             });
             dots.forEach((dot, i) => {
