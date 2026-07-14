@@ -197,7 +197,11 @@
                             <div class="flex items-center gap-3 pt-4 border-t border-slate-200 dark:border-slate-800">
                                 <div class="bg-center bg-no-repeat bg-cover rounded-full size-12" style="background-image: url('{{ offering.instructors[0].avatar }}');"></div>
                                 <div>
-                                    <p class="text-leapp-black dark:text-white font-semibold">{{ offering.instructors[0].name }}</p>
+                                    <p class="text-leapp-black dark:text-white font-semibold inline-flex items-center gap-1">
+                                        <span>{{ offering.instructors[0].name }}</span>
+                                        {% set is_verified = offering.instructors[0].is_verified %}
+                                        {% include "templates/includes/verified_badge.html" %}
+                                    </p>
                                     <a class="text-leapp-yellow text-sm hover:underline" href="{{ offering.instructors[0].profile_url }}">View Profile</a>
                                 </div>
                             </div>
@@ -236,7 +240,11 @@
                                 <div class="flex items-start gap-4 p-4 rounded-lg border border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-900/30 hover:border-leapp-yellow/50 transition-all">
                                     <div class="bg-center bg-no-repeat bg-cover rounded-full size-16 flex-shrink-0" style="background-image: url('{{ instructor.avatar }}');"></div>
                                     <div class="flex-1">
-                                        <p class="text-leapp-black dark:text-white font-bold text-lg mb-1">{{ instructor.name }}</p>
+                                        <p class="text-leapp-black dark:text-white font-bold text-lg mb-1 inline-flex items-center gap-1">
+                                            <span>{{ instructor.name }}</span>
+                                            {% set is_verified = instructor.is_verified %}
+                                            {% include "templates/includes/verified_badge.html" %}
+                                        </p>
                                         <a class="text-leapp-yellow text-sm hover:underline inline-flex items-center gap-1" href="{{ instructor.profile_url }}">
                                             <span>View Profile</span>
                                             <span class="material-symbols-outlined text-base">arrow_forward</span>

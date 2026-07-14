@@ -99,17 +99,38 @@
                     </label>
                 </div>
 
-                <!-- Organization Information Section -->
+                <!-- Partner Type & Organization -->
                 <div class="space-y-4 pt-4">
                     <div class="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-gray-700">
                         <span class="material-symbols-outlined text-leapp-yellow">business</span>
-                        <h3 class="text-leapp-black dark:text-white text-lg font-bold">Organization Information</h3>
+                        <h3 class="text-leapp-black dark:text-white text-lg font-bold">Partner Type</h3>
+                    </div>
+
+                    <div class="flex flex-col gap-2">
+                        <p class="text-leapp-black dark:text-white text-base font-medium leading-normal">I am registering as <span class="text-red-500">*</span></p>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <label class="flex items-center gap-3 p-4 rounded-xl border border-gray-300 dark:border-gray-600 cursor-pointer has-[:checked]:border-leapp-yellow has-[:checked]:bg-leapp-yellow/10">
+                                <input type="radio" name="partner_type" value="Individual" class="h-4 w-4 text-leapp-yellow focus:ring-leapp-yellow" {% if (partner_type or 'Individual') == 'Individual' %}checked{% endif %} required />
+                                <span>
+                                    <span class="block font-semibold text-leapp-black dark:text-white">Individual</span>
+                                    <span class="block text-xs text-gray-500">Solo educator / instructor</span>
+                                </span>
+                            </label>
+                            <label class="flex items-center gap-3 p-4 rounded-xl border border-gray-300 dark:border-gray-600 cursor-pointer has-[:checked]:border-leapp-yellow has-[:checked]:bg-leapp-yellow/10">
+                                <input type="radio" name="partner_type" value="Organisation" class="h-4 w-4 text-leapp-yellow focus:ring-leapp-yellow" {% if partner_type == 'Organisation' %}checked{% endif %} />
+                                <span>
+                                    <span class="block font-semibold text-leapp-black dark:text-white">Organisation</span>
+                                    <span class="block text-xs text-gray-500">School, academy, or business</span>
+                                </span>
+                            </label>
+                        </div>
                     </div>
                     
-                    <label class="flex flex-col">
-                        <p class="text-leapp-black dark:text-white text-base font-medium leading-normal pb-2">Organization Name <span class="text-gray-500 dark:text-gray-400 font-normal text-sm">(optional)</span></p>
+                    <label class="flex flex-col" id="organization-name-wrap">
+                        <p class="text-leapp-black dark:text-white text-base font-medium leading-normal pb-2">Organization Name <span id="org-name-required" class="text-red-500 {% if partner_type != 'Organisation' %}hidden{% endif %}">*</span><span id="org-name-optional" class="text-gray-500 dark:text-gray-400 font-normal text-sm {% if partner_type == 'Organisation' %}hidden{% endif %}">(optional)</span></p>
                         <input
                             name="organization_name"
+                            id="organization_name"
                             value="{{ organization_name or '' }}"
                             class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark h-14 p-[15px] text-base font-normal leading-normal text-leapp-black dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-400 focus:border-leapp-yellow focus:outline-0 focus:ring-2 focus:ring-leapp-yellow/50"
                             placeholder="Enter your organization or business name" type="text" />
@@ -262,6 +283,21 @@
 {% block scripts %}
 <script>
     document.addEventListener('DOMContentLoaded', () => {
+        function syncPartnerTypeUI() {
+            const selected = document.querySelector('input[name="partner_type"]:checked');
+            const isOrg = selected && selected.value === 'Organisation';
+            const req = document.getElementById('org-name-required');
+            const opt = document.getElementById('org-name-optional');
+            const orgInput = document.getElementById('organization_name');
+            if (req) req.classList.toggle('hidden', !isOrg);
+            if (opt) opt.classList.toggle('hidden', isOrg);
+            if (orgInput) orgInput.required = !!isOrg;
+        }
+        document.querySelectorAll('input[name="partner_type"]').forEach((el) => {
+            el.addEventListener('change', syncPartnerTypeUI);
+        });
+        syncPartnerTypeUI();
+
         // Password toggle
         const togglePassword = document.getElementById('toggle-password');
         const passwordInput = document.getElementById('password-input');

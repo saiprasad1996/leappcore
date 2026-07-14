@@ -1,6 +1,8 @@
 import frappe
 from frappe import _
 
+from leappcore.backend.common.partner_verification import is_partner_verified
+
 
 def get_context(context):
     """Render partner profile page"""
@@ -71,7 +73,8 @@ def get_user_info():
         "full_name": user.full_name,
         "email": user.email,
         "phone": user.phone,
-        "user_image": user.user_image
+        "user_image": user.user_image,
+        "is_verified": is_partner_verified(frappe.session.user),
     }
 
 

@@ -33,6 +33,7 @@
                 <a href="/partner/profile" class="px-4 py-3 text-sm font-bold border-b-2 border-leapp-yellow text-leapp-yellow">Profile</a>
                 <a href="/partner/offering/register" class="px-4 py-3 text-sm font-bold text-gray-600 dark:text-gray-400 hover:text-leapp-yellow transition-colors">Offerings</a>
                 <a href="/partner/event/register" class="px-4 py-3 text-sm font-bold text-gray-600 dark:text-gray-400 hover:text-leapp-yellow transition-colors">Events</a>
+                <a href="/partner/verification" class="px-4 py-3 text-sm font-bold text-gray-600 dark:text-gray-400 hover:text-leapp-yellow transition-colors">Verification</a>
                 <a href="/partner/interests" class="px-4 py-3 text-sm font-bold text-gray-600 dark:text-gray-400 hover:text-leapp-yellow transition-colors">User Interests</a>
             </div>
         </div>
@@ -64,7 +65,11 @@
                             {% endif %}
                         </div>
                         <div class="w-full">
-                            <h3 class="text-xl font-bold text-leapp-black dark:text-white">{{ user_info.full_name }}</h3>
+                            <h3 class="text-xl font-bold text-leapp-black dark:text-white inline-flex items-center justify-center gap-1 flex-wrap">
+                                <span>{{ user_info.full_name }}</span>
+                                {% set is_verified = user_info.is_verified %}
+                                {% include "templates/includes/verified_badge.html" %}
+                            </h3>
                             <p class="text-sm text-gray-600 dark:text-gray-400">{{ user_info.email }}</p>
                             {% if user_info.phone %}
                             <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">{{ user_info.phone }}</p>

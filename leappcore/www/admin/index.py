@@ -60,7 +60,19 @@ def get_doctype_categories():
             "doctypes": [
                 {"name": "User Profile", "icon": "person", "label": "User Profiles", "href": "/desk/user?enabled=1&role=Leapp+Customer"},
                 {"name": "Partner Profile", "icon": "groups", "label": "Partner Profiles", "href": "/desk/user?enabled=1&role=Leapp+Partner"},
-                {"name": "Customer Interest", "icon": "favorite", "label": "Customer Interests", "href": "/partner/interests"},
+                {
+                    "name": "Partner Verification Template",
+                    "icon": "checklist",
+                    "label": "Verification Templates",
+                    "href": "/app/partner-verification-template",
+                },
+                {
+                    "name": "Partner Verification Request",
+                    "icon": "verified_user",
+                    "label": "Partner Verification Queue",
+                    "href": "/admin/verification",
+                },
+                {"name": "Customer Interest", "icon": "favorite", "label": "Customer Interests", "href": "/admin/interests"},
                 {"name": "Event Registration", "icon": "app_registration", "label": "Event Registrations", "href": "/app/event-registration"},
                 {"name": "Event Claim", "icon": "verified", "label": "Event Claims", "href": "/app/event-claim"},
             ]

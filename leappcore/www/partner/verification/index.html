@@ -1,0 +1,391 @@
+{% extends 'templates/htmlbase/base.html' %}
+
+{% block head %}
+<style type="text/css">
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+    .material-symbols-outlined.filled {
+        font-variation-settings: 'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24;
+    }
+    .pv-dropzone {
+        box-shadow: inset 0 0 0 1.5px rgba(148, 163, 184, 0.28);
+    }
+    .dark .pv-dropzone {
+        box-shadow: inset 0 0 0 1.5px rgba(148, 163, 184, 0.18);
+    }
+    .pv-dropzone.is-dragover {
+        background-color: rgba(245, 197, 24, 0.14);
+        box-shadow: 0 0 0 2px rgba(245, 197, 24, 0.45);
+    }
+    .pv-dropzone.is-disabled {
+        opacity: 0.6;
+        pointer-events: none;
+    }
+    .pv-card {
+        box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06), 0 2px 6px rgba(15, 23, 42, 0.04);
+    }
+    .dark .pv-card {
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25), 0 2px 6px rgba(0, 0, 0, 0.2);
+    }
+    .pv-field {
+        box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05), 0 1px 2px rgba(15, 23, 42, 0.04);
+    }
+    .dark .pv-field {
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2), 0 1px 2px rgba(0, 0, 0, 0.15);
+    }
+    .pv-input-soft {
+        box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+    }
+    .pv-input-soft:focus {
+        box-shadow: 0 0 0 3px rgba(245, 197, 24, 0.35);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="flex-1 w-full bg-background-light dark:bg-background-dark text-leapp-black dark:text-white">
+    <div class="w-full px-4 sm:px-6 lg:px-8 py-8">
+        <div class="mb-8">
+            <div class="mb-4">
+                <h1 class="text-3xl sm:text-4xl font-black text-leapp-black dark:text-white">Partner Verification</h1>
+                <p class="text-gray-600 dark:text-gray-400 mt-2">Submit documents to earn a verified badge next to your name</p>
+            </div>
+            <div class="flex gap-4 border-b border-gray-200 dark:border-gray-700 overflow-x-auto">
+                <a href="/partner/profile" class="shrink-0 px-4 py-3 text-sm font-bold text-gray-600 dark:text-gray-400 hover:text-leapp-yellow transition-colors">Profile</a>
+                <a href="/partner/offering/register" class="shrink-0 px-4 py-3 text-sm font-bold text-gray-600 dark:text-gray-400 hover:text-leapp-yellow transition-colors">Offerings</a>
+                <a href="/partner/event/register" class="shrink-0 px-4 py-3 text-sm font-bold text-gray-600 dark:text-gray-400 hover:text-leapp-yellow transition-colors">Events</a>
+                <a href="/partner/verification" class="shrink-0 px-4 py-3 text-sm font-bold border-b-2 border-leapp-yellow text-leapp-yellow">Verification</a>
+                <a href="/partner/interests" class="shrink-0 px-4 py-3 text-sm font-bold text-gray-600 dark:text-gray-400 hover:text-leapp-yellow transition-colors">User Interests</a>
+            </div>
+        </div>
+
+        <div id="pv-alert" class="hidden mb-6 p-4 text-sm rounded-lg flex items-center gap-2" role="alert"></div>
+
+        {% if error_message %}
+        <div class="mb-6 p-4 text-sm text-amber-900 bg-amber-50 dark:bg-amber-900/30 dark:text-amber-100 rounded-lg">{{ error_message }}</div>
+        {% else %}
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+            {# Sidebar first in DOM so it appears above form on mobile; order-last on lg puts it right #}
+            <aside class="order-1 lg:order-2 lg:col-span-1 lg:sticky lg:top-6 space-y-5">
+                <div class="pv-card rounded-2xl bg-white dark:bg-background-dark p-7 space-y-4">
+                    <div class="flex flex-wrap items-center justify-between gap-3">
+                        <div>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Partner type</p>
+                            <p class="font-bold text-lg">{{ partner_type }}</p>
+                        </div>
+                        <span class="px-3 py-1.5 rounded-full text-xs font-bold
+                            {% if status == 'Verified' %}bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200
+                            {% elif status == 'Rejected' %}bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200
+                            {% elif status in ('Submitted', 'Under Review') %}bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200
+                            {% else %}bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200{% endif %}">
+                            {{ status }}
+                        </span>
+                    </div>
+
+                    {% if is_verified or status == 'Verified' %}
+                    <p class="text-sm text-gray-600 dark:text-gray-400">Your account is verified. Families will see this badge next to your name.</p>
+                    <div class="flex items-center gap-2 p-4 rounded-xl bg-leapp-yellow/15">
+                        <span class="font-bold">Your name</span>
+                        <span class="material-symbols-outlined filled text-leapp-yellow" title="Verified partner" aria-label="Verified partner">verified</span>
+                    </div>
+                    {% elif status == 'Submitted' %}
+                    <p class="text-sm text-gray-600 dark:text-gray-400">We have received your application. An admin will review it shortly.</p>
+                    {% elif status == 'Under Review' %}
+                    <p class="text-sm text-gray-600 dark:text-gray-400">Your application is being reviewed. You will get an email when a decision is made.</p>
+                    {% elif status == 'Rejected' %}
+                    <div class="p-4 rounded-xl bg-red-50 dark:bg-red-900/25 text-sm text-red-800 dark:text-red-200">
+                        <p class="font-semibold mb-1">Needs updates</p>
+                        <p>{{ rejection_reason or 'Please update your details and resubmit.' }}</p>
+                    </div>
+                    {% elif status == 'Revoked' %}
+                    <p class="text-sm text-gray-600 dark:text-gray-400">Verification was revoked. You can submit a new application.</p>
+                    {% else %}
+                    <p class="text-sm text-gray-600 dark:text-gray-400">Complete the checklist. You can save a draft and submit when ready.</p>
+                    {% endif %}
+                </div>
+
+                <div class="pv-card rounded-2xl bg-white dark:bg-background-dark p-7 space-y-4">
+                    <h3 class="font-bold text-base flex items-center gap-2">
+                        <span class="material-symbols-outlined text-leapp-yellow text-xl">route</span>
+                        After you submit
+                    </h3>
+                    <ol class="space-y-3 text-sm text-gray-600 dark:text-gray-400">
+                        <li class="flex gap-2">
+                            <span class="font-bold text-leapp-black dark:text-white shrink-0">1.</span>
+                            <span>We mark your application as submitted.</span>
+                        </li>
+                        <li class="flex gap-2">
+                            <span class="font-bold text-leapp-black dark:text-white shrink-0">2.</span>
+                            <span>An admin reviews your details and documents.</span>
+                        </li>
+                        <li class="flex gap-2">
+                            <span class="font-bold text-leapp-black dark:text-white shrink-0">3.</span>
+                            <span>You get an email when approved or if something needs updating.</span>
+                        </li>
+                    </ol>
+                    {% if can_edit %}
+                    <p class="text-xs text-gray-500 dark:text-gray-400 pt-3">
+                        Tip: use <span class="font-semibold">Save draft</span> anytime, then <span class="font-semibold">Submit for review</span> when everything looks good.
+                    </p>
+                    {% endif %}
+                </div>
+
+                {% if not (is_verified or status == 'Verified') %}
+                <div class="rounded-2xl bg-gradient-to-br from-gray-50 to-gray-100/80 dark:from-gray-900/50 dark:to-gray-800/40 p-6 space-y-2">
+                    <p class="text-xs font-bold uppercase tracking-wide text-gray-500">Badge preview</p>
+                    <p class="text-lg font-bold inline-flex items-center gap-1 text-gray-400">
+                        <span>Your name</span>
+                        <span class="material-symbols-outlined filled text-gray-300 dark:text-gray-600" title="Appears after approval">verified</span>
+                    </p>
+                    <p class="text-xs text-gray-500">This yellow badge appears next to your name once approved.</p>
+                </div>
+                {% endif %}
+            </aside>
+
+            <div class="order-2 lg:order-1 lg:col-span-2 space-y-6">
+                {% if status == 'Verified' %}
+                <div class="pv-card rounded-2xl bg-green-50 dark:bg-green-900/20 p-10 text-center space-y-3">
+                    <span class="material-symbols-outlined filled text-leapp-yellow text-5xl">verified</span>
+                    <h2 class="text-2xl font-black">You’re verified</h2>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 max-w-md mx-auto">
+                        Families will see the verified badge next to your name on your profile and course pages.
+                    </p>
+                </div>
+                {% else %}
+                <form id="verification-form" class="pv-card rounded-2xl bg-white dark:bg-background-dark p-7 sm:p-8 space-y-6" enctype="multipart/form-data">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                    <div class="pb-1">
+                        {% if verification_template %}
+                        <h2 class="text-lg font-bold">{{ verification_template.title }}</h2>
+                        {% else %}
+                        <h2 class="text-lg font-bold">Verification checklist</h2>
+                        {% endif %}
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Fill in each section. Required fields are marked with *</p>
+                    </div>
+
+                    {% for field in field_rows %}
+                    <div class="pv-field rounded-2xl bg-gray-50 dark:bg-gray-900/40 p-5 sm:p-6 space-y-3" data-field-key="{{ field.field_key }}" data-fieldtype="{{ field.fieldtype }}">
+                        {% if field.fieldtype == 'Check' %}
+                        <label class="flex items-start gap-3 cursor-pointer">
+                            <input type="checkbox" class="pv-input mt-0.5 h-5 w-5 rounded text-leapp-yellow focus:ring-leapp-yellow shrink-0" {% if field.value %}checked{% endif %} {% if not can_edit %}disabled{% endif %} />
+                            <span>
+                                <span class="text-base font-medium block">
+                                    {% if field.field_key == 'accept_guidelines' %}
+                                    I agree to
+                                    <a href="/partner/guidelines" target="_blank" class="text-leapp-yellow hover:underline font-bold" onclick="event.stopPropagation()">LEAPP partner guidelines</a>
+                                    {% else %}
+                                    {{ field.label }}
+                                    {% endif %}
+                                    {% if field.reqd %} <span class="text-red-500">*</span>{% endif %}
+                                </span>
+                                {% if field.description %}
+                                <span class="text-xs text-gray-500 dark:text-gray-400 block mt-0.5">{{ field.description }}</span>
+                                {% endif %}
+                            </span>
+                        </label>
+                        {% else %}
+                        <label class="text-base font-medium block">
+                            {{ field.label }}{% if field.reqd %} <span class="text-red-500">*</span>{% endif %}
+                        </label>
+                        {% if field.description and field.fieldtype != 'Attach' %}
+                        <p class="text-xs text-gray-500 dark:text-gray-400">{{ field.description }}</p>
+                        {% endif %}
+
+                        {% if field.fieldtype == 'Long Text' %}
+                        <textarea class="pv-input pv-input-soft form-input w-full rounded-xl border-0 bg-white dark:bg-background-dark p-4 outline-none" rows="4" placeholder="Write a short summary…" {% if not can_edit %}disabled{% endif %}>{{ field.value or '' }}</textarea>
+                        {% elif field.fieldtype == 'Int' %}
+                        <input type="number" step="1" class="pv-input pv-input-soft form-input w-full max-w-xs rounded-xl border-0 bg-white dark:bg-background-dark h-12 px-4 outline-none" value="{{ field.value if field.value != '' else '' }}" {% if not can_edit %}disabled{% endif %} />
+                        {% elif field.fieldtype == 'Decimal' %}
+                        <input type="number" step="0.01" class="pv-input pv-input-soft form-input w-full max-w-xs rounded-xl border-0 bg-white dark:bg-background-dark h-12 px-4 outline-none" value="{{ field.value if field.value != '' else '' }}" {% if not can_edit %}disabled{% endif %} />
+                        {% elif field.fieldtype == 'Attach' %}
+                        <div class="pv-dropzone mt-1 flex flex-col items-center justify-center gap-2 rounded-2xl bg-white dark:bg-background-dark px-6 py-11 text-center transition-all cursor-pointer hover:bg-leapp-yellow/5 {% if not can_edit %}is-disabled{% endif %}"
+                             role="button"
+                             tabindex="{% if can_edit %}0{% else %}-1{% endif %}"
+                             aria-label="Upload {{ field.label }}">
+                            <input type="file" class="pv-file hidden" accept="image/*,.pdf,application/pdf" {% if not can_edit %}disabled{% endif %} />
+                            <span class="material-symbols-outlined text-4xl text-leapp-yellow">upload_file</span>
+                            <p class="pv-dropzone-title text-sm font-bold text-leapp-black dark:text-white px-1">
+                                {% if field.value %}File uploaded — click or drop to replace{% else %}Drop file here or click to upload{% endif %}
+                            </p>
+                            <p class="pv-dropzone-name text-sm text-leapp-yellow font-medium {% if not field.value %}hidden{% endif %}">
+                                {% if field.value %}
+                                <a href="{{ field.value }}" target="_blank" class="hover:underline" onclick="event.stopPropagation()">View current file</a>
+                                {% endif %}
+                            </p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">
+                                {% if field.description %}{{ field.description }} · {% endif %}Images or PDF
+                            </p>
+                        </div>
+                        {% else %}
+                        <input type="text" class="pv-input pv-input-soft form-input w-full rounded-xl border-0 bg-white dark:bg-background-dark h-12 px-4 outline-none" value="{{ field.value or '' }}" {% if not can_edit %}disabled{% endif %} />
+                        {% endif %}
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+
+                    {% if can_edit %}
+                    <div class="flex flex-col sm:flex-row gap-3 pt-1">
+                        <button type="button" id="pv-save-draft" class="px-6 py-3 rounded-xl font-bold bg-gray-100 dark:bg-gray-800 text-leapp-black dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">Save draft</button>
+                        <button type="button" id="pv-submit" class="px-6 py-3 bg-leapp-yellow text-leapp-black rounded-xl font-bold hover:bg-leapp-yellow/90 transition-colors shadow-md shadow-leapp-yellow/20">
+                            {% if status == 'Rejected' %}Resubmit{% else %}Submit for review{% endif %}
+                        </button>
+                    </div>
+                    {% elif status in ('Submitted', 'Under Review') %}
+                    <p class="text-sm text-gray-500 dark:text-gray-400 pt-2">This checklist is locked while under review.</p>
+                    {% endif %}
+                </form>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</main>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const csrf = '{{ csrf_token }}';
+    const alertEl = document.getElementById('pv-alert');
+    const canEdit = {{ 'true' if can_edit else 'false' }};
+
+    function showAlert(msg, ok) {
+        if (!alertEl) return;
+        alertEl.textContent = msg;
+        alertEl.className = 'mb-6 p-4 text-sm rounded-lg flex items-center gap-2 ' +
+            (ok ? 'text-green-800 bg-green-100 dark:bg-green-900 dark:text-green-200'
+                : 'text-red-800 bg-red-100 dark:bg-red-900 dark:text-red-200');
+        alertEl.classList.remove('hidden');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function collectAnswers() {
+        const answers = [];
+        document.querySelectorAll('[data-field-key]').forEach((wrap) => {
+            const key = wrap.dataset.fieldKey;
+            const ft = wrap.dataset.fieldtype;
+            let value = '';
+            if (ft === 'Check') {
+                value = wrap.querySelector('.pv-input')?.checked ? 1 : 0;
+            } else if (ft === 'Attach') {
+                value = '';
+            } else {
+                value = wrap.querySelector('.pv-input')?.value ?? '';
+            }
+            answers.push({ field_key: key, value });
+        });
+        return answers;
+    }
+
+    function buildFormData(answers) {
+        const fd = new FormData();
+        fd.append('answers', JSON.stringify(answers));
+        document.querySelectorAll('[data-field-key]').forEach((wrap) => {
+            if (wrap.dataset.fieldtype !== 'Attach') return;
+            const fileInput = wrap.querySelector('.pv-file');
+            if (fileInput && fileInput.files && fileInput.files[0]) {
+                fd.append('answer__' + wrap.dataset.fieldKey, fileInput.files[0]);
+            }
+        });
+        return fd;
+    }
+
+    async function callApi(method, answers) {
+        const fd = buildFormData(answers);
+        const res = await fetch('/api/method/leappcore.api.partner_verification.' + method, {
+            method: 'POST',
+            headers: { 'X-Frappe-CSRF-Token': csrf },
+            body: fd,
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+            const msg = (data && (data.message || data._error_message || data.exc)) || 'Request failed';
+            throw new Error(typeof msg === 'string' ? msg : 'Request failed');
+        }
+        const result = data.message !== undefined ? data.message : data;
+        if (result && result.exc) throw new Error('Something went wrong');
+        return result;
+    }
+
+    function setFileLabel(zone, file) {
+        const title = zone.querySelector('.pv-dropzone-title');
+        const nameEl = zone.querySelector('.pv-dropzone-name');
+        if (!file) return;
+        if (title) title.textContent = 'Ready to upload — click or drop to replace';
+        if (nameEl) {
+            nameEl.textContent = file.name;
+            nameEl.classList.remove('hidden');
+        }
+    }
+
+    function assignFile(input, file) {
+        if (!file) return;
+        const dt = new DataTransfer();
+        dt.items.add(file);
+        input.files = dt.files;
+        setFileLabel(input.closest('.pv-dropzone'), file);
+    }
+
+    document.querySelectorAll('.pv-dropzone').forEach((zone) => {
+        const input = zone.querySelector('.pv-file');
+        if (!input || input.disabled) return;
+
+        zone.addEventListener('click', (e) => {
+            if (e.target.closest('a')) return;
+            input.click();
+        });
+        zone.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                input.click();
+            }
+        });
+        input.addEventListener('change', () => {
+            if (input.files && input.files[0]) setFileLabel(zone, input.files[0]);
+        });
+        ['dragenter', 'dragover'].forEach((evt) => {
+            zone.addEventListener(evt, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                zone.classList.add('is-dragover');
+            });
+        });
+        ['dragleave', 'drop'].forEach((evt) => {
+            zone.addEventListener(evt, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                zone.classList.remove('is-dragover');
+            });
+        });
+        zone.addEventListener('drop', (e) => {
+            const file = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+            if (file) assignFile(input, file);
+        });
+    });
+
+    if (!canEdit) return;
+
+    document.getElementById('pv-save-draft')?.addEventListener('click', async () => {
+        try {
+            await callApi('save_draft', collectAnswers());
+            showAlert('Draft saved.', true);
+            setTimeout(() => location.reload(), 800);
+        } catch (e) {
+            showAlert(e.message || 'Could not save draft', false);
+        }
+    });
+
+    document.getElementById('pv-submit')?.addEventListener('click', async () => {
+        try {
+            await callApi('submit_verification', collectAnswers());
+            showAlert('Submitted for review.', true);
+            setTimeout(() => location.reload(), 800);
+        } catch (e) {
+            showAlert(e.message || 'Could not submit', false);
+        }
+    });
+});
+</script>
+{% endblock %}

@@ -9,7 +9,62 @@
     .material-symbols-outlined {
         font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
     }
-    
+
+    .chip-option {
+        cursor: pointer;
+        user-select: none;
+    }
+
+    .chip-option input {
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    .chip-option-label {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        padding: 0.5rem 0.875rem;
+        border-radius: 9999px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        border: 1px solid rgb(209 213 219);
+        background: white;
+        color: inherit;
+        transition: background 0.15s, border-color 0.15s, color 0.15s;
+    }
+
+    .dark .chip-option-label {
+        border-color: rgb(75 85 99);
+        background: transparent;
+    }
+
+    .chip-option input:checked + .chip-option-label {
+        background: rgba(252, 211, 77, 0.25);
+        border-color: #fcd34d;
+        font-weight: 700;
+    }
+
+    .chip-option input:focus-visible + .chip-option-label {
+        outline: 2px solid rgba(252, 211, 77, 0.6);
+        outline-offset: 2px;
+    }
+
+    .area-chip input:checked + .chip-option-label {
+        background: #fcd34d;
+        color: #111;
+        border-color: #fcd34d;
+    }
+
+    .form-step.hidden-step {
+        display: none;
+    }
+
+    .step-tab[aria-disabled="true"] {
+        opacity: 0.45;
+        pointer-events: none;
+    }
 </style>
 {% endblock %}
 
@@ -23,15 +78,16 @@
                     <h1 class="text-3xl sm:text-4xl font-black text-leapp-black dark:text-white">
                        {% if is_edit %}Edit Event{% else %}Create New Event{% endif %}
                     </h1>
-                    <p class="text-gray-600 dark:text-gray-400 mt-2">{% if is_edit %}Update your event details{% else %}Add a new event to the platform{% endif %}</p>
+                    <p class="text-gray-600 dark:text-gray-400 mt-2">{% if is_edit %}Update your event details{% else %}A few short steps — you can skip optional parts{% endif %}</p>
                 </div>
             </div>
-            
+
             <!-- Navigation Tabs -->
             <div class="flex gap-4 border-b border-gray-200 dark:border-gray-700">
                 <a href="/partner/profile" class="px-4 py-3 text-sm font-bold text-gray-600 dark:text-gray-400 hover:text-leapp-yellow transition-colors">Profile</a>
                 <a href="/partner/offering/register" class="px-4 py-3 text-sm font-bold text-gray-600 dark:text-gray-400 hover:text-leapp-yellow transition-colors">Offerings</a>
                 <a href="/partner/event/register" class="px-4 py-3 text-sm font-bold border-b-2 border-leapp-yellow text-leapp-yellow">Events</a>
+                <a href="/partner/verification" class="px-4 py-3 text-sm font-bold text-gray-600 dark:text-gray-400 hover:text-leapp-yellow transition-colors">Verification</a>
                 <a href="/partner/interests" class="px-4 py-3 text-sm font-bold text-gray-600 dark:text-gray-400 hover:text-leapp-yellow transition-colors">User Interests</a>
             </div>
         </div>
@@ -42,7 +98,7 @@
             <span>{{ success_message }}</span>
         </div>
         {% endif %}
-        
+
         {% if error_message %}
         <div class="mb-6 p-4 text-sm text-red-800 bg-red-100 rounded-lg dark:bg-red-900 dark:text-red-200 flex items-center gap-2" role="alert">
             <span class="material-symbols-outlined">error</span>
@@ -50,7 +106,7 @@
         </div>
         {% endif %}
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
             <!-- My Events Sidebar -->
             <div class="lg:col-span-1 order-2 lg:order-1">
                 <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-background-dark p-6 shadow-lg sticky top-6">
@@ -58,16 +114,16 @@
                         <h3 class="text-lg font-bold text-leapp-black dark:text-white">My Events</h3>
                         <span class="px-2 py-1 bg-leapp-yellow/10 text-leapp-yellow text-xs font-bold rounded-full">{{ my_events|length }}</span>
                     </div>
-                    
+
                     {% if my_events %}
                     <div class="space-y-3 max-h-[400px] overflow-y-auto">
                         {% for item in my_events %}
-                        <a href="/partner/event/register?id={{ item.name }}" 
+                        <a href="/partner/event/register?id={{ item.name }}"
                            class="block p-3 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-leapp-yellow hover:bg-leapp-yellow/5 transition-all {% if event.name == item.name %}border-leapp-yellow bg-leapp-yellow/5{% endif %}">
                             <div class="flex items-start justify-between gap-2">
                                 <div class="flex-1 min-w-0">
                                     <p class="font-semibold text-leapp-black dark:text-white truncate">{{ item.event_name }}</p>
-                                    <p class="text-xs text-gray-600 dark:text-gray-400 truncate">{{ item.heading or 'No heading' }}</p>
+                                    <p class="text-xs text-gray-600 dark:text-gray-400 truncate">{{ item.heading or 'No subtitle' }}</p>
                                     <div class="flex items-center gap-2 mt-2">
                                         {% if item.start_datetime %}
                                         <span class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
@@ -76,9 +132,9 @@
                                         </span>
                                         {% endif %}
                                         {% if item.active %}
-                                        <span class="px-2 py-0.5 bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 text-xs rounded-full">Active</span>
+                                        <span class="px-2 py-0.5 bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 text-xs rounded-full">Live</span>
                                         {% else %}
-                                        <span class="px-2 py-0.5 bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200 text-xs rounded-full">Inactive</span>
+                                        <span class="px-2 py-0.5 bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200 text-xs rounded-full">Draft</span>
                                         {% endif %}
                                     </div>
                                 </div>
@@ -92,8 +148,8 @@
                         <p class="text-sm text-gray-500 dark:text-gray-400">No events yet</p>
                     </div>
                     {% endif %}
-                    
-                    <button onclick="window.location.href='/partner/event/register'" class="w-full mt-4 px-4 py-3 border-2 border-dashed border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400 rounded-lg hover:border-leapp-yellow hover:text-leapp-yellow transition-all flex items-center justify-center gap-2">
+
+                    <button type="button" onclick="window.location.href='/partner/event/register'" class="w-full mt-4 px-4 py-3 border-2 border-dashed border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400 rounded-lg hover:border-leapp-yellow hover:text-leapp-yellow transition-all flex items-center justify-center gap-2">
                         <span class="material-symbols-outlined">add</span>
                         <span class="text-sm font-medium">New Event</span>
                     </button>
@@ -101,184 +157,262 @@
             </div>
 
             <!-- Event Form -->
-            <div class="lg:col-span-2 order-1 lg:order-2">
-                <form method="post" action="/partner/event/register{% if event.name %}?id={{ event.name }}{% endif %}" id="event-form" enctype="multipart/form-data" class="space-y-6">
+            <div class="lg:col-span-3 order-1 lg:order-2">
+                <form method="post" action="/partner/event/register{% if event.name %}?id={{ event.name }}{% endif %}" id="event-form" enctype="multipart/form-data" class="space-y-4"
+                      data-is-edit="{{ '1' if is_edit else '0' }}">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-                    
-                    <!-- Basic Information -->
-                    <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-background-dark p-6 shadow-lg space-y-4">
-                        <div class="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-gray-700">
-                            <span class="material-symbols-outlined text-leapp-yellow">event</span>
-                            <h3 class="text-lg font-bold text-leapp-black dark:text-white">Event Information</h3>
-                        </div>
-                        
-                        <label class="flex flex-col">
-                            <p class="text-leapp-black dark:text-white text-base font-medium leading-normal pb-2">Event Name <span class="text-red-500">*</span></p>
-                            <input
-                                name="event_name"
-                                value="{{ event.event_name or '' }}"
-                                required
-                                class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark h-14 p-[15px] text-base font-normal leading-normal text-leapp-black dark:text-white placeholder:text-gray-400 focus:border-leapp-yellow focus:outline-0 focus:ring-2 focus:ring-leapp-yellow/50"
-                                placeholder="e.g., Summer Art Camp 2024" type="text" />
-                        </label>
-                        
-                        <label class="flex flex-col">
-                            <p class="text-leapp-black dark:text-white text-base font-medium leading-normal pb-2">Heading</p>
-                            <input
-                                name="heading"
-                                value="{{ event.heading or '' }}"
-                                class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark h-14 p-[15px] text-base font-normal leading-normal text-leapp-black dark:text-white placeholder:text-gray-400 focus:border-leapp-yellow focus:outline-0 focus:ring-2 focus:ring-leapp-yellow/50"
-                                placeholder="Event heading or subtitle" type="text" />
-                        </label>
-                        
-                        <label class="flex flex-col">
-                            <p class="text-leapp-black dark:text-white text-base font-medium leading-normal pb-2">Short Description</p>
-                            <textarea
-                                name="short_description"
-                                rows="3"
-                                class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark p-[15px] text-base font-normal leading-normal text-leapp-black dark:text-white placeholder:text-gray-400 focus:border-leapp-yellow focus:outline-0 focus:ring-2 focus:ring-leapp-yellow/50"
-                                placeholder="Brief description for preview">{{ event.short_description or '' }}</textarea>
-                        </label>
-                        
-                        <label class="flex flex-col">
-                            <p class="text-leapp-black dark:text-white text-base font-medium leading-normal pb-2">Long Description</p>
-                            <textarea
-                                name="long_description"
-                                rows="5"
-                                class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark p-[15px] text-base font-normal leading-normal text-leapp-black dark:text-white placeholder:text-gray-400 focus:border-leapp-yellow focus:outline-0 focus:ring-2 focus:ring-leapp-yellow/50"
-                                placeholder="Detailed description of the event">{{ event.long_description or '' }}</textarea>
-                        </label>
-                        
-                        <!-- Featured Image Upload -->
-                        <div class="flex flex-col">
-                            <p class="text-leapp-black dark:text-white text-base font-medium leading-normal pb-2">Featured Image</p>
-                            <div class="flex items-start gap-4">
-                                <div id="image-preview" class="w-32 h-32 rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 flex items-center justify-center overflow-hidden bg-gray-50 dark:bg-gray-800">
-                                    {% if event.featured_image %}
-                                    <img src="{{ event.featured_image }}" alt="Preview" class="w-full h-full object-cover" />
-                                    {% else %}
-                                    <span class="material-symbols-outlined text-gray-400 text-4xl">image</span>
-                                    {% endif %}
-                                </div>
-                                <div class="flex-1">
-                                    <input type="file" name="featured_image" id="image-input" accept="image/*" class="hidden" />
-                                    <button type="button" onclick="document.getElementById('image-input').click()"
-                                        class="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-all flex items-center gap-2">
-                                        <span class="material-symbols-outlined text-sm">upload</span>
-                                        <span class="text-sm">Upload Image</span>
-                                    </button>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">Recommended: 1200x630px, max 2MB</p>
-                                </div>
+
+                    <!-- Progress + step tabs -->
+                    <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-background-dark p-4 sm:p-5 shadow-lg space-y-4">
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                            <p id="step-progress-label" class="text-sm font-semibold text-gray-700 dark:text-gray-300">Step 1 of 3 · Basics</p>
+                            <div class="h-2 flex-1 sm:max-w-xs rounded-full bg-gray-100 dark:bg-gray-800 overflow-hidden">
+                                <div id="step-progress-bar" class="h-full bg-leapp-yellow transition-all duration-300" style="width: 33.33%"></div>
                             </div>
+                        </div>
+                        <div class="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1" role="tablist" aria-label="Event steps">
+                            <button type="button" class="step-tab shrink-0 px-3 py-2 rounded-lg text-sm font-bold border-2 border-leapp-yellow bg-leapp-yellow/15 text-leapp-black dark:text-white" data-step="1" role="tab" aria-selected="true">1. Basics</button>
+                            <button type="button" class="step-tab shrink-0 px-3 py-2 rounded-lg text-sm font-bold border-2 border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-400" data-step="2" role="tab" aria-selected="false" {% if not is_edit %}aria-disabled="true"{% endif %}>2. When &amp; where</button>
+                            <button type="button" class="step-tab shrink-0 px-3 py-2 rounded-lg text-sm font-bold border-2 border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-400" data-step="3" role="tab" aria-selected="false" {% if not is_edit %}aria-disabled="true"{% endif %}>3. Findability</button>
                         </div>
                     </div>
 
-                    <!-- Schedule & Location -->
-                    <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-background-dark p-6 shadow-lg space-y-4">
-                        <div class="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-gray-700">
-                            <span class="material-symbols-outlined text-leapp-yellow">schedule</span>
-                            <h3 class="text-lg font-bold text-leapp-black dark:text-white">Schedule & Location</h3>
-                        </div>
-                        
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div id="step-inline-error" class="hidden p-3 text-sm text-red-800 bg-red-50 dark:bg-red-900/40 dark:text-red-200 rounded-lg" role="status"></div>
+
+                    <!-- ========== STEP 1: Basics ========== -->
+                    <div class="form-step space-y-4" data-step-panel="1">
+                        <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-background-dark p-6 shadow-lg space-y-4">
+                            <div class="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-gray-700">
+                                <span class="material-symbols-outlined text-leapp-yellow">event</span>
+                                <div>
+                                    <h3 class="text-lg font-bold text-leapp-black dark:text-white">Basics</h3>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">Name your event and tell families what it is about</p>
+                                </div>
+                            </div>
+
                             <label class="flex flex-col">
-                                <p class="text-leapp-black dark:text-white text-base font-medium leading-normal pb-2">Start Date & Time</p>
+                                <p class="text-leapp-black dark:text-white text-base font-medium leading-normal pb-1">Event name <span class="text-red-500">*</span></p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400 pb-2">Parents search by this name — it must be unique</p>
                                 <input
-                                    name="start_datetime"
-                                    value="{{ event.start_datetime or '' }}"
-                                    type="datetime-local"
-                                    class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark h-14 p-[15px] text-base font-normal leading-normal text-leapp-black dark:text-white placeholder:text-gray-400 focus:border-leapp-yellow focus:outline-0 focus:ring-2 focus:ring-leapp-yellow/50" />
+                                    name="event_name"
+                                    id="event-name-input"
+                                    value="{{ event.event_name or '' }}"
+                                    required
+                                    class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark h-14 p-[15px] text-base font-normal leading-normal text-leapp-black dark:text-white placeholder:text-gray-400 focus:border-leapp-yellow focus:outline-0 focus:ring-2 focus:ring-leapp-yellow/50"
+                                    placeholder="e.g., Summer Art Camp 2024" type="text" />
                             </label>
-                            
+
                             <label class="flex flex-col">
-                                <p class="text-leapp-black dark:text-white text-base font-medium leading-normal pb-2">End Date & Time</p>
+                                <p class="text-leapp-black dark:text-white text-base font-medium leading-normal pb-1">Subtitle parents see</p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400 pb-2">A short line under the name on event cards</p>
                                 <input
-                                    name="end_datetime"
-                                    value="{{ event.end_datetime or '' }}"
-                                    type="datetime-local"
-                                    class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark h-14 p-[15px] text-base font-normal leading-normal text-leapp-black dark:text-white placeholder:text-gray-400 focus:border-leapp-yellow focus:outline-0 focus:ring-2 focus:ring-leapp-yellow/50" />
+                                    name="heading"
+                                    value="{{ event.heading or '' }}"
+                                    class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark h-14 p-[15px] text-base font-normal leading-normal text-leapp-black dark:text-white placeholder:text-gray-400 focus:border-leapp-yellow focus:outline-0 focus:ring-2 focus:ring-leapp-yellow/50"
+                                    placeholder="e.g., Creative fun for ages 6–12" type="text" />
                             </label>
-                        </div>
-                        
-                        <!-- Location (city) → Area (same pattern as offering register) -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
-                            <div class="rounded-xl bg-gray-50 dark:bg-gray-900/40 p-4 sm:p-5 flex flex-col gap-2 shadow-sm dark:shadow-none ring-1 ring-gray-200/70 dark:ring-white/[0.06]">
-                                <label for="event-location-search-input" class="text-leapp-black dark:text-white text-base font-medium leading-normal">Location</label>
-                                <p class="text-xs text-gray-500 dark:text-gray-400 -mt-0.5">Search and pick a city. The area list only shows neighbourhoods in that city.</p>
-                                <div class="relative">
-                                    <input type="text" id="event-location-search-input" autocomplete="off" readonly
-                                        placeholder="Click to search city…"
-                                        value="{{ event.location_display or '' }}"
-                                        class="form-input w-full rounded-xl border-0 ring-1 ring-gray-200/80 dark:ring-white/[0.08] bg-white dark:bg-background-dark h-14 px-[15px] text-base text-leapp-black dark:text-white placeholder:text-gray-400 focus:ring-2 focus:ring-leapp-yellow/50 focus:outline-0 cursor-pointer" />
-                                    <input type="hidden" name="location" id="event-location-selected" value="{{ event.location or '' }}" />
-                                    <div id="event-location-dropdown" class="hidden absolute z-30 mt-1 w-full max-h-60 overflow-y-auto rounded-xl bg-white dark:bg-background-dark shadow-lg ring-1 ring-gray-200/60 dark:ring-white/[0.08]">
-                                        <div class="p-2">
-                                            <input type="text" id="event-location-filter-input" autocomplete="off" placeholder="Type to filter…"
-                                                class="w-full px-3 py-2 rounded-lg border-0 ring-1 ring-gray-200/70 dark:ring-white/[0.08] bg-white dark:bg-background-dark text-sm text-leapp-black dark:text-white focus:ring-2 focus:ring-leapp-yellow/40 focus:outline-0" />
-                                        </div>
-                                        <div id="event-location-list" class="py-1"></div>
+
+                            <label class="flex flex-col">
+                                <p class="text-leapp-black dark:text-white text-base font-medium leading-normal pb-1">Short preview</p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400 pb-2">Shown on event listing cards</p>
+                                <textarea
+                                    name="short_description"
+                                    rows="3"
+                                    class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark p-[15px] text-base font-normal leading-normal text-leapp-black dark:text-white placeholder:text-gray-400 focus:border-leapp-yellow focus:outline-0 focus:ring-2 focus:ring-leapp-yellow/50"
+                                    placeholder="One or two sentences for the card preview">{{ event.short_description or '' }}</textarea>
+                            </label>
+
+                            <label class="flex flex-col">
+                                <p class="text-leapp-black dark:text-white text-base font-medium leading-normal pb-1">Full details</p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400 pb-2">Everything families need to know on the event page</p>
+                                <textarea
+                                    name="long_description"
+                                    rows="5"
+                                    class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark p-[15px] text-base font-normal leading-normal text-leapp-black dark:text-white placeholder:text-gray-400 focus:border-leapp-yellow focus:outline-0 focus:ring-2 focus:ring-leapp-yellow/50"
+                                    placeholder="Describe the activities, who it is for, what to bring…">{{ event.long_description or '' }}</textarea>
+                            </label>
+
+                            <div class="flex flex-col">
+                                <p class="text-leapp-black dark:text-white text-base font-medium leading-normal pb-2">Cover image</p>
+                                <div class="flex items-start gap-4">
+                                    <div id="image-preview" class="w-32 h-32 rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 flex items-center justify-center overflow-hidden bg-gray-50 dark:bg-gray-800">
+                                        {% if event.featured_image %}
+                                        <img src="{{ event.featured_image }}" alt="Preview" class="w-full h-full object-cover" />
+                                        {% else %}
+                                        <span class="material-symbols-outlined text-gray-400 text-4xl">image</span>
+                                        {% endif %}
+                                    </div>
+                                    <div class="flex-1">
+                                        <input type="file" name="featured_image" id="image-input" accept="image/*" class="hidden" />
+                                        <button type="button" onclick="document.getElementById('image-input').click()"
+                                            class="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-all flex items-center gap-2">
+                                            <span class="material-symbols-outlined text-sm">upload</span>
+                                            <span class="text-sm">Upload Image</span>
+                                        </button>
+                                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">Recommended: 1200x630px, max 2MB</p>
                                     </div>
                                 </div>
                             </div>
-                            <div class="rounded-xl bg-gray-50 dark:bg-gray-900/40 p-4 sm:p-5 flex flex-col gap-2 shadow-sm dark:shadow-none ring-1 ring-gray-200/70 dark:ring-white/[0.06]">
-                                <label for="event-area-select" class="text-leapp-black dark:text-white text-base font-medium leading-normal">Area</label>
-                                <p class="text-xs text-gray-500 dark:text-gray-400 -mt-0.5">Choose a neighbourhood in the city you selected.</p>
-                                <input type="hidden" name="area" id="event-area-hidden" value="{{ event.area or '' }}" />
-                                <select id="event-area-select" disabled
-                                    class="form-input w-full rounded-xl border-0 ring-1 ring-gray-200/80 dark:ring-white/[0.08] bg-white dark:bg-background-dark h-14 px-[15px] text-base text-leapp-black dark:text-white focus:ring-2 focus:ring-leapp-yellow/50 focus:outline-0 disabled:opacity-60 disabled:cursor-not-allowed">
-                                </select>
+
+                            <div class="flex items-start gap-3 pt-2 border-t border-gray-100 dark:border-gray-800">
+                                <input
+                                    type="checkbox"
+                                    id="active"
+                                    name="active"
+                                    {% if event.active %}checked{% endif %}
+                                    class="mt-1 h-5 w-5 rounded border-gray-300 dark:border-gray-600 text-leapp-yellow focus:ring-leapp-yellow focus:ring-2" />
+                                <label for="active" class="text-base text-gray-700 dark:text-gray-300">
+                                    <span class="font-medium">Show this event to families</span>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">Turn on when you are ready for people to find it</p>
+                                </label>
+                            </div>
+                            <div id="publish-date-tip" class="hidden p-3 text-sm text-amber-800 bg-amber-50 dark:bg-amber-900/30 dark:text-amber-200 rounded-lg">
+                                Add a start date in the next step so families know when to come.
                             </div>
                         </div>
-                        <script type="application/json" id="event-locations-json">{{ locations | tojson }}</script>
-                        <script type="application/json" id="event-areas-json">{{ areas | tojson }}</script>
-                        <script type="application/json" id="event-initial-area-json">{{ event.area | tojson }}</script>
-
-                        
-                        <label class="flex flex-col">
-                            <p class="text-leapp-black dark:text-white text-base font-medium leading-normal pb-2">Venue Address</p>
-                            <textarea
-                                name="venue_address"
-                                rows="3"
-                                class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark p-[15px] text-base font-normal leading-normal text-leapp-black dark:text-white placeholder:text-gray-400 focus:border-leapp-yellow focus:outline-0 focus:ring-2 focus:ring-leapp-yellow/50"
-                                placeholder="Full venue address with landmarks">{{ event.venue_address or '' }}</textarea>
-                        </label>
                     </div>
 
-                    <!-- Status -->
-                    <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-background-dark p-6 shadow-lg space-y-4">
-                        <div class="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-gray-700">
-                            <span class="material-symbols-outlined text-leapp-yellow">toggle_on</span>
-                            <h3 class="text-lg font-bold text-leapp-black dark:text-white">Status</h3>
-                        </div>
-                        
-                        <div class="flex items-center gap-3">
-                            <input
-                                type="checkbox"
-                                id="active"
-                                name="active"
-                                {% if event.active %}checked{% endif %}
-                                class="h-5 w-5 rounded border-gray-300 dark:border-gray-600 text-leapp-yellow focus:ring-leapp-yellow focus:ring-2" />
-                            <label for="active" class="text-base text-gray-700 dark:text-gray-300">
-                                <span class="font-medium">Make this event active</span>
-                                <p class="text-sm text-gray-500 dark:text-gray-400">Active events will be visible to all users on the platform</p>
+                    <!-- ========== STEP 2: When & where ========== -->
+                    <div class="form-step space-y-4 hidden-step" data-step-panel="2">
+                        <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-background-dark p-6 shadow-lg space-y-4">
+                            <div class="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-gray-700">
+                                <span class="material-symbols-outlined text-leapp-yellow">schedule</span>
+                                <div>
+                                    <h3 class="text-lg font-bold text-leapp-black dark:text-white">When &amp; where</h3>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">Optional for a draft — add these before you go live</p>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <label class="flex flex-col">
+                                    <p class="text-leapp-black dark:text-white text-base font-medium leading-normal pb-2">Start date &amp; time</p>
+                                    <input
+                                        name="start_datetime"
+                                        id="start-datetime"
+                                        value="{{ event.start_datetime or '' }}"
+                                        type="datetime-local"
+                                        class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark h-14 p-[15px] text-base font-normal leading-normal text-leapp-black dark:text-white placeholder:text-gray-400 focus:border-leapp-yellow focus:outline-0 focus:ring-2 focus:ring-leapp-yellow/50" />
+                                </label>
+
+                                <label class="flex flex-col">
+                                    <p class="text-leapp-black dark:text-white text-base font-medium leading-normal pb-2">End date &amp; time</p>
+                                    <input
+                                        name="end_datetime"
+                                        id="end-datetime"
+                                        value="{{ event.end_datetime or '' }}"
+                                        type="datetime-local"
+                                        class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark h-14 p-[15px] text-base font-normal leading-normal text-leapp-black dark:text-white placeholder:text-gray-400 focus:border-leapp-yellow focus:outline-0 focus:ring-2 focus:ring-leapp-yellow/50" />
+                                </label>
+                            </div>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 -mt-2">End should be after start</p>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+                                <div class="rounded-xl bg-gray-50 dark:bg-gray-900/40 p-4 sm:p-5 flex flex-col gap-2 shadow-sm dark:shadow-none ring-1 ring-gray-200/70 dark:ring-white/[0.06]">
+                                    <label for="event-location-search-input" class="text-leapp-black dark:text-white text-base font-medium leading-normal">City</label>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400 -mt-0.5">Search and pick a city. Areas below only show neighbourhoods for that city.</p>
+                                    <div class="relative">
+                                        <input type="text" id="event-location-search-input" autocomplete="off" readonly
+                                            placeholder="Click to search city…"
+                                            value="{{ event.location_display or '' }}"
+                                            class="form-input w-full rounded-xl border-0 ring-1 ring-gray-200/80 dark:ring-white/[0.08] bg-white dark:bg-background-dark h-14 px-[15px] text-base text-leapp-black dark:text-white placeholder:text-gray-400 focus:ring-2 focus:ring-leapp-yellow/50 focus:outline-0 cursor-pointer" />
+                                        <input type="hidden" name="location" id="event-location-selected" value="{{ event.location or '' }}" />
+                                        <div id="event-location-dropdown" class="hidden absolute z-30 mt-1 w-full max-h-60 overflow-y-auto rounded-xl bg-white dark:bg-background-dark shadow-lg ring-1 ring-gray-200/60 dark:ring-white/[0.08]">
+                                            <div class="p-2">
+                                                <input type="text" id="event-location-filter-input" autocomplete="off" placeholder="Type to filter…"
+                                                    class="w-full px-3 py-2 rounded-lg border-0 ring-1 ring-gray-200/70 dark:ring-white/[0.08] bg-white dark:bg-background-dark text-sm text-leapp-black dark:text-white focus:ring-2 focus:ring-leapp-yellow/40 focus:outline-0" />
+                                            </div>
+                                            <div id="event-location-list" class="py-1"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="rounded-xl bg-gray-50 dark:bg-gray-900/40 p-4 sm:p-5 flex flex-col gap-2 shadow-sm dark:shadow-none ring-1 ring-gray-200/70 dark:ring-white/[0.06]">
+                                    <p class="text-leapp-black dark:text-white text-base font-medium leading-normal">Area / neighbourhood</p>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400 -mt-0.5">Tap one area for the city you selected</p>
+                                    <div id="event-area-chips" class="flex flex-wrap gap-2 min-h-[3rem]" aria-live="polite">
+                                        <p class="text-sm text-gray-400 area-empty-hint">Select a city first</p>
+                                    </div>
+                                    <input type="hidden" name="area" id="event-area-hidden" value="{{ event.area or '' }}" />
+                                </div>
+                            </div>
+                            <script type="application/json" id="event-locations-json">{{ locations | tojson }}</script>
+                            <script type="application/json" id="event-areas-json">{{ areas | tojson }}</script>
+                            <script type="application/json" id="event-initial-area-json">{{ event.area | tojson }}</script>
+                            <script type="application/json" id="event-categories-json">{{ categories | tojson }}</script>
+                            <script type="application/json" id="event-initial-categories-json">{{ (event.categories or []) | tojson }}</script>
+
+                            <label class="flex flex-col">
+                                <p class="text-leapp-black dark:text-white text-base font-medium leading-normal pb-1">Venue / full address</p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400 pb-2">Street address and any landmarks that help families find you</p>
+                                <textarea
+                                    name="venue_address"
+                                    rows="3"
+                                    class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark p-[15px] text-base font-normal leading-normal text-leapp-black dark:text-white placeholder:text-gray-400 focus:border-leapp-yellow focus:outline-0 focus:ring-2 focus:ring-leapp-yellow/50"
+                                    placeholder="e.g., 42 MG Road, near Metro station">{{ event.venue_address or '' }}</textarea>
                             </label>
                         </div>
                     </div>
 
-                    <!-- Submit Buttons -->
-                    <div class="flex flex-col sm:flex-row justify-end gap-4 pt-4">
-                        <button
-                            type="button"
-                            onclick="window.location.href='/partner/profile'"
-                            class="px-6 py-3 border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-xl font-bold hover:bg-gray-50 dark:hover:bg-gray-800 transition-all">
-                            Cancel
+                    <!-- ========== STEP 3: Findability ========== -->
+                    <div class="form-step space-y-4 hidden-step" data-step-panel="3">
+                        <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-background-dark p-6 shadow-lg space-y-4">
+                            <div class="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-gray-700">
+                                <span class="material-symbols-outlined text-leapp-yellow">category</span>
+                                <div>
+                                    <h3 class="text-lg font-bold text-leapp-black dark:text-white">Findability</h3>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">Help families discover this event — optional but recommended</p>
+                                </div>
+                            </div>
+
+                            <div class="rounded-xl bg-gray-50 dark:bg-gray-900/40 p-4 sm:p-5 flex flex-col gap-2 shadow-sm dark:shadow-none ring-1 ring-gray-200/70 dark:ring-white/[0.06]">
+                                <label for="category-parent-select" class="text-leapp-black dark:text-white text-base font-medium leading-normal">Category</label>
+                                <p class="text-xs text-gray-500 dark:text-gray-400 -mt-0.5">Choose the broad type first. Topics below are filtered to match.</p>
+                                <select id="category-parent-select"
+                                    class="form-input w-full rounded-xl border-0 ring-1 ring-gray-200/80 dark:ring-white/[0.08] bg-white dark:bg-background-dark h-14 px-[15px] text-base text-leapp-black dark:text-white focus:ring-2 focus:ring-leapp-yellow/50 focus:outline-0">
+                                    <option value="">Select category…</option>
+                                    {% for g in category_parent_groups %}
+                                    <option value="{{ g }}" {% if g == event.category_parent %}selected{% endif %}>{{ g }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="rounded-xl bg-gray-50 dark:bg-gray-900/40 p-4 sm:p-5 flex flex-col gap-2 shadow-sm dark:shadow-none ring-1 ring-gray-200/70 dark:ring-white/[0.06]">
+                                <p class="text-leapp-black dark:text-white text-base font-medium leading-normal">Topics</p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400 -mt-0.5">Tap one or more topics so families can find this</p>
+                                <div id="categories-chips" class="flex flex-wrap gap-2 min-h-[3rem]" aria-live="polite">
+                                    <p class="text-sm text-gray-400 categories-empty-hint">Select a category first</p>
+                                </div>
+                                <input type="hidden" name="categories" id="categories-input" value='{{ (event.categories or []) | tojson }}'>
+                            </div>
+
+                            <div class="rounded-xl border border-dashed border-gray-300 dark:border-gray-600 p-4 space-y-1">
+                                <p class="text-sm font-semibold text-leapp-black dark:text-white">Ready to save?</p>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">You can always come back and edit. If “Show this event to families” is on, it will appear on LEAPP after you save.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step navigation -->
+                    <div class="flex flex-col sm:flex-row justify-between gap-3 pt-2">
+                        <button type="button" id="step-back-btn"
+                            class="px-6 py-3 border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-xl font-bold hover:bg-gray-50 dark:hover:bg-gray-800 transition-all disabled:opacity-40 disabled:cursor-not-allowed">
+                            Back
                         </button>
-                        <button
-                            type="submit"
-                            class="flex items-center justify-center gap-2 px-6 py-3 bg-leapp-yellow text-leapp-black rounded-xl font-bold hover:bg-leapp-yellow/90 transition-all">
-                            <span class="material-symbols-outlined">save</span>
-                            <span>{% if is_edit %}Update Event{% else %}Create Event{% endif %}</span>
-                        </button>
+                        <div class="flex flex-col sm:flex-row gap-3 sm:ml-auto">
+                            <button type="button" onclick="window.location.href='/partner/event/register'"
+                                class="px-6 py-3 border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-xl font-bold hover:bg-gray-50 dark:hover:bg-gray-800 transition-all">
+                                Cancel
+                            </button>
+                            <button type="button" id="step-continue-btn"
+                                class="inline-flex items-center justify-center gap-2 px-6 py-3 bg-leapp-yellow text-leapp-black rounded-xl font-bold hover:bg-leapp-yellow/90 transition-all">
+                                <span>Continue</span>
+                                <span class="material-symbols-outlined text-base">arrow_forward</span>
+                            </button>
+                            <button type="submit" id="step-submit-btn"
+                                class="hidden inline-flex items-center justify-center gap-2 px-6 py-3 bg-leapp-yellow text-leapp-black rounded-xl font-bold hover:bg-leapp-yellow/90 transition-all">
+                                <span class="material-symbols-outlined">save</span>
+                                <span>{% if is_edit %}Update Event{% else %}Create Event{% endif %}</span>
+                            </button>
+                        </div>
                     </div>
                 </form>
             </div>
@@ -289,8 +423,68 @@
 
 {% block scripts %}
 <script>
+    const STEP_TITLES = {
+        1: 'Basics',
+        2: 'When & where',
+        3: 'Findability'
+    };
+
+    function parseJsonEl(id, fallback) {
+        const el = document.getElementById(id);
+        if (!el) return fallback;
+        try {
+            return JSON.parse(el.textContent || JSON.stringify(fallback));
+        } catch (err) {
+            return fallback;
+        }
+    }
+
+    function escapeHtml(str) {
+        return String(str || '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+    }
+
+    function buildChipOptions(container, items, selectedIds, valueKey, labelFn, emptyHintHtml, singleSelect) {
+        if (!container) return;
+        container.innerHTML = '';
+        if (!items || !items.length) {
+            if (emptyHintHtml) container.innerHTML = emptyHintHtml;
+            return;
+        }
+        const want = new Set(Array.isArray(selectedIds) ? selectedIds : (selectedIds ? [selectedIds] : []));
+        items.forEach((item) => {
+            const value = item[valueKey] || item.name;
+            const text = labelFn(item);
+            const id = `chip-${container.id}-${value}`.replace(/[^a-zA-Z0-9_-]/g, '_');
+            const label = document.createElement('label');
+            label.className = 'chip-option relative' + (singleSelect ? ' area-chip' : '');
+            label.innerHTML = `
+                <input type="${singleSelect ? 'radio' : 'checkbox'}" name="${singleSelect ? container.id + '-radio' : ''}" id="${id}" value="${escapeHtml(value)}" ${want.has(value) ? 'checked' : ''} />
+                <span class="chip-option-label">${escapeHtml(text)}</span>
+            `;
+            container.appendChild(label);
+        });
+    }
+
+    function collectChipValues(container) {
+        if (!container) return [];
+        return Array.from(container.querySelectorAll('input:checked')).map((cb) => cb.value);
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
-        // Auto-hide success messages after 5 seconds
+        const form = document.getElementById('event-form');
+        const isEdit = form && form.dataset.isEdit === '1';
+        let currentStep = 1;
+        let maxReachedStep = isEdit ? 3 : 1;
+        const inlineError = document.getElementById('step-inline-error');
+        const publishTip = document.getElementById('publish-date-tip');
+        const activeCheckbox = document.getElementById('active');
+        const startInput = document.getElementById('start-datetime');
+        const endInput = document.getElementById('end-datetime');
+
         const successAlert = document.querySelector('[role="alert"]');
         if (successAlert && successAlert.classList.contains('text-green-800')) {
             setTimeout(() => {
@@ -298,122 +492,222 @@
                 setTimeout(() => successAlert.remove(), 300);
             }, 5000);
         }
-        
-        // Image preview
-        document.getElementById('image-input').addEventListener('change', function(e) {
+
+        document.getElementById('image-input')?.addEventListener('change', function (e) {
             const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    document.getElementById('image-preview').innerHTML = 
-                        `<img src="${e.target.result}" alt="Preview" class="w-full h-full object-cover" />`;
-                };
-                reader.readAsDataURL(file);
-            }
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function (ev) {
+                document.getElementById('image-preview').innerHTML =
+                    `<img src="${ev.target.result}" alt="Preview" class="w-full h-full object-cover" />`;
+            };
+            reader.readAsDataURL(file);
         });
-        
-        // Location (city) → single Area select
-        const eventLocationsJson = document.getElementById('event-locations-json');
-        const eventAreasJson = document.getElementById('event-areas-json');
-        const eventInitialAreaJson = document.getElementById('event-initial-area-json');
-        if (eventLocationsJson && eventAreasJson) {
-            const locations = JSON.parse(eventLocationsJson.textContent || '[]');
-            const allAreas = JSON.parse(eventAreasJson.textContent || '[]');
-            let initialAreaName = null;
-            try {
-                initialAreaName = JSON.parse((eventInitialAreaJson && eventInitialAreaJson.textContent) || 'null');
-            } catch (err) {
-                initialAreaName = null;
+
+        function showInlineError(msg) {
+            if (!inlineError) return;
+            inlineError.textContent = msg;
+            inlineError.classList.remove('hidden');
+        }
+
+        function clearInlineError() {
+            if (!inlineError) return;
+            inlineError.textContent = '';
+            inlineError.classList.add('hidden');
+        }
+
+        function updatePublishTip() {
+            if (!publishTip || !activeCheckbox) return;
+            const needsTip = activeCheckbox.checked && !(startInput && startInput.value);
+            publishTip.classList.toggle('hidden', !needsTip);
+        }
+
+        function datetimeOrderOk() {
+            if (!startInput || !endInput) return true;
+            if (!startInput.value || !endInput.value) return true;
+            return endInput.value > startInput.value;
+        }
+
+        activeCheckbox?.addEventListener('change', updatePublishTip);
+        startInput?.addEventListener('change', updatePublishTip);
+        updatePublishTip();
+
+        function goToStep(step) {
+            if (step < 1 || step > 3) return;
+            if (!isEdit && step > maxReachedStep) return;
+            currentStep = step;
+            if (step > maxReachedStep) maxReachedStep = step;
+            clearInlineError();
+
+            document.querySelectorAll('.form-step').forEach((panel) => {
+                const n = Number(panel.dataset.stepPanel);
+                panel.classList.toggle('hidden-step', n !== currentStep);
+            });
+
+            document.querySelectorAll('.step-tab').forEach((tab) => {
+                const n = Number(tab.dataset.step);
+                const active = n === currentStep;
+                const unlocked = isEdit || n <= maxReachedStep;
+                tab.setAttribute('aria-selected', active ? 'true' : 'false');
+                tab.setAttribute('aria-disabled', unlocked ? 'false' : 'true');
+                tab.className =
+                    'step-tab shrink-0 px-3 py-2 rounded-lg text-sm font-bold border-2 transition-all ' +
+                    (active
+                        ? 'border-leapp-yellow bg-leapp-yellow/15 text-leapp-black dark:text-white'
+                        : 'border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-400');
+            });
+
+            const label = document.getElementById('step-progress-label');
+            if (label) label.textContent = `Step ${currentStep} of 3 · ${STEP_TITLES[currentStep]}`;
+            const bar = document.getElementById('step-progress-bar');
+            if (bar) bar.style.width = `${(currentStep / 3) * 100}%`;
+
+            const backBtn = document.getElementById('step-back-btn');
+            const continueBtn = document.getElementById('step-continue-btn');
+            const submitBtn = document.getElementById('step-submit-btn');
+            if (backBtn) backBtn.disabled = currentStep === 1;
+            if (continueBtn) {
+                continueBtn.classList.toggle('hidden', currentStep === 3);
+                continueBtn.style.display = currentStep === 3 ? 'none' : '';
             }
-            if (initialAreaName === '') initialAreaName = null;
-
-            const locationSearch = document.getElementById('event-location-search-input');
-            const locationHidden = document.getElementById('event-location-selected');
-            const locationDropdown = document.getElementById('event-location-dropdown');
-            const locationFilterInput = document.getElementById('event-location-filter-input');
-            const locationList = document.getElementById('event-location-list');
-            const areaSelect = document.getElementById('event-area-select');
-            const areaHidden = document.getElementById('event-area-hidden');
-
-            function syncAreaHidden() {
-                if (areaHidden) areaHidden.value = areaSelect.value || '';
+            if (submitBtn) {
+                submitBtn.classList.toggle('hidden', currentStep !== 3);
+                submitBtn.style.display = currentStep === 3 ? '' : 'none';
             }
 
-            function buildAreaOptions(locationDocName, selectedAreaName) {
-                areaSelect.innerHTML = '';
-                const ph = document.createElement('option');
-                ph.value = '';
-                ph.textContent = 'Select area…';
-                areaSelect.appendChild(ph);
-                if (!locationDocName) {
-                    areaSelect.disabled = true;
-                    if (areaHidden) areaHidden.value = '';
+            window.scrollTo({ top: form.offsetTop - 24, behavior: 'smooth' });
+        }
+
+        document.querySelectorAll('.step-tab').forEach((tab) => {
+            tab.addEventListener('click', () => {
+                const n = Number(tab.dataset.step);
+                if (isEdit || n <= maxReachedStep) goToStep(n);
+            });
+        });
+
+        document.getElementById('step-back-btn')?.addEventListener('click', () => {
+            if (currentStep > 1) goToStep(currentStep - 1);
+        });
+
+        document.getElementById('step-continue-btn')?.addEventListener('click', () => {
+            clearInlineError();
+            if (currentStep === 1) {
+                const title = document.getElementById('event-name-input');
+                if (title && !title.value.trim()) {
+                    title.reportValidity();
+                    title.focus();
                     return;
                 }
-                areaSelect.disabled = false;
-                allAreas
-                    .filter((a) => a.location === locationDocName)
-                    .sort((a, b) =>
-                        String(a.area_name || a.name || '').localeCompare(
-                            String(b.area_name || b.name || ''),
-                            undefined,
-                            { sensitivity: 'base' }
-                        )
+            }
+            if (currentStep === 2 && !datetimeOrderOk()) {
+                showInlineError('End date & time should be after the start.');
+                return;
+            }
+            if (currentStep < 3) {
+                maxReachedStep = Math.max(maxReachedStep, currentStep + 1);
+                goToStep(currentStep + 1);
+            }
+        });
+
+        // Location → area chips (single select)
+        const locations = parseJsonEl('event-locations-json', []);
+        const allAreas = parseJsonEl('event-areas-json', []);
+        let initialAreaName = parseJsonEl('event-initial-area-json', null);
+        if (initialAreaName === '') initialAreaName = null;
+
+        const locationSearch = document.getElementById('event-location-search-input');
+        const locationHidden = document.getElementById('event-location-selected');
+        const locationDropdown = document.getElementById('event-location-dropdown');
+        const locationFilterInput = document.getElementById('event-location-filter-input');
+        const locationList = document.getElementById('event-location-list');
+        const areaChips = document.getElementById('event-area-chips');
+        const areaHidden = document.getElementById('event-area-hidden');
+
+        function syncAreaHiddenFromChips() {
+            if (!areaHidden || !areaChips) return;
+            const selected = areaChips.querySelector('input:checked');
+            areaHidden.value = selected ? selected.value : '';
+        }
+
+        function buildAreaChips(locationDocName, selectedAreaName) {
+            if (!areaChips) return;
+            if (!locationDocName) {
+                areaChips.innerHTML = '<p class="text-sm text-gray-400 area-empty-hint">Select a city first</p>';
+                if (areaHidden) areaHidden.value = '';
+                return;
+            }
+            const filtered = allAreas
+                .filter((a) => a.location === locationDocName)
+                .sort((a, b) =>
+                    String(a.area_name || a.name || '').localeCompare(
+                        String(b.area_name || b.name || ''),
+                        undefined,
+                        { sensitivity: 'base' }
                     )
-                    .forEach((a) => {
-                        const opt = document.createElement('option');
-                        opt.value = a.name;
-                        opt.textContent = a.area_name || a.name;
-                        if (selectedAreaName && a.name === selectedAreaName) opt.selected = true;
-                        areaSelect.appendChild(opt);
-                    });
-                syncAreaHidden();
+                );
+            if (!filtered.length) {
+                areaChips.innerHTML = '<p class="text-sm text-gray-400">No areas found for this city</p>';
+                if (areaHidden) areaHidden.value = '';
+                return;
             }
+            buildChipOptions(
+                areaChips,
+                filtered,
+                selectedAreaName,
+                'name',
+                (a) => a.area_name || a.name,
+                null,
+                true
+            );
+            areaChips.querySelectorAll('input').forEach((input) => {
+                input.addEventListener('change', syncAreaHiddenFromChips);
+            });
+            syncAreaHiddenFromChips();
+        }
 
-            areaSelect.addEventListener('change', syncAreaHidden);
-
-            function renderLocationList(filter) {
-                const q = (filter || '').toLowerCase().trim();
-                const filtered = !q
-                    ? locations
-                    : locations.filter(
-                          (l) =>
-                              String(l.city || '')
-                                  .toLowerCase()
-                                  .includes(q) || String(l.name || '').toLowerCase().includes(q)
-                      );
-                locationList.innerHTML = '';
-                filtered.forEach((l) => {
-                    const row = document.createElement('div');
-                    row.className =
-                        'location-option px-4 py-2.5 hover:bg-leapp-yellow/10 cursor-pointer text-sm text-leapp-black dark:text-white rounded-lg mx-1';
-                    row.dataset.name = l.name;
-                    row.textContent = l.city || l.name;
-                    row.addEventListener('click', () => {
-                        locationHidden.value = l.name;
-                        locationSearch.value = l.city || l.name;
-                        locationDropdown.classList.add('hidden');
-                        locationFilterInput.value = '';
-                        renderLocationList('');
-                        buildAreaOptions(l.name, null);
-                    });
-                    locationList.appendChild(row);
+        function renderLocationList(filter) {
+            if (!locationList) return;
+            const q = (filter || '').toLowerCase().trim();
+            const filtered = !q
+                ? locations
+                : locations.filter(
+                      (l) =>
+                          String(l.city || '').toLowerCase().includes(q) ||
+                          String(l.name || '').toLowerCase().includes(q)
+                  );
+            locationList.innerHTML = '';
+            filtered.forEach((l) => {
+                const row = document.createElement('div');
+                row.className =
+                    'location-option px-4 py-2.5 hover:bg-leapp-yellow/10 cursor-pointer text-sm text-leapp-black dark:text-white rounded-lg mx-1';
+                row.dataset.name = l.name;
+                row.textContent = l.city || l.name;
+                row.addEventListener('click', () => {
+                    locationHidden.value = l.name;
+                    locationSearch.value = l.city || l.name;
+                    locationDropdown.classList.add('hidden');
+                    locationFilterInput.value = '';
+                    renderLocationList('');
+                    buildAreaChips(l.name, null);
                 });
-            }
+                locationList.appendChild(row);
+            });
+        }
 
-            function openLocationDropdown() {
-                locationDropdown.classList.remove('hidden');
-                renderLocationList(locationFilterInput.value);
-                locationFilterInput.focus();
-            }
+        function openLocationDropdown() {
+            locationDropdown.classList.remove('hidden');
+            renderLocationList(locationFilterInput.value);
+            locationFilterInput.focus();
+        }
 
+        if (locationSearch && locationDropdown) {
             locationSearch.addEventListener('click', (e) => {
                 e.stopPropagation();
                 openLocationDropdown();
             });
             locationFilterInput.addEventListener('input', () => renderLocationList(locationFilterInput.value));
             document.addEventListener('click', (e) => {
-                const wrap = locationSearch && locationSearch.closest('.relative');
+                const wrap = locationSearch.closest('.relative');
                 if (wrap && !wrap.contains(e.target)) {
                     locationDropdown.classList.add('hidden');
                 }
@@ -425,12 +719,75 @@
                     locationSearch.focus();
                 }
             });
-
-            const initialLoc = locationHidden.value;
+            const initialLoc = locationHidden && locationHidden.value;
             if (initialLoc) {
-                buildAreaOptions(initialLoc, initialAreaName);
+                buildAreaChips(initialLoc, initialAreaName);
             }
         }
+
+        // Category parent → subcategory chips
+        const allOfferingCategories = parseJsonEl('event-categories-json', []);
+        const categoryParentSelect = document.getElementById('category-parent-select');
+        const categoriesChips = document.getElementById('categories-chips');
+        const categoriesInputEl = document.getElementById('categories-input');
+        let initialCategorySelections = parseJsonEl('event-initial-categories-json', []);
+
+        function rebuildSubcategoryChips(parentGroup, selectedNames) {
+            if (!categoriesChips) return;
+            if (!parentGroup) {
+                categoriesChips.innerHTML =
+                    '<p class="text-sm text-gray-400 categories-empty-hint">Select a category first</p>';
+                return;
+            }
+            const filtered = allOfferingCategories
+                .filter((c) => (c.parent_group || '') === parentGroup)
+                .sort((a, b) =>
+                    String(a.category_name || a.name || '').localeCompare(
+                        String(b.category_name || b.name || ''),
+                        undefined,
+                        { sensitivity: 'base' }
+                    )
+                );
+            if (!filtered.length) {
+                categoriesChips.innerHTML = '<p class="text-sm text-gray-400">No topics for this category</p>';
+                return;
+            }
+            buildChipOptions(
+                categoriesChips,
+                filtered,
+                selectedNames,
+                'name',
+                (c) => c.category_name || c.name
+            );
+        }
+
+        if (categoryParentSelect) {
+            categoryParentSelect.addEventListener('change', () => {
+                rebuildSubcategoryChips(categoryParentSelect.value, []);
+                if (categoriesInputEl) categoriesInputEl.value = JSON.stringify([]);
+            });
+            const initialParent = categoryParentSelect.value;
+            if (initialParent) {
+                rebuildSubcategoryChips(initialParent, initialCategorySelections);
+            }
+        }
+
+        form.addEventListener('submit', function (e) {
+            clearInlineError();
+            if (!datetimeOrderOk()) {
+                e.preventDefault();
+                showInlineError('End date & time should be after the start.');
+                maxReachedStep = Math.max(maxReachedStep, 2);
+                goToStep(2);
+                return;
+            }
+            syncAreaHiddenFromChips();
+            if (categoriesInputEl) {
+                categoriesInputEl.value = JSON.stringify(collectChipValues(categoriesChips));
+            }
+        });
+
+        goToStep(1);
     });
 </script>
 {% endblock %}

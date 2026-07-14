@@ -9,6 +9,9 @@ A comprehensive partner portal for LEAPP platform that allows partners to manage
 ├── profile/
 │   ├── index.py       # Partner profile management
 │   └── index.html     # Profile UI
+├── verification/
+│   ├── index.py       # Partner verification checklist (draft/submit)
+│   └── index.html
 ├── offering/
 │   └── register/
 │       ├── index.py   # Offering create/edit backend
@@ -18,6 +21,13 @@ A comprehensive partner portal for LEAPP platform that allows partners to manage
         ├── index.py   # Event create/edit backend
         └── index.html # Event form UI
 ```
+
+### Partner Verification (`/partner/verification`)
+- Checklist fields come from Desk **Partner Verification Template** (Individual / Organisation), chosen from signup `partner_type` on Partner Profile.
+- Lifecycle: Draft → Submitted → Under Review → Verified | Rejected (resubmit) ; admin may Revoke.
+- Admin review queue: `/admin/verification`. Templates: `/app/partner-verification-template`.
+- Verified badge uses `Partner Profile.is_verified` (not a publish gate).
+- Partner guidelines (static): `/partner/guidelines` — linked from the verification checklist “agree to guidelines” checkbox.
 
 ## Pages Created
 

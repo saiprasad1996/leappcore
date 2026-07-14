@@ -71,6 +71,8 @@ def _load_offering(offering_id: str):
         order_by="order_no asc, creation asc",
     )
 
+    from leappcore.backend.common.partner_verification import is_partner_verified
+
     instructors = []
     for row in doc.get("instructors") or []:
         full_name = frappe.db.get_value("User", row.instructor, "full_name") or row.instructor
@@ -80,6 +82,7 @@ def _load_offering(offering_id: str):
                 "name": full_name,
                 "avatar": avatar,
                 "profile_url": f"/partner/profile/public?partner_id={quote(row.instructor, safe='')}",
+                "is_verified": is_partner_verified(row.instructor),
             }
         )
 

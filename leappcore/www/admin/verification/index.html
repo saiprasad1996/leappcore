@@ -1,0 +1,190 @@
+{% extends 'templates/htmlbase/base.html' %}
+
+{% block head %}
+<style type="text/css">
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="flex-1 w-full bg-background-light dark:bg-background-dark text-leapp-black dark:text-white">
+    <div class="w-full px-4 sm:px-6 lg:px-8 py-8">
+        <div class="mb-8">
+            <div class="flex items-center justify-between mb-4 gap-4 flex-wrap">
+                <div>
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="px-2 py-1 bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 text-xs font-bold rounded-full">ADMIN</span>
+                    </div>
+                    <h1 class="text-3xl sm:text-4xl font-black">Partner Verification</h1>
+                    <p class="text-gray-600 dark:text-gray-400 mt-2">Review partner verification applications</p>
+                </div>
+                <div class="flex gap-2">
+                    <a href="/app/partner-verification-template" class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-800">Templates (Desk)</a>
+                    <a href="/admin" class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center gap-2">
+                        <span class="material-symbols-outlined text-sm">arrow_back</span> Admin
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div id="pv-admin-alert" class="hidden mb-4 p-3 rounded-lg text-sm"></div>
+
+        <!-- Status filters -->
+        <div class="flex flex-wrap gap-2 mb-6">
+            {% set filters = [
+                ('Submitted', 'Submitted'),
+                ('Under Review', 'Under Review'),
+                ('Verified', 'Verified'),
+                ('Rejected', 'Rejected'),
+                ('Revoked', 'Revoked'),
+                ('Draft', 'Draft'),
+                ('all', 'All')
+            ] %}
+            {% for value, label in filters %}
+            <a href="/admin/verification?status={{ value|urlencode }}{% if search_q %}&q={{ search_q|urlencode }}{% endif %}"
+               class="px-3 py-1.5 rounded-full text-xs font-bold border {% if current_status == value %}border-leapp-yellow bg-leapp-yellow/20{% else %}border-gray-200 dark:border-gray-700{% endif %}">
+                {{ label }}{% if value != 'all' and stats.get(value) is not none %} ({{ stats[value] }}){% endif %}
+            </a>
+            {% endfor %}
+        </div>
+
+        <form method="get" action="/admin/verification" class="mb-6 flex gap-2">
+            <input type="hidden" name="status" value="{{ current_status }}" />
+            <input type="search" name="q" value="{{ search_q or '' }}" placeholder="Search name or email…"
+                class="flex-1 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark h-11 px-4" />
+            <button type="submit" class="px-4 rounded-xl bg-leapp-yellow text-leapp-black font-bold">Search</button>
+        </form>
+
+        {% if detail %}
+        <div class="mb-4">
+            <a href="/admin/verification?status={{ current_status|urlencode }}" class="text-sm text-leapp-yellow hover:underline">← Back to list</a>
+        </div>
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="lg:col-span-1 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-background-dark p-6 shadow-lg space-y-3">
+                <h2 class="text-lg font-bold">{{ detail.partner_name }}</h2>
+                <p class="text-sm text-gray-600 dark:text-gray-400">{{ detail.partner_email }}</p>
+                <p class="text-sm"><span class="font-medium">Type:</span> {{ detail.partner_type }}</p>
+                <p class="text-sm"><span class="font-medium">Status:</span> {{ detail.status }}</p>
+                {% if detail.submitted_on %}<p class="text-xs text-gray-500">Submitted: {{ detail.submitted_on }}</p>{% endif %}
+                {% if detail.reviewed_on %}<p class="text-xs text-gray-500">Reviewed: {{ detail.reviewed_on }}</p>{% endif %}
+                {% if detail.rejection_reason %}
+                <div class="p-3 rounded-lg bg-red-50 dark:bg-red-900/20 text-sm">{{ detail.rejection_reason }}</div>
+                {% endif %}
+
+                <div class="flex flex-col gap-2 pt-4 border-t border-gray-200 dark:border-gray-700">
+                    {% if detail.status == 'Submitted' %}
+                    <button type="button" class="pv-admin-action px-4 py-2 bg-blue-600 text-white rounded-lg font-bold" data-action="start_review" data-name="{{ detail.name }}">Start review</button>
+                    {% endif %}
+                    {% if detail.status in ('Submitted', 'Under Review') %}
+                    <button type="button" class="pv-admin-action px-4 py-2 bg-green-600 text-white rounded-lg font-bold" data-action="approve" data-name="{{ detail.name }}">Approve</button>
+                    <button type="button" id="pv-reject-toggle" class="px-4 py-2 bg-red-600 text-white rounded-lg font-bold">Reject…</button>
+                    <div id="pv-reject-box" class="hidden space-y-2">
+                        <textarea id="pv-reject-reason" rows="3" class="w-full rounded-lg border border-gray-300 dark:border-gray-600 p-2 text-sm" placeholder="Rejection reason (required)"></textarea>
+                        <button type="button" class="pv-admin-action w-full px-4 py-2 bg-red-700 text-white rounded-lg font-bold" data-action="reject" data-name="{{ detail.name }}">Confirm reject</button>
+                    </div>
+                    {% endif %}
+                    {% if detail.status == 'Verified' %}
+                    <button type="button" class="pv-admin-action px-4 py-2 border-2 border-red-500 text-red-600 rounded-lg font-bold" data-action="revoke" data-name="{{ detail.name }}">Revoke verification</button>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="lg:col-span-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-background-dark p-6 shadow-lg space-y-4">
+                <h3 class="font-bold text-lg">Submitted answers</h3>
+                {% for a in detail.answers %}
+                <div class="border-b border-gray-100 dark:border-gray-800 pb-3">
+                    <p class="text-xs uppercase tracking-wide text-gray-500">{{ a.label }} <span class="normal-case">({{ a.fieldtype }})</span></p>
+                    {% if a.is_file %}
+                    <a href="{{ a.display }}" target="_blank" class="text-leapp-yellow hover:underline text-sm">Open file</a>
+                    {% else %}
+                    <p class="text-sm mt-1 whitespace-pre-wrap">{{ a.display or '—' }}</p>
+                    {% endif %}
+                </div>
+                {% else %}
+                <p class="text-sm text-gray-500">No answers.</p>
+                {% endfor %}
+            </div>
+        </div>
+        {% else %}
+        <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-background-dark shadow-lg overflow-hidden">
+            <div class="divide-y divide-gray-100 dark:divide-gray-800">
+                {% for row in requests %}
+                <a href="/admin/verification?id={{ row.name }}&status={{ current_status|urlencode }}" class="flex items-center justify-between gap-4 p-4 hover:bg-leapp-yellow/5 transition-colors">
+                    <div class="min-w-0">
+                        <p class="font-semibold truncate">{{ row.partner_name }}</p>
+                        <p class="text-xs text-gray-500 truncate">{{ row.partner_email }} · {{ row.partner_type }}</p>
+                    </div>
+                    <div class="text-right shrink-0">
+                        <span class="text-xs font-bold px-2 py-1 rounded-full bg-gray-100 dark:bg-gray-800">{{ row.status }}</span>
+                        {% if row.submitted_on %}<p class="text-xs text-gray-400 mt-1">{{ row.submitted_on }}</p>{% endif %}
+                    </div>
+                </a>
+                {% else %}
+                <div class="p-10 text-center text-gray-500">No applications in this filter.</div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</main>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const csrf = '{{ csrf_token }}';
+    const alertEl = document.getElementById('pv-admin-alert');
+    document.getElementById('pv-reject-toggle')?.addEventListener('click', () => {
+        document.getElementById('pv-reject-box')?.classList.toggle('hidden');
+    });
+
+    function showAlert(msg, ok) {
+        if (!alertEl) return;
+        alertEl.textContent = msg;
+        alertEl.className = 'mb-4 p-3 rounded-lg text-sm ' + (ok
+            ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+            : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200');
+        alertEl.classList.remove('hidden');
+    }
+
+    async function run(action, name) {
+        const map = {
+            start_review: 'admin_start_review',
+            approve: 'admin_approve',
+            reject: 'admin_reject',
+            revoke: 'admin_revoke',
+        };
+        const method = map[action];
+        if (!method) return;
+        const body = { request_name: name };
+        if (action === 'reject') {
+            body.reason = document.getElementById('pv-reject-reason')?.value || '';
+        }
+        if (action === 'revoke' && !confirm('Revoke this partner’s verified badge?')) return;
+
+        const res = await fetch('/api/method/leappcore.api.partner_verification.' + method, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Frappe-CSRF-Token': csrf,
+            },
+            body: JSON.stringify(body),
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+            const msg = typeof data.message === 'string' ? data.message : 'Action failed';
+            showAlert(msg, false);
+            return;
+        }
+        showAlert('Updated.', true);
+        setTimeout(() => location.reload(), 600);
+    }
+
+    document.querySelectorAll('.pv-admin-action').forEach((btn) => {
+        btn.addEventListener('click', () => run(btn.dataset.action, btn.dataset.name));
+    });
+});
+</script>
+{% endblock %}

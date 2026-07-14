@@ -2,6 +2,8 @@ import frappe
 from frappe import _
 from urllib.parse import unquote
 
+from leappcore.backend.common.partner_verification import is_partner_verified
+
 
 def get_context(context):
     """Public partner profile page - viewable by anyone"""
@@ -68,7 +70,8 @@ def get_partner_info(partner_id):
         "bio": user.bio or "",
         "location": user.location or "",
         "phone": user.phone or "",
-        "username": user.username or ""
+        "username": user.username or "",
+        "is_verified": is_partner_verified(partner_id),
     }
 
 

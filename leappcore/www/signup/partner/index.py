@@ -41,6 +41,7 @@ def get_context(context):
             context.phone = frappe.form_dict.get("phone", "")
             context.country_code = frappe.form_dict.get("country_code", "+91")
             context.organization_name = frappe.form_dict.get("organization_name", "")
+            context.partner_type = frappe.form_dict.get("partner_type", "Individual")
             context.city = frappe.form_dict.get("city", "")
             context.address = frappe.form_dict.get("address", "")
             return context
@@ -52,6 +53,7 @@ def get_context(context):
             context.phone = frappe.form_dict.get("phone", "")
             context.country_code = frappe.form_dict.get("country_code", "+91")
             context.organization_name = frappe.form_dict.get("organization_name", "")
+            context.partner_type = frappe.form_dict.get("partner_type", "Individual")
             context.city = frappe.form_dict.get("city", "")
             context.address = frappe.form_dict.get("address", "")
             frappe.log_error(frappe.get_traceback(), "Partner Signup Error")
@@ -110,14 +112,21 @@ def signup_partner():
     password = frappe.form_dict.get("password")
     confirm_password = frappe.form_dict.get("confirm_password")
     organization_name = (frappe.form_dict.get("organization_name") or "").strip()
+    partner_type = (frappe.form_dict.get("partner_type") or "Individual").strip()
     phone = frappe.form_dict.get("phone")
     country_code = frappe.form_dict.get("country_code", "+91")
     address = frappe.form_dict.get("address")
     city = frappe.form_dict.get("city")
+
+    if partner_type not in ("Individual", "Organisation"):
+        partner_type = "Individual"
     
     # Validate inputs
     if not full_name or not email or not password:
         frappe.throw(_("Please fill in all required fields"), frappe.ValidationError)
+
+    if partner_type == "Organisation" and not organization_name:
+        frappe.throw(_("Organization name is required for Organisation partners"), frappe.ValidationError)
     
     if password != confirm_password:
         frappe.throw(_("Passwords do not match"), frappe.ValidationError)
@@ -144,6 +153,7 @@ def signup_partner():
             "send_welcome_email": 0,
             "phone": phone,
             "mobile_no": full_phone,
+            "location": city or "",
         })
         
         # Add Leapp Partner role
@@ -154,20 +164,7 @@ def signup_partner():
         # Save the user
         user.flags.ignore_permissions = True
         user.insert(ignore_permissions=True)
-        
-        # Create a Partner profile document if you have a Partner doctype
-        # Uncomment and modify if you have a Partner doctype
-        # partner_profile = frappe.get_doc({
-        #     "doctype": "Partner",
-        #     "user": user.name,
-        #     "organization_name": organization_name,
-        #     "phone": phone,
-        #     "address": address,
-        #     "city": city,
-        # })
-        # partner_profile.insert(ignore_permissions=True)
-        
-        # Store optional organization on User bio for profile context
+
         if organization_name:
             frappe.db.set_value(
                 "User",
@@ -175,6 +172,20 @@ def signup_partner():
                 {"bio": f"Organization: {organization_name}"},
                 update_modified=False,
             )
+
+        # Create Partner Profile with partner_type for verification checklists
+        partner_profile = frappe.get_doc({
+            "doctype": "Partner Profile",
+            "user": user.name,
+            "org_name": organization_name or "",
+            "partner_type": partner_type,
+            "verification_status": "Not Started",
+            "is_verified": 0,
+            "rating": 0,
+        })
+        partner_profile.flags.ignore_permissions = True
+        partner_profile.flags.ignore_mandatory = True
+        partner_profile.insert(ignore_permissions=True)
         
         frappe.db.commit()
 

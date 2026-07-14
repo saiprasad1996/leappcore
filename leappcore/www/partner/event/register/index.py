@@ -9,19 +9,19 @@ def get_context(context):
     if frappe.session.user == "Guest":
         frappe.local.flags.redirect_location = "/login?redirect-to=/partner/event/register"
         raise frappe.Redirect
-    
+
     # Check if user has Leapp Partner role
     if not has_partner_role():
         # Redirect customers to courses page
         frappe.local.flags.redirect_location = "/courses"
         raise frappe.Redirect
-    
+
     context.csrf_token = frappe.sessions.get_csrf_token()
     context.no_cache = 1
-    
+
     # Get event ID if editing
     event_id = frappe.form_dict.get("id")
-    
+
     # Handle form submission
     if frappe.request.method == "POST":
         try:
@@ -34,7 +34,7 @@ def get_context(context):
             frappe.clear_messages()
             context.error_message = str(e)
             frappe.log_error(frappe.get_traceback(), "Event Save Error")
-    
+
     # Load event if editing
     if event_id:
         context.event = load_event(event_id)
@@ -42,15 +42,17 @@ def get_context(context):
     else:
         context.event = get_empty_event()
         context.is_edit = False
-    
+
     # Check for success message
     if frappe.form_dict.get("success"):
         context.success_message = _("Event saved successfully!")
-    
-    # Load my events
+
+    # Load my events + select options
     context.my_events = get_my_events()
     context.locations = get_locations()
     context.areas = get_areas()
+    context.categories = get_categories()
+    context.category_parent_groups = get_category_parent_groups()
 
     return context
 
@@ -76,6 +78,8 @@ def get_empty_event():
         "location": "",
         "location_display": "",
         "active": 0,
+        "categories": [],
+        "category_parent": "",
     }
 
 
@@ -83,21 +87,21 @@ def load_event(event_id):
     """Load event for editing"""
     if not frappe.db.exists("Leapp Event", event_id):
         frappe.throw(_("Event not found"))
-    
+
     event = frappe.get_doc("Leapp Event", event_id)
-    
+
     # Check if current user is the organizer
     if event.organizer != frappe.session.user:
         frappe.throw(_("You do not have permission to edit this event"), frappe.PermissionError)
-    
+
     data = event.as_dict()
-    
+
     # Convert datetime to string for HTML inputs
     if data.get("start_datetime"):
         data["start_datetime"] = str(data["start_datetime"]).replace(" ", "T")[:16]
     if data.get("end_datetime"):
         data["end_datetime"] = str(data["end_datetime"]).replace(" ", "T")[:16]
-    
+
     # Area display + city (location) for form
     data["location"] = data.get("location") or ""
     data["location_display"] = ""
@@ -117,6 +121,11 @@ def load_event(event_id):
         data["area_name"] = frappe.db.get_value("Area", data["area"], "area_name") or ""
     else:
         data["area_name"] = ""
+
+    data["categories"] = [
+        row.event_category for row in (event.category or []) if row.event_category
+    ]
+    data["category_parent"] = infer_category_parent_group(data["categories"])
 
     return data
 
@@ -139,21 +148,80 @@ def get_areas():
     )
 
 
+def get_categories():
+    """Offering categories reused for event tagging."""
+    return frappe.get_all(
+        "Offering Category",
+        fields=["name", "category_name", "parent_group"],
+        order_by="parent_group, category_name",
+    )
+
+
+def get_category_parent_groups():
+    """Distinct parent_group values for the Category (parent) dropdown."""
+    rows = frappe.get_all(
+        "Offering Category",
+        fields=["parent_group"],
+        filters={"parent_group": ("!=", "")},
+        distinct=True,
+        order_by="parent_group asc",
+    )
+    groups = [r.parent_group for r in rows if r.get("parent_group")]
+    preferred = ["Learn", "Leisure", "Play"]
+    ordered = [g for g in preferred if g in groups]
+    for g in groups:
+        if g not in ordered:
+            ordered.append(g)
+    return ordered
+
+
+def infer_category_parent_group(category_names):
+    """Pick parent group for edit form when subcategories may span groups (use majority)."""
+    if not category_names:
+        return ""
+    counts = {}
+    for cn in category_names:
+        pg = frappe.db.get_value("Offering Category", cn, "parent_group")
+        if pg:
+            counts[pg] = counts.get(pg, 0) + 1
+    if not counts:
+        return ""
+    return max(counts.items(), key=lambda x: (x[1], x[0]))[0]
+
+
 def get_my_events():
     """Get all events created by current user"""
     events = frappe.get_all(
         "Leapp Event",
         filters={"organizer": frappe.session.user},
-        fields=["name", "event_name", "heading", "start_datetime", "end_datetime", "venue_address", "active", "modified"],
-        order_by="start_datetime desc"
+        fields=[
+            "name",
+            "event_name",
+            "heading",
+            "start_datetime",
+            "end_datetime",
+            "venue_address",
+            "active",
+            "modified",
+        ],
+        order_by="start_datetime desc",
     )
     return events
+
+
+def _is_duplicate_event_name_error(exc):
+    msg = str(exc).lower()
+    if "duplicate entry" in msg or "uniquevalidationerror" in type(exc).__name__.lower():
+        return "event_name" in msg or "event name" in msg or "leapp event" in msg
+    return "event_name" in msg and (
+        "duplicate" in msg or "unique" in msg or "already exists" in msg
+    )
 
 
 def save_event(event_id=None):
     """Save event"""
     user = frappe.session.user
-    
+
     # Get form data
     event_name = frappe.form_dict.get("event_name")
     heading = frappe.form_dict.get("heading")
@@ -166,25 +234,29 @@ def save_event(event_id=None):
     area = (frappe.form_dict.get("area") or "").strip()
     active = 1 if frappe.form_dict.get("active") else 0
 
+    categories = json.loads(frappe.form_dict.get("categories") or "[]")
+    if not isinstance(categories, list):
+        frappe.throw(_("Invalid categories data"))
+
     if area and not location:
         location = frappe.db.get_value("Area", area, "location") or ""
     if area and location:
         area_loc = frappe.db.get_value("Area", area, "location")
         if area_loc != location:
             frappe.throw(_("Selected area does not belong to the selected city."))
-    
+
     # Validate required fields
     if not event_name:
         frappe.throw(_("Event name is required"))
-    
+
     if event_id:
         # Update existing event
         event = frappe.get_doc("Leapp Event", event_id)
-        
+
         # Check permission
         if event.organizer != user:
             frappe.throw(_("You do not have permission to edit this event"), frappe.PermissionError)
-        
+
         event.event_name = event_name
         event.heading = heading
         event.start_datetime = start_datetime if start_datetime else None
@@ -195,28 +267,42 @@ def save_event(event_id=None):
         event.location = location or None
         event.area = area or None
         event.active = active
+        event.category = []
     else:
         # Create new event
-        event = frappe.get_doc({
-            "doctype": "Leapp Event",
-            "organizer": user,
-            "event_name": event_name,
-            "heading": heading,
-            "start_datetime": start_datetime if start_datetime else None,
-            "end_datetime": end_datetime if end_datetime else None,
-            "venue_address": venue_address,
-            "long_description": long_description,
-            "short_description": short_description,
-            "location": location or None,
-            "area": area or None,
-            "active": active,
-        })
+        event = frappe.get_doc(
+            {
+                "doctype": "Leapp Event",
+                "organizer": user,
+                "event_name": event_name,
+                "heading": heading,
+                "start_datetime": start_datetime if start_datetime else None,
+                "end_datetime": end_datetime if end_datetime else None,
+                "venue_address": venue_address,
+                "long_description": long_description,
+                "short_description": short_description,
+                "location": location or None,
+                "area": area or None,
+                "active": active,
+            }
+        )
+
+    for cat in categories:
+        if cat:
+            event.append("category", {"event_category": cat})
 
     # Persist first so `event.name` exists — File requires attached_to_name as str/int
-    if event_id:
-        event.save(ignore_permissions=True)
-    else:
-        event.insert(ignore_permissions=True)
+    try:
+        if event_id:
+            event.save(ignore_permissions=True)
+        else:
+            event.insert(ignore_permissions=True)
+    except Exception as e:
+        if _is_duplicate_event_name_error(e):
+            frappe.throw(
+                _("An event with this name already exists. Please choose a different name.")
+            )
+        raise
 
     if frappe.request.files.get("featured_image"):
         file = frappe.request.files.get("featured_image")

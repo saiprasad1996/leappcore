@@ -1,0 +1,6 @@
+{# Expects: is_verified (bool/int). Optional: size_class #}
+{% if is_verified %}
+<span class="inline-flex items-center align-middle {{ size_class or '' }}" title="Verified partner" aria-label="Verified partner">
+    <span class="material-symbols-outlined text-leapp-yellow" style="font-variation-settings: 'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24;">verified</span>
+</span>
+{% endif %}
