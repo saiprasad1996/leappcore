@@ -4,6 +4,8 @@ from frappe.utils import cint
 from frappe.utils.oauth import get_oauth2_authorize_url, get_oauth_keys
 from frappe.utils.password import get_decrypted_password
 
+from leappcore.turnstile import get_turnstile_site_key, verify_turnstile
+
 
 def get_context(context):
     # Redirect if already logged in
@@ -16,6 +18,7 @@ def get_context(context):
             raise frappe.Redirect
     
     context.csrf_token = frappe.sessions.get_csrf_token()
+    context.turnstile_site_key = get_turnstile_site_key()
     context.no_cache = 1
     
     # Get redirect URL if provided
@@ -28,6 +31,10 @@ def get_context(context):
     if frappe.request.method == "POST":
         try:
             login_user()
+        except frappe.ValidationError as e:
+            frappe.clear_messages()
+            context.error_message = str(e)
+            return context
         except frappe.AuthenticationError:
             frappe.clear_messages()
             context.error_message = _("Invalid login credentials")
@@ -73,6 +80,8 @@ def get_google_login_info(redirect_to=None):
 def login_user():
     """Handle user login"""
     from frappe.auth import LoginManager
+
+    verify_turnstile("login")
     
     # Get credentials from form
     usr = frappe.form_dict.get("usr")

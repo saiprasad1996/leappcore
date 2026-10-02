@@ -1,6 +1,8 @@
 import frappe
 from frappe import _
 
+from leappcore.turnstile import get_turnstile_site_key, verify_turnstile
+
 
 def get_context(context):
     """Contact Us page context"""
@@ -8,6 +10,7 @@ def get_context(context):
     frappe.flags.ignore_csrf_check = True
     
     context.csrf_token = frappe.sessions.get_csrf_token()
+    context.turnstile_site_key = get_turnstile_site_key()
     context.no_cache = 1
     
     # Handle form submission
@@ -25,6 +28,8 @@ def get_context(context):
 
 def save_contact_response():
     """Save contact form submission"""
+    verify_turnstile("contact")
+
     # Get form data
     contact_name = frappe.form_dict.get("contact_name")
     email = frappe.form_dict.get("email")

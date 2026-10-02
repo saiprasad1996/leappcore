@@ -4,6 +4,7 @@ from frappe.utils.oauth import get_oauth_keys
 
 from leappcore.oauth_utils import get_leapp_oauth2_authorize_url
 from frappe.utils.password import get_decrypted_password
+from leappcore.turnstile import get_turnstile_site_key, verify_turnstile
 
 
 def get_context(context):
@@ -20,6 +21,7 @@ def get_context(context):
     frappe.flags.ignore_csrf_check = True
     
     context.csrf_token = frappe.sessions.get_csrf_token()
+    context.turnstile_site_key = get_turnstile_site_key()
     context.no_cache = 1
     
     # After Google signup, send customers to their profile (OAuth state redirect_to)
@@ -93,6 +95,8 @@ def get_google_login_info(redirect_to=None):
 def signup_user():
     """Handle user signup"""
     from frappe.website.utils import is_signup_disabled
+
+    verify_turnstile("signup")
     
     # Check if signup is disabled
     if is_signup_disabled():

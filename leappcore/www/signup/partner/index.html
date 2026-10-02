@@ -208,6 +208,13 @@
                     </label>
                 </div>
 
+                {% if turnstile_site_key %}
+                <div class="w-full flex justify-center pt-2">
+                    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+                    <div class="cf-turnstile" data-sitekey="{{ turnstile_site_key }}" data-action="partner-signup"></div>
+                </div>
+                {% endif %}
+
                 <!-- Submit Button -->
                 <div class="w-full pt-2">
                     <button

@@ -130,6 +130,12 @@
                         By signing up, you agree to our <a class="text-leapp-yellow hover:text-leapp-yellow/80 transition-colors" href="/terms">Terms of Service</a> and <a class="text-leapp-yellow hover:text-leapp-yellow/80 transition-colors" href="/terms">Privacy Policy</a>.
                     </label>
                 </div>
+                {% if turnstile_site_key %}
+                <div class="w-full flex justify-center pt-2">
+                    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+                    <div class="cf-turnstile" data-sitekey="{{ turnstile_site_key }}" data-action="signup"></div>
+                </div>
+                {% endif %}
                 <div class="w-full pt-2">
                     <button
                         class="flex min-w-[84px] w-full cursor-pointer items-center justify-center overflow-hidden rounded-xl h-12 px-5 bg-leapp-yellow text-leapp-black text-base font-bold leading-normal tracking-[0.015em] transition-all hover:bg-leapp-yellow/90"

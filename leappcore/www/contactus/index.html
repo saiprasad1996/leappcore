@@ -212,6 +212,13 @@
                                 placeholder="Tell us how we can help you..."></textarea>
                         </label>
 
+                        {% if turnstile_site_key %}
+                        <div class="w-full flex justify-center">
+                            <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+                            <div class="cf-turnstile" data-sitekey="{{ turnstile_site_key }}" data-action="contact"></div>
+                        </div>
+                        {% endif %}
+
                         <!-- Submit Button -->
                         <button
                             type="submit"
